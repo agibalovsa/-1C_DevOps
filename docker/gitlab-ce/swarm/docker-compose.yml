@@ -1,0 +1,52 @@
+services:
+
+  gitlab:
+    image: "gitlab/gitlab-ce:${GITLAB_CE_VER}"
+    container_name: gitlab
+    restart: always
+    hostname: 'gitlab'
+    ports:
+      - "22:22"
+      - "443:443"
+    volumes:
+      - gitlab_data:/var/opt/gitlab
+      - gitlab_logs:/var/log/gitlab
+      - gitlab_config:/etc/gitlab
+    shm_size: '256m'
+    environment:
+      GITLAB_OMNIBUS_CONFIG: "from_file('/omnibus_config.rb')"
+    configs:
+      - source: gitlab_conf
+        target: /omnibus_config.rb
+    secrets:
+      - gitlab_root_password
+      - source: gitlab_key
+        target: /etc/gitlab/ssl/gitlab.key
+      - source: gitlab_crt
+        target: /etc/gitlab/ssl/gitlab.crt
+
+  gitlab-runner:
+    image: gitlab/gitlab-runner:alpine
+    deploy:
+      mode: replicated
+      replicas: 1
+
+configs:
+  gitlab_conf:
+    external: true
+
+secrets:
+  gitlab_root_password:
+    external: true
+  gitlab_key:
+    external: true
+  gitlab_crt:
+    external: true
+
+volumes:
+  gitlab_data:
+    external: true
+  gitlab_logs:
+    external: true
+  gitlab_config:
+    external: true
