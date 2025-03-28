@@ -1,0 +1,10 @@
+external_url 'https://{{ env "GITLAB_HOSTNAME" }}/'
+
+gitlab_rails['initial_root_password'] = File.read('/run/secrets/gitlab_root_password').gsub("\n", "")
+
+letsencrypt['enable'] = false
+
+nginx['redirect_http_to_https'] = true
+nginx['http2_enabled'] = false
+nginx['ssl_certificate'] = "/etc/gitlab/ssl/gitlab.crt"
+nginx['ssl_certificate_key'] = "/etc/gitlab/ssl/gitlab.key"
