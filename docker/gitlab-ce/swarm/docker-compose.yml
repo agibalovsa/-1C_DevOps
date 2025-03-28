@@ -2,7 +2,6 @@ services:
 
   gitlab:
     image: "gitlab/gitlab-ce:${GITLAB_CE_VER}"
-    container_name: gitlab
     restart: always
     hostname: 'gitlab'
     ports:
