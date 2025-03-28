@@ -2,7 +2,6 @@ services:
 
   gitlab:
     image: "gitlab/gitlab-ce:${GITLAB_CE_VER}"
-    restart: always
     hostname: 'gitlab'
     ports:
       - "22:22"
@@ -11,7 +10,6 @@ services:
       - gitlab_data:/var/opt/gitlab
       - gitlab_logs:/var/log/gitlab
       - gitlab_config:/etc/gitlab
-    shm_size: '256m'
     environment:
       GITLAB_OMNIBUS_CONFIG: "from_file('/omnibus_config.rb')"
     configs:
