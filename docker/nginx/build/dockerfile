@@ -1,0 +1,7 @@
+FROM nginx:latest
+
+COPY [ "stream.conf", "/etc/nginx/" ]
+
+RUN set -eux; \
+    mkdir -p /etc/nginx/stream.d; \
+    echo "include /etc/nginx/stream.conf;" >> /etc/nginx/nginx.conf;

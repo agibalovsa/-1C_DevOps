@@ -1,0 +1,8 @@
+stream {
+
+  server {
+    listen {{ env "GITLAB_SSH_PORT" }};
+    proxy_pass {{ env "GITLAB_HOSTNAME" }}:{{ env "GITLAB_SSH_PORT" }};
+  }
+
+}

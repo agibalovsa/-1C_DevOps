@@ -1,0 +1,42 @@
+services:
+
+  nginx:
+    image: nginx:latest
+    hostname: 'nginx'
+    ports:
+      - "80:80"
+      - "443:443"
+      - "${GITLAB_SSH_PORT}:${GITLAB_SSH_PORT}"
+    volumes:
+      - nginx_conf:/etc/nginx/conf.d
+      - stream_conf:/etc/nginx/stream.d
+    environment:
+      TZ: "Europe/Moscow"
+    configs:
+      - source: nginx_conf
+        target: /etc/nginx/conf.d/nginx.conf
+      - source: stream_conf
+        target: /etc/nginx/stream.d/stream.conf
+    secrets:
+      - source: nginx_key
+        target: /etc/nginx/ssl/nginx.key
+      - source: nginx_crt
+        target: /etc/nginx/ssl/nginx.crt
+
+volumes:
+  nginx_conf:
+    external: true
+  stream_conf:
+    external: true
+
+configs:
+  nginx_conf:
+    external: true
+  stream_conf:
+    external: true
+
+secrets:
+  nginx_key:
+    external: true
+  nginx_crt:
+    external: true
