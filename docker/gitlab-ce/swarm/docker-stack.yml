@@ -4,8 +4,8 @@ services:
     image: "gitlab/gitlab-ce:${GITLAB_CE_VER}"
     hostname: 'gitlab'
     ports:
-      - "22:22"
-      - "443:443"
+      - "${GITLAB_SSH_PORT}:22"
+      - "${GITLAB_HTTPS_PORT}:443"
     volumes:
       - gitlab_data:/var/opt/gitlab
       - gitlab_logs:/var/log/gitlab
