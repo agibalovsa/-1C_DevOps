@@ -30,7 +30,7 @@ services:
       SONAR_WEB_JAVAOPTS: -Xms512m -Xmx2g -XX:+HeapDumpOnOutOfMemoryError
       SONAR_CE_JAVAOPTS: -Xms1024m -Xmx6g -XX:+HeapDumpOnOutOfMemoryError
       SONAR_SEARCH_JAVAOPTS: -Xms2g -Xmx2g -XX:+HeapDumpOnOutOfMemoryError
-      SONAR_WEB_CONTEXT: ${SONAR_LOCATION}
+      SONAR_WEB_CONTEXT: ${SONAR_WEB_CONTEXT}
     volumes:
       - sonarqube_conf:/opt/sonarqube/conf
       - sonarqube_data:/opt/sonarqube/data
