@@ -1,1 +1,1 @@
-# -1C_DevOps
+# 1C-DevOps

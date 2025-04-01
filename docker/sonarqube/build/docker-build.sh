@@ -3,7 +3,7 @@
 # shellcheck source=/dev/null
 source .arg
 
-DOCKER_BUILDKIT=1 docker build \
+docker build \
   --build-arg "SONARQUBE_VERSION=${SONARQUBE_VERSION}" \
   --build-arg "RUSSIAN_PACK=$RUSSIAN_PACK" \
   --build-arg "BRANCH_PLUGIN_VERSION=$BRANCH_PLUGIN_VERSION" \

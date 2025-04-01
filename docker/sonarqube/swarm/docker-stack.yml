@@ -54,5 +54,5 @@ volumes:
     external: true
 
 secrets:
-   sonar_password:
-     external: true
+  sonar_password:
+    external: true
