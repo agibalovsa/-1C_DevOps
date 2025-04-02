@@ -3,6 +3,11 @@ external_url 'https://{{ env "GITLAB_HOSTNAME" }}/'
 gitlab_rails['initial_root_password'] = File.read('/run/secrets/gitlab_root_password').gsub("\n", "")
 gitlab_rails['gitlab_shell_ssh_port'] = {{ env "GITLAB_SSH_PORT" }}
 
+gitlab_rails['gitlab_email_enabled'] = true
+gitlab_rails['gitlab_email_from'] = '{{ env "GITLAB_EMAIL" }}'
+gitlab_rails['gitlab_email_display_name'] = 'GitLab Admin'
+gitlab_rails['gitlab_email_subject_suffix'] = '[GitLab]'
+
 letsencrypt['enable'] = false
 
 nginx['redirect_http_to_https'] = true
