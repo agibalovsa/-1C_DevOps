@@ -7,15 +7,16 @@ services:
       - "80:80"
       - "443:443"
       - "${GITLAB_SSH_PORT}:${GITLAB_SSH_PORT}"
-    volumes:
-      - nginx_conf:/etc/nginx/conf.d
-      - stream_conf:/etc/nginx/stream.d
     environment:
-      TZ: "Europe/Moscow"
-      HOSTNAME: "${HOSTNAME}"
-      GITLAB_HOSTNAME: "${GITLAB_HOSTNAME}"
-      SONAR_HOSTNAME: "${SONAR_HOSTNAME}"
-      PORTAINER_HOSTNAME: "${PORTAINER_HOSTNAME}"
+      TZ:                   "Europe/Moscow"
+      HOSTNAME:             "${HOSTNAME}"
+      GITLAB_HOSTNAME:      "${GITLAB_HOSTNAME}"
+      GITLAB_HTTPS_PORT:    "${GITLAB_HTTPS_PORT}"
+      GITLAB_SSH_PORT:      "${GITLAB_SSH_PORT}"
+      SONAR_HOSTNAME:       "${SONAR_HOSTNAME}"
+      SONAR_HTTP_PORT:      "${SONAR_HTTP_PORT}"
+      PORTAINER_HOSTNAME:   "${PORTAINER_HOSTNAME}"
+      PORTAINER_HTTPS_PORT: "${PORTAINER_HTTPS_PORT}"
     configs:
       - source: nginx_conf
         target: /etc/nginx/conf.d/nginx.conf
@@ -26,12 +27,6 @@ services:
         target: /etc/nginx/ssl/nginx.key
       - source: nginx_crt
         target: /etc/nginx/ssl/nginx.crt
-
-volumes:
-  nginx_conf:
-    external: true
-  stream_conf:
-    external: true
 
 configs:
   nginx_conf:

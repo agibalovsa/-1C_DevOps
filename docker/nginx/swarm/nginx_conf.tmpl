@@ -24,7 +24,7 @@ server {
     proxy_read_timeout 300;
     proxy_connect_timeout 300;
 
-    proxy_pass http://{{ env "GITLAB_HOSTNAME" }};
+    proxy_pass https://{{ env "GITLAB_HOSTNAME" }}:{{ env "GITLAB_HTTPS_PORT" }};
 
   }
 
@@ -39,7 +39,22 @@ server {
     proxy_set_header X-Forwarded-Protocol $scheme;
     proxy_set_header X-Url-Scheme         $scheme;
 
-    proxy_pass http://{{ env "SONAR_HOSTNAME" }};
+    proxy_pass http://{{ env "SONAR_HOSTNAME" }}:{{ env "SONAR_HTTP_PORT" }};
+
+  }
+
+  location /portainer/ {
+
+    client_max_body_size 0;
+
+    proxy_set_header Host                 $host;
+    proxy_set_header X-Real-IP            $remote_addr;
+    proxy_set_header X-Forwarded-For      $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto    $scheme;
+    proxy_set_header X-Forwarded-Protocol $scheme;
+    proxy_set_header X-Url-Scheme         $scheme;
+
+    proxy_pass https://{{ env "PORTAINER_HOSTNAME" }}:{{ env "PORTAINER_HTTPS_PORT" }};
 
   }
 
