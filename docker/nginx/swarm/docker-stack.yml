@@ -12,6 +12,10 @@ services:
       - stream_conf:/etc/nginx/stream.d
     environment:
       TZ: "Europe/Moscow"
+      HOSTNAME: "${HOSTNAME}"
+      GITLAB_HOSTNAME: "${GITLAB_HOSTNAME}"
+      SONAR_HOSTNAME: "${SONAR_HOSTNAME}"
+      PORTAINER_HOSTNAME: "${PORTAINER_HOSTNAME}"
     configs:
       - source: nginx_conf
         target: /etc/nginx/conf.d/nginx.conf
