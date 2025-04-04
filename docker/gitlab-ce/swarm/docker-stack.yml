@@ -12,6 +12,10 @@ services:
       - gitlab_config:/etc/gitlab
     environment:
       GITLAB_OMNIBUS_CONFIG: "from_file('/omnibus_config.rb')"
+      TZ:                    "Europe/Moscow"
+      GITLAB_HOSTNAME:       "${GITLAB_HOSTNAME}"
+      GITLAB_SSH_PORT:       "${GITLAB_SSH_PORT}"
+      GITLAB_EMAIL:          "${GITLAB_EMAIL}"
     configs:
       - source: gitlab_conf
         target: /omnibus_config.rb
