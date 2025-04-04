@@ -17,6 +17,7 @@ services:
       SONAR_HTTP_PORT:      "${SONAR_HTTP_PORT}"
       PORTAINER_HOSTNAME:   "${PORTAINER_HOSTNAME}"
       PORTAINER_HTTPS_PORT: "${PORTAINER_HTTPS_PORT}"
+      PORTAINER_HTTP_PORT:  "${PORTAINER_HTTP_PORT}"
     configs:
       - source: nginx_conf
         target: /etc/nginx/conf.d/nginx.conf
