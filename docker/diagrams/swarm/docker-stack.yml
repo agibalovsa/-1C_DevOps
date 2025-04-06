@@ -1,0 +1,25 @@
+services:
+
+  plantuml:
+    image: plantuml/plantuml-server:jetty
+    environment:
+      BASE_URL: ${PLANTUML_LOCATION}
+    ports:
+      - "${PLANTUML_PORT}:8080"
+    deploy:
+      mode: global
+      placement:
+        constraints:
+          - "node.hostname == ${PLANTUML_NODE}"
+
+  draw-io:
+    image: jgraph/drawio:latest
+    environment:
+      PUBLIC_DNS: ${DRAWIO_LOCATION}
+    ports:
+      - "${DRAWIO_PORT}:8080"
+    deploy:
+      mode: global
+      placement:
+        constraints:
+          - "node.hostname == ${DRAWIO_NODE}"
