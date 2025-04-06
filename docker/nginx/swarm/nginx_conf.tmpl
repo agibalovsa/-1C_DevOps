@@ -53,8 +53,12 @@ server {
     proxy_set_header X-Forwarded-Proto    $scheme;
     proxy_set_header X-Forwarded-Protocol $scheme;
     proxy_set_header X-Url-Scheme         $scheme;
+    proxy_set_header Upgrade     $http_upgrade;
+    proxy_set_header Connection  "upgrade";
 
-    proxy_pass https://{{ env "PORTAINER_HOSTNAME" }}:{{ env "PORTAINER_HTTPS_PORT" }};
+    proxy_cache_bypass $http_upgrade;
+
+    proxy_pass https://{{ env "PORTAINER_HOSTNAME" }}:{{ env "PORTAINER_HTTPS_PORT" }}/;
 
   }
 
