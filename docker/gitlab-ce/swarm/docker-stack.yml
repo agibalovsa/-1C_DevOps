@@ -1,8 +1,16 @@
 services:
 
   gitlab:
-    image: "gitlab/gitlab-ce:${GITLAB_CE_VER}"
+
+    # main
+    image: "${GITLAB_TAG}"
     hostname: 'gitlab'
+    environment:
+      GITLAB_OMNIBUS_CONFIG: "from_file('/omnibus_config.rb')"
+      TZ:                    "${TZ}"
+      GITLAB_HOSTNAME:       "${GITLAB_HOSTNAME}"
+      GITLAB_SSH_PORT:       "${GITLAB_SSH_PORT}"
+      GITLAB_EMAIL:          "${GITLAB_EMAIL}"
     ports:
       - "${GITLAB_SSH_PORT}:22"
       - "${GITLAB_HTTPS_PORT}:443"
@@ -10,12 +18,8 @@ services:
       - gitlab_data:/var/opt/gitlab
       - gitlab_logs:/var/log/gitlab
       - gitlab_config:/etc/gitlab
-    environment:
-      GITLAB_OMNIBUS_CONFIG: "from_file('/omnibus_config.rb')"
-      TZ:                    "Europe/Moscow"
-      GITLAB_HOSTNAME:       "${GITLAB_HOSTNAME}"
-      GITLAB_SSH_PORT:       "${GITLAB_SSH_PORT}"
-      GITLAB_EMAIL:          "${GITLAB_EMAIL}"
+
+    # swarm
     configs:
       - source: gitlab_conf
         target: /omnibus_config.rb
@@ -27,11 +31,31 @@ services:
         target: /etc/gitlab/ssl/gitlab.crt
 
   gitlab-runner:
+
+    # main
     image: gitlab/gitlab-runner:alpine
+    volumes:
+      - gitlab-runner-config:/etc/gitlab-runner
+      - gitlab-runner-temp:/home/gitlab-runner
+
+    # swarm
     deploy:
       mode: replicated
       replicas: 1
 
+# main
+volumes:
+  gitlab_data:
+    external: true
+  gitlab_logs:
+    external: true
+  gitlab_config:
+    external: true
+  gitlab-runner-config:
+    external: true
+  gitlab-runner-temp:
+
+# swarm
 configs:
   gitlab_conf:
     external: true
@@ -42,12 +66,4 @@ secrets:
   gitlab_key:
     external: true
   gitlab_crt:
-    external: true
-
-volumes:
-  gitlab_data:
-    external: true
-  gitlab_logs:
-    external: true
-  gitlab_config:
     external: true

@@ -2,17 +2,18 @@ services:
 
   plantuml:
 
-    # main part
+    # main
     image: ${PLANTUML_TAG}
     hostname: 'plantuml'
     environment:
-      BASE_URL: ${PLANTUML_URL}
+      BASE_URL: "${PLANTUML_URL}"
+      TZ:       "${TZ}"
     ports:
       - "${PLANTUML_PORT}:8080"
     volumes:
       - plantuml_temp:/tmp/jetty
 
-    # swarm part
+    # swarm
     deploy:
       mode: global
       placement:
@@ -21,7 +22,7 @@ services:
 
   draw-io:
 
-    # main part
+    # main
     image: ${DRAWIO_TAG}
     hostname: 'drawio'
     environment:
@@ -29,12 +30,13 @@ services:
     ports:
       - "${DRAWIO_PORT}:8080"
 
-    # swarm part
+    # swarm
     deploy:
       mode: global
       placement:
         constraints:
           - "node.hostname == ${DRAWIO_NODE}"
 
+# main
 volumes:
   plantuml_temp:
