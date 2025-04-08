@@ -2,6 +2,10 @@ services:
 
   plantuml:
 
+    # compose part
+    container_name: 'plantuml'
+    restart: always
+
     # main part
     image: ${PLANTUML_TAG}
     hostname: 'plantuml'
@@ -12,14 +16,11 @@ services:
     volumes:
       - plantuml_temp:/tmp/jetty
 
-    # swarm part
-    deploy:
-      mode: global
-      placement:
-        constraints:
-          - "node.hostname == ${PLANTUML_NODE}"
-
   draw-io:
+
+    # compose part
+    container_name: 'drawio'
+    restart: always
 
     # main part
     image: ${DRAWIO_TAG}
@@ -28,13 +29,6 @@ services:
       PUBLIC_DNS: ${DRAWIO_LOCATION}
     ports:
       - "${DRAWIO_PORT}:8080"
-
-    # swarm part
-    deploy:
-      mode: global
-      placement:
-        constraints:
-          - "node.hostname == ${DRAWIO_NODE}"
 
 volumes:
   plantuml_temp:

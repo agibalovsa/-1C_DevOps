@@ -7,7 +7,6 @@ services:
       POSTGRES_USER: sonar
       POSTGRES_PASSWORD_FILE: /run/secrets/sonar_password
     volumes:
-      - postgresql:/var/lib/postgresql
       - postgresql_data:/var/lib/postgresql/data
     secrets:
       - sonar_password
@@ -49,8 +48,6 @@ volumes:
     external: true
   sonarqube_logs:
   sonarqube_temp:
-  postgresql:
-    external: true
   postgresql_data:
     external: true
 
