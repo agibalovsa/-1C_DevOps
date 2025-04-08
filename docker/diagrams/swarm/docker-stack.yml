@@ -6,7 +6,7 @@ services:
     image: ${PLANTUML_TAG}
     hostname: 'plantuml'
     environment:
-      BASE_URL: ${PLANTUML_LOCATION}
+      BASE_URL: ${PLANTUML_URL}
     ports:
       - "${PLANTUML_PORT}:8080"
     volumes:
@@ -25,7 +25,7 @@ services:
     image: ${DRAWIO_TAG}
     hostname: 'drawio'
     environment:
-      PUBLIC_DNS: ${DRAWIO_LOCATION}
+      PUBLIC_DNS: ${DRAWIO_URL}
     ports:
       - "${DRAWIO_PORT}:8080"
 
