@@ -1,6 +1,6 @@
 services:
 
-  plantuml:
+  docker-registry:
 
     # main
     image: ${DOCKER_REGISTRY_TAG}
