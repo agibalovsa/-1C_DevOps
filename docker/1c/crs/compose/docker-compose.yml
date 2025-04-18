@@ -10,6 +10,9 @@ services:
     image: "${OC_CRSERVER_TAG}"
     hostname: "${OC_CRSERVER_HOSTNAME}"
     command: crserver
+    environment:
+      OC_CRSERVER_LOCATION: ${OC_CRSERVER_LOCATION}
+      OC_CRSERVER_HOSTNAME: ${OC_CRSERVER_HOSTNAME}
     ports:
       - "${OC_CRSERVER_PORT}:1542"
       - "${OC_CRSERVER_HTTP_PORT}:80"
