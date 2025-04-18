@@ -2,11 +2,11 @@ services:
 
   plantuml:
 
-    # compose part
+    # compose
     container_name: 'plantuml'
     restart: always
 
-    # main part
+    # main
     image: ${PLANTUML_TAG}
     hostname: 'plantuml'
     environment:
@@ -18,11 +18,11 @@ services:
 
   draw-io:
 
-    # compose part
+    # compose
     container_name: 'drawio'
     restart: always
 
-    # main part
+    # main
     image: ${DRAWIO_TAG}
     hostname: 'drawio'
     environment:
@@ -30,5 +30,6 @@ services:
     ports:
       - "${DRAWIO_PORT}:8080"
 
+# main
 volumes:
   plantuml_temp:

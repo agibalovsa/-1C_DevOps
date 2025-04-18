@@ -1,0 +1,22 @@
+services:
+
+  oc_crserver:
+
+    # compose
+    container_name: 'oc_crserver'
+    restart: always
+
+    # main
+    image: "${OC_CRSERVER_TAG}"
+    hostname: "${OC_CRSERVER_HOSTNAME}"
+    command: crserver
+    ports:
+      - "${OC_CRSERVER_PORT}:1542"
+      - "${OC_CRSERVER_HTTP_PORT}:80"
+    volumes:
+      - "${OC_CRSERVER_VOL}:/home/usr1cv8/crserver"
+
+# main
+volumes:
+  "${OC_CRSERVER_VOL}":
+    external: true
