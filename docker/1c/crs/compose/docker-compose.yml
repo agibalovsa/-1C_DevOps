@@ -11,6 +11,7 @@ services:
     hostname: "${OC_CRSERVER_HOSTNAME}"
     command: crserver
     environment:
+      TZ: ${TZ}
       OC_CRSERVER_LOCATION: ${OC_CRSERVER_LOCATION}
       OC_CRSERVER_HOSTNAME: ${OC_CRSERVER_HOSTNAME}
     ports:
