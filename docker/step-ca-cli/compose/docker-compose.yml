@@ -1,0 +1,28 @@
+services:
+
+  step-ca-cli:
+
+    # compose
+    container_name: step-ca-cli
+    restart: always
+
+    # main
+    image: ${STEP_INT_TAG}
+    environment:
+      - DOMAIN_NAME=${DOMAIN_NAME}
+      - STEP_URL=${STEP_URL}
+      - STEP_FINGERPRINT=${STEP_FINGERPRINT}
+    ports:
+      - "80:80"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /etc/localtime:/etc/localtime
+      - stepca_certs:/root/.step/certs
+      - stepca_config:/root/.step/config
+
+# main
+volumes:
+  stepca_certs:
+    external: true
+  stepca_config:
+    external: true
