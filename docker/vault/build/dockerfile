@@ -1,0 +1,4 @@
+FROM "${VAULT_TAG}"
+
+COPY [ "vault-config.json", "/etc/vault/config/vault-config.json" ]
+ENTRYPOINT [ "vault" ]

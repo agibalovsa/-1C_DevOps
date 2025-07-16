@@ -42,14 +42,18 @@ services:
 volumes:
   sonarqube_conf:
     external: true
+    name: ${SONAR_VOL_CONF}
   sonarqube_data:
     external: true
+    name: ${SONAR_VOL_DATA}
   sonarqube_extensions:
     external: true
+    name: ${SONAR_VOL_EXT}
   sonarqube_logs:
   sonarqube_temp:
   postgresql_data:
     external: true
+    name: ${PG_VOL_DATA}
 
 secrets:
   sonar_password:
