@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+install_packs() {
+
+    mkdir /docker-entrypoint-initdb.d;
+
+    wget --progress=dot:giga --timeout=30 -O "pgpro-repo-add.sh" "https://repo.postgrespro.ru/1c/1c-${PG_MAJOR_VERSION}/keys/pgpro-repo-add.sh";
+    chmod +x pgpro-repo-add.sh;
+    sh pgpro-repo-add.sh;
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends "postgrespro-1c-${PG_MAJOR_VERSION}";
+    rm pgpro-repo-add.sh;
+
+}

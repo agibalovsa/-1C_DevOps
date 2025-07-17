@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+set_startup() {
+
+    install --verbose --directory --owner postgres --group postgres --mode 3777 /var/run/postgresql;
+
+    # this 1777 will be replaced by 0700 at runtime (allows semi-arbitrary "--user" values)
+    install --verbose --directory --owner postgres --group postgres --mode 1777 /var/lib/postgresql/data
+
+    dpkg-divert --add --rename --divert "/opt/pgpro/postgresql.conf.sample.dpkg" "/opt/pgpro/1c-${PG_MAJOR_VERSION}/share/postgresql.conf.sample";
+    cp -v /opt/pgpro/postgresql.conf.sample.dpkg /opt/pgpro/postgresql.conf.sample;
+    ln -sv ../../postgresql.conf.sample "/opt/pgpro/1c-${PG_MAJOR_VERSION}/share/";
+    sed -ri "s!^#?(listen_addresses)\s*=\s*\S+.*!\1 = '*'!" /opt/pgpro/postgresql.conf.sample;
+    grep -F "listen_addresses = '*'" /opt/pgpro/postgresql.conf.sample;
+
+    postgres --version
+
+}

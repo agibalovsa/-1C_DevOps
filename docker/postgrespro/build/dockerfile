@@ -1,99 +1,55 @@
 ARG REGISTRY= \
-    OS_TAG=debian:bookworm-slim
+    OS_TAG=debian:bookworm-slim \
+    PG_MAJOR_VERSION= \
+    PG_VERSION=
 
 # hadolint ignore=DL3006
 FROM "${REGISTRY}${OS_TAG}"
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
-# explicitly set user/group IDs
-# hadolint ignore=DL3008
-RUN set -eux; \
-    groupadd -r postgres --gid=999; \
-# https://salsa.debian.org/postgresql/postgresql-common/blob/997d842ee744687d99a2b2d95c1083a2615c79e8/debian/postgresql-common.postinst#L32-35
-    useradd -r -g postgres --uid=999 --home-dir=/var/lib/postgresql --shell=/bin/bash postgres; \
-# also create the postgres user's home directory with appropriate permissions
-# see https://github.com/docker-library/postgres/issues/274
-    install --verbose --directory --owner postgres --group postgres --mode 1777 /var/lib/postgresql
+LABEL maintainer="Agibalov Sergei <agibse@rarus.ru>" \
+      version="${PG_VERSION}" \
+      manufacturer="Postgres pro" \
+      libs="https://github.com/docker-library/postgres/blob/master/Dockerfile-debian.template"
 
-# make the "en_US.UTF-8" locale so postgres will be utf-8 enabled by default
-# hadolint ignore=DL3008
-RUN set -eux; \
-    if [ -f /etc/dpkg/dpkg.cfg.d/docker ]; then \
-# if this file exists, we're likely in "debian:xxx-slim", and locales are thus being excluded so we need to remove that exclusion (since we need locales)
-        grep -q '/usr/share/locale' /etc/dpkg/dpkg.cfg.d/docker; \
-        sed -ri '/\/usr\/share\/locale/d' /etc/dpkg/dpkg.cfg.d/docker; \
-        ! grep -q '/usr/share/locale' /etc/dpkg/dpkg.cfg.d/docker; \
-    fi; \
-    apt-get update; apt-get install -y --no-install-recommends locales; rm -rf /var/lib/apt/lists/*; \
-    echo 'en_US.UTF-8 UTF-8' >> /etc/locale.gen; \
-    echo 'ru_RU.UTF-8 UTF-8' >> /etc/locale.gen; \
-    locale-gen; \
-    locale -a | grep 'en_US.utf8'
+# hadolint ignore=SC1091
+RUN --mount=from=context,target=/context \
+    set -eux; \
+    . context/pre_install; \
+    set_users; \
+    set_locals; \
+    install_packs
 
 ENV LANG="en_US.utf8"
 
-ARG PG_MAJOR \
-    PG_VERSION
+# hadolint ignore=SC1091
+RUN --mount=from=context,target=/context \
+    --mount=from=context_arg,target=/context_arg \
+    set -eux; \
+    . context/install; \
+    . /context_arg/.arg; \
+    install_packs
 
-# hadolint ignore=DL3008
-RUN set -eux; \
-    apt-get update; \
-    apt-get install -y --no-install-recommends \
-        libnss-wrapper \
-        xz-utils \
-        zstd \
-        less \
-    ; \
-    rm -rf /var/lib/apt/lists/*;
+# hadolint ignore=SC1091
+RUN --mount=from=context,target=/context \
+    --mount=from=context_arg,target=/context_arg \
+    set -eux; \
+    . context/post_install; \
+    . /context_arg/.arg; \
+    set_startup
 
-RUN set -eux; \
-    mkdir /docker-entrypoint-initdb.d; \
-    \
-    wget --progress=dot:giga --timeout=30 -O "pgpro-repo-add.sh" "https://repo.postgrespro.ru/1c/1c-${PG_MAJOR}/keys/pgpro-repo-add.sh"; \
-    chmod +x pgpro-repo-add.sh; \
-    sh pgpro-repo-add.sh; \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends "postgrespro-1c-${PG_MAJOR}"; \
-    rm pgpro-repo-add.sh; \
-    \
-    postgres --version; \
-    \
-    install --verbose --directory --owner postgres --group postgres --mode 3777 /var/run/postgresql; \
-# this 1777 will be replaced by 0700 at runtime (allows semi-arbitrary "--user" values)
-    install --verbose --directory --owner postgres --group postgres --mode 1777 /var/lib/postgresql/data
-
-ENV PG_MAJOR="${PG_MAJOR}" \
-    PATH="${PATH}:/opt/pgpro/1c-${PG_MAJOR}/bin" \
+ENV PG_MAJOR="${PG_MAJOR_VERSION}" \
+    PATH="${PATH}:/opt/pgpro/1c-${PG_MAJOR_VERSION}/bin" \
     PGDATA="/var/lib/postgresql/data"
-VOLUME [ "/var/lib/postgresql/data" ]
 
-COPY docker-entrypoint.sh docker-ensure-initdb.sh /usr/local/bin/
+COPY --chmod=777 [ "docker-entrypoint.sh", "docker-ensure-initdb.sh", "/usr/local/bin/" ]
 RUN ln -sT docker-ensure-initdb.sh /usr/local/bin/docker-enforce-initdb.sh
+
+VOLUME [ "/var/lib/postgresql/data" ]
+EXPOSE 5432
+STOPSIGNAL SIGINT
+
 ENTRYPOINT ["docker-entrypoint.sh"]
 
-# We set the default STOPSIGNAL to SIGINT, which corresponds to what PostgreSQL
-# calls "Fast Shutdown mode" wherein new connections are disallowed and any
-# in-progress transactions are aborted, allowing PostgreSQL to stop cleanly and
-# flush tables to disk.
-#
-# See https://www.postgresql.org/docs/current/server-shutdown.html for more details
-# about available PostgreSQL server shutdown signals.
-#
-# See also https://www.postgresql.org/docs/current/server-start.html for further
-# justification of this as the default value, namely that the example (and
-# shipped) systemd service files use the "Fast Shutdown mode" for service
-# termination.
-#
-STOPSIGNAL SIGINT
-#
-# An additional setting that is recommended for all users regardless of this
-# value is the runtime "--stop-timeout" (or your orchestrator/runtime's
-# equivalent) for controlling how long to wait between sending the defined
-# STOPSIGNAL and sending SIGKILL.
-#
-# The default in most runtimes (such as Docker) is 10 seconds, and the
-# documentation at https://www.postgresql.org/docs/current/server-start.html notes
-# that even 90 seconds may not be long enough in many instances.
-
-EXPOSE 5432
 CMD ["postgres"]
