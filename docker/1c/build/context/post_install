@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+set_startup() {
+
+    # shellcheck source=/dev/null
+    . /context_arg/.arg;
+
+    # install server 1c
+    if [ "${SERVER}" -eq "1" ]; then
+        ln -s "${OC_PATH}/ragent" /usr/local/bin;
+        ln -s "${OC_PATH}/ras" /usr/local/bin;
+        ln -s "${OC_PATH}/rac" /usr/local/bin;
+        ln -s "${OC_PATH}/ibcmd" /usr/local/bin;
+        ln -s "${OC_PATH}/ibsrv" /usr/local/bin;
+    fi;
+
+    # install ws 1c
+    if [ "${WS}" -eq "1" ]; then
+        ln -s "${OC_PATH}/webinst" /usr/local/bin;
+        printf "%s\n" \
+            "LoadModule _1cws_module /opt/1cv8/x86_64/${OC_VERSION}/wsap24.so" \
+            | tee "/etc/apache2/mods-enabled/OC.load";
+    fi;
+
+    # install crs 1c
+    if [ "${CRS}" -eq "1" ]; then
+        ln -s "${OC_PATH}/crserver" /usr/local/bin;
+    fi;
+
+    if [ -f "${OC_PATH}/libstdc++.so.6" ] && [ -f "/usr/lib/x86_64-linux-gnu/libstdc++.so.6" ]; then
+        mv "${OC_PATH}/libstdc++.so.6" "${OC_PATH}/libstdc++.so.6.old";
+    fi;
+
+}

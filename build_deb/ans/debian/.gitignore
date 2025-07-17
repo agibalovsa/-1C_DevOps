@@ -1,0 +1,6 @@
+files
+debhelper-build-stamp
+1cans/*
+.debhelper/*
+*.debhelper
+*.substvars

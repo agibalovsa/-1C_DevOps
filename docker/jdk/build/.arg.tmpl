@@ -1,0 +1,38 @@
+## OS options
+
+OS_TAG="${OS_TAG}"
+
+## Axiom options
+
+# > pro, pro-full, runtime-pro, runtime-pro-full
+JDK_AXIOM_TYPE="${JDK_AXIOM_TYPE}"
+JDK_AXIOM_VERSION="${JDK_AXIOM_VERSION}"
+
+[[ "${{JDK_AXIOM_TYPE:0:3}}" = "pro" ]] && JDK_AXIOM_KIT="jdk" || JDK_AXIOM_KIT="jre"
+[[ "${{JDK_AXIOM_TYPE: -4}}" = "full" ]] && JDK_AXIOM_FULL="-full" || JDK_AXIOM_FULL=""
+
+## JDK options
+
+JDK_VERSION=${{JDK_AXIOM_VERSION}}
+JDK_KIT="${{JDK_AXIOM_KIT}}${{JDK_AXIOM_FULL}}"
+JDK_PROD=Axiom
+JDK_PATH="/usr/lib/jvm/axiomjdk-java${{JDK_VERSION:0:2}}-${{JDK_AXIOM_TYPE}}-amd64"
+JDK_TAG=axiom/${{JDK_KIT}}:${{JDK_VERSION/+/.}}
+
+## Install options
+
+INSTALL_MODE="${INSTALL_MODE:-install_from_url}"
+
+### install_from_file
+
+INSTALL_FILES="axiomjdk-${{JDK_AXIOM_KIT}}-pro${{JDK_VERSION}}-linux-amd64-full.deb"
+
+### install_from_repo
+
+INSTALL_PACKS="axiomjdk-java${{JDK_VERSION:0:2}}-${{JDK_AXIOM_TYPE}}=${{JDK_VERSION}}"
+APTLY_REPO_COMPONENTS="${APTLY_REPO_COMPONENTS:-axiom-jdk main}"
+
+### install_from_url
+
+# > https://download.axiomjdk.ru/axiomjdk-pro/<version>/axiomjdk-<jdk|jre>-pro<version>-linux-amd64<|full|lite>.deb
+INSTALL_URLS="https://download.axiomjdk.ru/axiomjdk-pro/${{JDK_VERSION}}/axiomjdk-${{JDK_AXIOM_KIT}}-pro${{JDK_VERSION}}-linux-amd64${{JDK_AXIOM_FULL}}.deb"

@@ -7,7 +7,7 @@ services:
     restart: always
 
     # main
-    image: ${STEP_INT_TAG}
+    image: ${STEP_TAG}
     environment:
       - DOMAIN_NAME=${DOMAIN_NAME}
       - STEP_URL=${STEP_URL}

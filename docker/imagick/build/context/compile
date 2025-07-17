@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+# Compilation of imagemagick deb packages
+#  $1 - Deb dir
+#
+compile_deb() {
+
+    apt-get update \
+        && apt-get install -y --no-install-recommends git make cmake checkinstall build-essential yasm nasm \
+        && rm -rf /var/lib/apt/lists/*;
+
+    # shellcheck disable=SC2153
+    git clone https://github.com/SoftCreatR/imei \
+        && cd imei \
+        && ([ -n "${IMEI_VERSION}" ] && git checkout "${IMEI_VERSION}") \
+        && chmod +x imei.sh \
+        && ./imei.sh --build-only --checkinstall \
+            --imagemagick-version="${IM_VERSION}" \
+            --aom-version="${AOM_VERSION}" \
+            --heif-version="${HEIF_VERSION}" \
+            --jxl-version="${JXL_VERSION}"
+
+    mkdir -p "${1}"
+    mv /usr/local/*.deb "${1}"
+
+}

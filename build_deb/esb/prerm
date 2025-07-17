@@ -1,0 +1,39 @@
+#!/bin/bash
+
+set -e
+
+systemd=$(ps --no-headers -o comm 1)
+
+if [ "${systemd}" == "systemd" ]; then
+    systemctl stop ESB_SERVICE
+else
+    if [ -f /usr/bin/ps ]; then
+        mv /usr/bin/ps /usr/bin/pse
+    fi
+    if [ -f /usr/bin/systemctl ]; then
+        mv /usr/bin/systemctl /usr/bin/systemctle
+    fi
+    cp /usr/share/1cesb/ps /usr/bin/ps
+    cp /usr/share/1cesb/systemctl /usr/bin/systemctl
+    chmod 777 /usr/bin/ps
+    chmod 777 /usr/bin/systemctl
+
+    systemctl disable ESB_SERVICE
+fi
+
+find_installer=(/opt/1C/1CE/components/1c-enterprise-installer*)
+installer="${find_installer[0]}"
+
+"${installer}/1ce-installer-cli" uninstall ESB_SERVICE
+"${installer}/1ce-installer-cli" support clean
+
+if [ ! "${systemd}" = "systemd" ]; then
+    rm /usr/bin/ps
+    rm /usr/bin/systemctl
+    if [ -f /usr/bin/pse ]; then
+        mv /usr/bin/pse /usr/bin/ps
+    fi
+    if [ -f /usr/bin/systemctle ]; then
+        mv /usr/bin/systemctle /usr/bin/systemctl
+    fi
+fi

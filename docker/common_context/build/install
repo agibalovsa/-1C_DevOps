@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+
+install_packs() {
+
+    # shellcheck source=/dev/null
+    . /common_context/certs;
+    # shellcheck source=/dev/null
+    . /common_context/aptly_repo;
+    # shellcheck source=/dev/null
+    . /context_arg/.arg;
+
+    "${INSTALL_MODE}";
+
+}
+
+install_from_repo() {
+
+    if command -v install_repo > /dev/null; then
+        install_repo
+    elif [ -n "${APTLY_REPO_NAME}" ] && [ -n "${APTLY_REPO_COMPONENTS}" ]; then
+        install_certs "${ROOT_CERTS}";
+        install_aptly_repo  "${APTLY_REPO_NAME}" "${APTLY_REPO_COMPONENTS}" "${APTLY_REPO_LOGIN}" "${APTLY_REPO_PASSWORD}";
+    else
+        echo "Not found repository install script" && exit 1;
+    fi;
+
+    apt-get update;
+    for package in ${INSTALL_PACKS}; do
+        apt-get install -yq --no-install-recommends "${package}";
+    done;
+    rm -rf /var/lib/apt/lists/*;
+
+    if command -v uninstall_repo > /dev/null; then
+        install_repo
+    elif [ -n "${APTLY_REPO_NAME}" ] && [ -n "${APTLY_REPO_COMPONENTS}" ]; then
+        uninstall_aptly_repo  "${APTLY_REPO_NAME}";
+        uninstall_certs "${ROOT_CERTS}";
+    else
+        echo "Not found repository uninstall script" && exit 1;
+    fi;
+
+}
+
+install_from_file() {
+
+    for fileName in ${INSTALL_FILES}; do
+        dpkg -i "/context/distr/${fileName}";
+    done;
+
+}
+
+install_from_url() {
+
+    for url in ${INSTALL_URLS}; do
+
+        mkdir -p /tmp/install_deb
+        fileName=$(basename "${url}");
+
+        wget --progress=dot:giga --timeout=30 -O "/tmp/install_deb/${fileName}" "${url}";
+
+        if [ "${fileName##*.}" = "zip" ]; then
+            unzip "/tmp/install_deb/${fileName}" -d /tmp/install_deb;
+        elif [ "${fileName##*.}" = "tar" ]; then
+            tar -xvf "/tmp/install_deb/${fileName}" -C /tmp/install_deb;
+        fi;
+
+        shopt -s globstar nullglob
+        for file_deb in /tmp/install_deb/*.deb; do
+            dpkg -i "${file_deb}";
+        done;
+
+        rm -r "/tmp/install_deb";
+
+    done;
+
+}

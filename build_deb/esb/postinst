@@ -1,0 +1,64 @@
+#!/bin/bash
+
+set -e
+
+components=0
+systemd=$(ps --no-headers -o comm 1)
+
+if [ "${systemd}" == "systemd" ]; then
+    printf "%s\n" \
+        "[Manager]" \
+        "DefaultEnvironment=\"JAVA_HOME=${JAVA_HOME}\"" \
+    | tee "/etc/systemd/system.conf.d/1c-enterprise-esb.conf";
+fi
+
+if [ ! "${systemd}" == "systemd" ]; then
+    if [ -f /usr/bin/ps ]; then
+        mv /usr/bin/ps /usr/bin/pse
+    fi
+    if [ -f /usr/bin/systemctl ]; then
+        mv /usr/bin/systemctl /usr/bin/systemctle
+    fi
+    cp /usr/share/1cesb/ps /usr/bin/ps
+    cp /usr/share/1cesb/systemctl /usr/bin/systemctl
+    chmod 777 /usr/bin/ps
+    chmod 777 /usr/bin/systemctl
+fi
+
+find_installer=(/opt/1C/1CE/components/1c-enterprise-installer*)
+installer="${find_installer[0]}"
+if [ -d "${installer}" ];
+then
+    components=$("${installer}/1ce-installer-cli" query installed | awk -F ":" 'BEGIN{pr=0}{if($1 == "components"){pr=1}else if(pr == 1 && $1 != ""){print $1}}' | wc -l)
+fi
+
+if [ ! "${components}" == 0 ]; 
+then
+    if [ "${systemd}" == "systemd" ]; then
+        systemctl stop ESB_SERVICE
+    else
+        systemctl disable ESB_SERVICE
+    fi
+    "${installer}/1ce-installer-cli" uninstall ESB_SERVICE
+fi
+
+ext_options="--ignore-hardware-checks"
+if [ ! "${systemd}" == "systemd" ]; then
+    ext_options="${ext_options} --disable-service-creation"
+fi
+
+eval "/usr/share/1cesb/install/1ce-installer-cli --verbose full install ESB_SERVICE --components 1c-enterprise-ring,ESB_SERVICE ${ext_options}"
+/usr/share/1cesb/install/1ce-installer-cli support clean
+
+rm -r /usr/share/1cesb/install
+
+if [ ! "${systemd}" = "systemd" ]; then
+    rm /usr/bin/ps
+    rm /usr/bin/systemctl
+    if [ -f /usr/bin/pse ]; then
+        mv /usr/bin/pse /usr/bin/ps
+    fi
+    if [ -f /usr/bin/systemctle ]; then
+        mv /usr/bin/systemctle /usr/bin/systemctl
+    fi
+fi

@@ -1,0 +1,32 @@
+services:
+
+  oc_ibsrv:
+
+    # compose
+    container_name: ${OC_IBSRV_NAME:-'oc_ibsrv'}
+    restart: always
+
+    # main
+    image: ${OC_IBSRV_TAG}
+    hostname: ${OC_SERVER_HOSTNAME}
+    command: ibsrv
+
+    environment:
+      TZ: ${TZ}
+      OC_IBSRV_CONFIG_PATH: /srv/1c/ibsrv/config_ibsrv.yml
+      OC_IBSRV_BASE_NAME: ${OC_IBSRV_BASE_NAME}
+      OC_IBSRV_HTTP_PORT: ${OC_IBSRV_HTTP_PORT}"
+      OC_IBSRV_HTTP_BASE_NAME: ${OC_IBSRV_HTTP_BASE_NAME}
+      OC_IBSRV_DEBUG: ${OC_IBSRV_BASE_NAME:-tcp}
+    ports:
+      - "${OC_IBSRV_HTTP_PORT}:${OC_IBSRV_HTTP_PORT}"
+      - "${OC_RMNGR_PORT}:1541"
+      - "1550:1550"
+      - "${OC_RPHOST_PORT}-1591:1560-1591"
+    volumes:
+      - oc_ibsrv_data:/srv/1c/ibsrv
+  
+volumes:
+  oc_ibsrv_data:
+    external: true
+    name: ${IBSRV_VOL_DATA}

@@ -1,0 +1,26 @@
+## OS options
+
+OS_TAG="${OS_TAG}"
+
+## Imagemagick options
+
+# > https://github.com/SoftCreatR/imei
+
+IM_VERSION="${IM_VERSION}"
+IMEI_VERSION="${IMEI_VERSION}"
+AOM_VERSION="${AOM_VERSION}"
+HEIF_VERSION="${HEIF_VERSION}"
+JXL_VERSION="${JXL_VERSION}"
+
+IM_TAG="os/imei:${{IM_VERSION/-/.}}"
+
+## Install options
+
+INSTALL_MODE=install_from_file
+
+### install_from_file
+
+INSTALL_FILES="imei-libaom_${{AOM_VERSION}}-imei6.11.4_amd64.deb \
+    imei-libheif_${{HEIF_VERSION}}-imei6.11.4_amd64.deb \
+    imei-libjxl_${{JXL_VERSION}}-imei6.11.4_amd64.deb \
+    imei-imagemagick_${{IM_VERSION}}-imei6.11.4_amd64.deb"

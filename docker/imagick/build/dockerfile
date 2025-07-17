@@ -1,0 +1,55 @@
+ARG REGISTRY= \
+    OS_TAG=debian:bookworm-slim
+
+# hadolint ignore=DL3006
+FROM "${REGISTRY}${OS_TAG}" AS pre_build
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# hadolint ignore=SC1091
+RUN --mount=from=context,target=/context \
+    set -eux; \
+    . context/pre_install; \
+    install_pack
+
+ARG IM_VERSION \
+    AOM_VERSION \
+    HEIF_VERSION \
+    JXL_VERSION \
+    IMEI_VERSION
+
+FROM pre_build AS compiler
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# hadolint ignore=SC1091
+RUN --mount=from=context,target=/context \
+    --mount=from=context_arg,target=/context_arg \
+    set -eux; \
+    . /context_arg/.arg; \
+    . context/compile; \
+    compile_deb "/srv/imagick/distr"
+
+FROM pre_build
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+LABEL maintainer="Agibalov Sergei <agibse@rarus.ru>" \
+      version="${IM_VERSION}" \
+      manufacturer="ImageMagick Studio LLC" \
+      libs="Aom:${AOM_VERSION}, Heif:${HEIF_VERSION}, JXL:${JXL_VERSION}" \
+      scripts="SoftCreatR-imei(${IMEI_VERSION})"
+
+# hadolint ignore=SC1091
+RUN --mount=from=common_context,target=/common_context \
+    --mount=from=context_arg,target=/context_arg \
+    --mount=from=compiler,source=/srv/imagick,target=/context \
+    set -eux; \
+    . common_context/install; \
+    install_packs
+
+# hadolint ignore=SC1091
+RUN --mount=from=context,target=/context \
+    set -eux; \
+    . context/post_install; \
+    set_startup

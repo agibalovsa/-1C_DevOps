@@ -1,0 +1,23 @@
+Source: 1cesblib
+Section: misc
+Priority: standard
+Build-Depends: tar
+Maintainer: 1C-Soft LLC <v8@1c.ru>
+Standards-Version: 4.7.2.0
+Homepage: https://releases.1c.ru/project/esb
+
+Package: 1cesbide
+Architecture: all
+Provides: 1cesbide
+Section: misc
+Depends: ${misc:Depends}, ${shlibs:Depends}
+Description: 1C Enterprise ESB with IDE
+ 1C Soft, 1996 – 2025.
+
+Package: 1cesb
+Architecture: all
+Provides: 1cesb
+Section: misc
+Depends: ${misc:Depends}, ${shlibs:Depends}
+Description: 1C Enterprise ESB
+ 1C Soft, 1996 – 2025.

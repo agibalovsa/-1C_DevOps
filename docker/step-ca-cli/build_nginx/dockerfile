@@ -1,0 +1,25 @@
+FROM nginx:latest
+
+# hadolint ignore=DL3008
+RUN set -eux; \
+    apt-get update \
+        && apt-get install -yq --no-install-recommends wget; \
+    apt-get clean \
+        && rm -rf /var/lib/apt/lists/*; \
+    wget --no-check-certificate --timeout=60 -O step-cli_amd64.deb "https://dl.smallstep.com/gh-release/cli/gh-release-header/v0.28.6/step-cli_0.28.6-1_amd64.deb"; \
+    dpkg -i step-cli_amd64.deb \
+        && rm step-cli_amd64.deb
+
+COPY [ "webroot.conf", "/etc/nginx/conf.d/" ]
+COPY [ "step-ca-acme-start.sh", "/docker-entrypoint.d/" ]
+COPY [ "step-ca-acme", "/etc/init.d/" ]
+COPY [ "step-ca-acme-init.sh", "/" ]
+
+RUN chmod 744 /docker-entrypoint.d/step-ca-acme-start.sh \
+    && chmod 744 /etc/init.d/step-ca-acme \
+    && chmod 744 /step-ca-acme-init.sh \
+    && update-rc.d step-ca-acme defaults \
+    && update-rc.d step-ca-acme enable
+
+VOLUME [ "/root/.step/certs"  ]
+VOLUME [ "/root/.step/config"  ]

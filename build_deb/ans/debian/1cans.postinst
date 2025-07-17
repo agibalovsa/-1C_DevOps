@@ -1,0 +1,21 @@
+#!/bin/bash
+
+set -e
+
+chmod 755 /var/opt/1cans/executable/start.sh
+
+if ! id usrans > /dev/null 2>@1; then
+    groupadd grpans
+    useradd usrans -N -G grpans
+    chown -R usrans:grpans /var/opt/1cans/
+fi;
+
+systemd=$(ps --no-headers -o comm 1)
+
+if [ "${systemd}" == "systemd" ]; then
+    chmod 755 /lib/systemd/system/1cans.service
+    ln -sf /lib/systemd/system/1cans.service /etc/systemd/system/1cans.service
+    systemctl daemon-reload
+    systemctl enable 1cans.service
+    systemctl start 1cans
+fi

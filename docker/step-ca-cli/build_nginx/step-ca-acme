@@ -1,0 +1,73 @@
+#!/bin/bash
+#
+### BEGIN INIT INFO
+# Provides:             step-ca-acme
+# Required-Start:       $syslog $remote_fs
+# Required-Stop:        $syslog $remote_fs
+# Should-Start:         $local_fs
+# Should-Stop:          $local_fs
+# Default-Start:        2 3 4 5
+# Default-Stop:         0 1 6
+# Short-Description:    Step ca (ACME)
+# Description:          Step ca (ACME)
+### END INIT INFO
+
+PATH=/bin:/usr/bin:/sbin:/usr/sbin
+DESC="Step ca (ACME)"
+NAME=step-ca-acme
+DAEMON=/usr/bin/step
+PARAMS="ca renew --daemon --force --pid-file=/var/run/nginx.pid /root/.step/certs/$DOMAIN_NAME.crt /root/.step/certs/$DOMAIN_NAME.key"
+PIDFILE=/var/run/step-ca-acme.pid
+
+# shellcheck source=/dev/null
+. /lib/lsb/init-functions
+
+# run the program and write its pid to a file.
+start() {
+
+  status &> /dev/null
+  if [[ -e $PIDFILE &&  $? -eq 0 ]]; then
+    log_success_msg "$DESC already started"
+    return
+  fi
+
+  log_daemon_msg "Starting $DESC" "$NAME"
+  start-stop-daemon --start --quiet --pidfile $PIDFILE --background --make-pidfile \
+    --startas /bin/bash -- -c "exec $DAEMON $PARAMS &>> /var/log/step-ca-acme.log"
+  log_end_msg $?
+}
+
+# stop the process
+# get pid value from the file and kill the process with it.
+stop() {
+  log_daemon_msg "Stopping $DESC" "$NAME"
+  start-stop-daemon --stop --retry 5 --quiet --oknodo --pidfile $PIDFILE
+  rm -f $PIDFILE
+  log_end_msg $?
+}
+
+status() {
+  status_of_proc -p $PIDFILE $DAEMON $NAME
+}
+
+# a function will be called according to a given command
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    status)
+        status && exit 0 || exit $?
+        ;;
+    restart)
+        stop
+        start
+        ;;
+    *)
+        echo "Usage: /etc/init.d/$NAME {start|stop|status|restart}" >&2
+        exit 2
+        ;;
+esac
+exit 0

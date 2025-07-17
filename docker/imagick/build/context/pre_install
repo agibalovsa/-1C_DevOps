@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+install_packs() {
+
+    apt-get update;
+    apt-get install -y --no-install-recommends \
+        libpng-dev \
+        libjpeg-dev \
+        libtiff-dev \
+        libltdl-dev \
+        ghostscript;
+
+    # dep heif
+    apt-get install -y --no-install-recommends \
+        libde265-dev \
+        libx265-dev;
+
+    # dep jxl
+    apt-get install -y --no-install-recommends \
+        libgif7 \
+        libopenexr-dev \
+        libbrotli-dev;
+
+    # dep imagemagick
+    apt-get install -y --no-install-recommends \
+        libraqm0 \
+        libgomp1 \
+        libfftw3-dev \
+        libxext6 \
+        liblqr-1-0-dev \
+        libzip-dev \
+        libice-dev \
+        libsm-dev \
+        libxml2-dev;
+
+    rm -rf /var/lib/apt/lists/*;
+
+    ln -s /usr/lib/x86_64-linux-gnu/libtiff.so.6 /usr/lib/x86_64-linux-gnu/libtiff.so.5
+
+}

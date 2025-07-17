@@ -1,0 +1,15 @@
+Source: 1cans
+Section: misc
+Priority: standard
+Build-Depends: tar
+Maintainer: 1C-Soft LLC <v8@1c.ru>
+Standards-Version: 4.7.2.0
+Homepage: https://releases.1c.ru/project/Analytics
+
+Package: 1cans
+Architecture: all
+Provides: 1cans
+Section: misc
+Depends: ${misc:Depends}, ${shlibs:Depends}
+Description: 1C Analytics
+ 1C Soft, 1996 – 2025.

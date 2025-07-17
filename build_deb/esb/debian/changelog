@@ -1,0 +1,82 @@
+1cesblib (7.0.5+57) stable; urgency=medium
+
+  * Сервер
+    * Настроечные файлы сервера
+      * В настроечный файл сервера integrationBus.yml добавлены дополнительные параметры для управления размером пула потоков.
+  * Среда администрирования и разработки
+    * https://1cmycloud.com/console/help/esb/7.0/docs/topics/whats-new-in-7-0/
+
+ -- Rarus-Samara <sam-gr@rarus.ru>  Wed, 03 Jul 2025 15:00:00 +0400
+
+1cesblib (6.1.6+15) stable; urgency=medium
+
+  * Системные требования
+    * Изменены системные требования для «1С:Шины». Теперь для работы сервера требуется наличие Java Runtime Environment (JRE) версии 17.
+  * Сервер
+    * Настроечные файлы сервера
+      * Добавлен новый настроечный файл сервера jobs.yml, в котором задается размер пула потоков фоновых заданий.
+    * Авторизация и аутентификация для доступа к HTTP-сервисам / API
+      * Изменился запрос на получение токена аутентификации.
+    * Хранилище двоичных данных
+      * Добавлена поддержка ограничения размера загружаемых двоичных данных на сервере.
+    * Создание снимков данных приложения при подготовке миграции
+      * В случае возникновения ошибки при подготовке миграции «1С:Шина» собирает снимки данных приложения (дампы) и отправляет их в сервис «1С:Пульт».
+  * Среда администрирования и разработки
+    * https://1cmycloud.com/console/help/esb/6.1/docs/topics/whats-new-in-6-1
+
+ -- Rarus-Samara <sam-gr@rarus.ru>  Wed, 03 Jul 2025 15:00:00 +0400
+
+1cesblib (4.1.4+6) stable; urgency=medium
+
+  * Встроенный язык
+    * Стандартная библиотека
+      * Тип «СоединениеSftp»
+        * В методы типа СоединениеSftp добавлен необязательный параметр Таймаут, позволяющий задать период времени, в течение которого сервер «1С:Шины» будет ожидать завершения операции.
+      * Тип «ИсключениеSftp»
+        * В тип ИсключениеSftp добавлено свойство КодОшибки, которое содержит код ошибки, записанный сервером.
+      * Тип «ИсключениеФайловойСистемыSftp»
+        * Чтобы выделить проблемы, связанные с файловой системой, создан тип ИсключениеФайловойСистемыSftp, наследующий свойства и методы от ИсключениеSftp.
+  * Прикладная функциональность
+    * Указание таймаута подключения к серверу
+      * Реализована возможность задать таймаут при подключении к удаленному серверу по протоколу SSH.
+  * Элементы проекта
+    * План обмена
+      * Элемент проекта ПланОбмена теперь можно создавать в среде разработки и добавлять в автоматический интерфейс.
+
+ -- Rarus-Samara <sam-gr@rarus.ru>  Mon, 25 Sep 2024 15:00:00 +0400
+
+1cesblib (4.0.6+49) stable; urgency=medium
+
+  * Встроенный язык
+  * Групповая разработка
+  * Отладка
+  * Панель управления
+  * Прикладная функциональность
+  * Среда разработки
+  * Электронная почта
+  * Криптография
+  * Элементы проекта
+  * Язык запросов
+
+ -- Rarus-Samara <sam-gr@rarus.ru>  Mon, 04 Dec 2023 15:00:00 +0400
+
+1cesblib (3.1.1) beta; urgency=medium
+
+  * Fix errors
+  * Project Element Enumeration
+  * Project Element Information Register
+  * Project Elements Structure and Stored Structure
+  * Storage of delivered messages
+  * Project Element Soap Service Client
+  * New nodes of the project element Integration Process
+  * Storage of delivered messages of the Integration Process
+  * New property of the RabbitMQ node Assignment of the project element Integration Process
+  * Project Element Soap Service
+
+ -- Rarus-Samara <sam-gr@rarus.ru>  Sun, 05 May 2023 09:21:04 +0400
+
+1cesblib (2.0.3) stable; urgency=medium
+
+  * Fixed identified errors
+
+ -- Rarus-Samara <sam-gr@rarus.ru>  Mon, 16 Dec 2022 23:59:59 +0300

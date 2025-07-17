@@ -1,0 +1,36 @@
+## OS options
+
+JDK_TAG="${JDK_TAG}"
+
+## 1C options
+
+OC_VERSION="${OC_VERSION}"
+
+OC_MODE="${OC_MODE:-server}" # server, ibsrv, crserver, client, other
+SERVER="${SERVER:-1}"
+WS="${WS:-1}"
+CRS="${CRS:-0}"
+CLIENT="${CLIENT:-0}"
+
+OC_TAG="1c/${{OC_MODE}}:${{OC_VERSION}}"
+
+## Install options
+
+INSTALL_MODE="${INSTALL_MODE:-install_from_file}"
+
+### install_from_file
+
+INSTALL_FILES="1c-enterprise-${{OC_VERSION}}-common.deb"
+[[ "${{SERVER}}" = "1" ]] && INSTALL_FILES="${{INSTALL_FILES}} 1c-enterprise-${{OC_VERSION}}-server.deb" || :
+[[ "${{WS}}" = "1" ]] && INSTALL_FILES="${{INSTALL_FILES}} 1c-enterprise-${{OC_VERSION}}-ws.deb" || :
+[[ "${{CRS}}" = "1" ]] && INSTALL_FILES="${{INSTALL_FILES}} 1c-enterprise-${{OC_VERSION}}-crs.deb" || :
+[[ "${{CLIENT}}" = "1" ]] && INSTALL_FILES="${{INSTALL_FILES}} 1c-enterprise-${{OC_VERSION}}-client.deb" || :
+
+### install_from_repo
+
+APTLY_REPO_COMPONENTS="1c main"
+INSTALL_PACKS="1c-enterprise-${{OC_VERSION}}-common" || : 
+[[ "${{SERVER}}" = "1" ]] && INSTALL_PACKS="${{INSTALL_PACKS}} 1c-enterprise-${{OC_VERSION}}-server" || :
+[[ "${{WS}}" = "1" ]] && INSTALL_PACKS="${{INSTALL_PACKS}} 1c-enterprise-${{OC_VERSION}}-ws" || :
+[[ "${{CRS}}" = "1" ]] && INSTALL_PACKS="${{INSTALL_PACKS}} 1c-enterprise-${{OC_VERSION}}-crs" || :
+[[ "${{CLIENT}}" = "1" ]] && INSTALL_PACKS="${{INSTALL_PACKS}} 1c-enterprise-${{OC_VERSION}}-client" || :

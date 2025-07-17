@@ -1,0 +1,31 @@
+ARG REGISTRY= \
+    OS_TAG=debian:bookworm-slim
+
+# hadolint ignore=DL3006
+FROM "${REGISTRY}${OS_TAG}"
+
+ARG STEP_CA_VERSION
+
+LABEL maintainer="Agibalov Sergei <agibse@rarus.ru>" \
+      version="${STEP_CA_VERSION}" \
+      manufacturer="Smallstep Labs"
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# hadolint ignore=SC1091,DL3008
+RUN --mount=from=context,target=/context \
+    --mount=from=common_context,target=/common_context \
+    --mount=from=context_arg,target=/context_arg \
+    set -eux; \
+    . context/install; \
+    . common_context/install; \
+    install_packs
+
+COPY --chmod=766 [ "entrypoint.sh", "send_sighup.sh", "/" ]
+
+HEALTHCHECK CMD "/healthcheck.sh"
+
+ENTRYPOINT [ "/entrypoint.sh" ]
+
+VOLUME [ "/root/.step/certs" ]
+VOLUME [ "/root/.step/config" ]
