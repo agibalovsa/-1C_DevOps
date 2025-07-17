@@ -1,0 +1,28 @@
+services:
+
+  oc_hasp:
+
+    # compose
+    container_name: ${OC_HASP_NAME:-oc_hasp}
+    restart: always
+
+    # main
+    image: ${OC_HASP_TAG}
+    hostname: ${OC_HASP_HOSTNAME}
+    command: slc
+    stdin_open: true
+    tty: true
+    environment:
+      TZ: ${TZ}
+    ports:
+      - "${OC_HASP_PORT_MNG}:1947"
+      - "${OC_HASP_PORT_MNG}:1947/udp"
+      - "${OC_HASP_PORT}:475/udp"
+    volumes:
+      - oc_hasp_conf:/etc/haspd/
+
+# main
+volumes:
+  oc_hasp_conf:
+    external: true
+    name: ${OC_VOL_HASP_CONF:-oc_hasp_conf}

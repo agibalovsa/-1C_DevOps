@@ -2,7 +2,7 @@ services:
 
   oc_slc:
 
-  # compose
+    # compose
     container_name: ${OC_SLC_NAME:-oc_slc}
     restart: always
 

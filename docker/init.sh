@@ -19,19 +19,36 @@ init_stack () {
             "compose" "compose" off
     )
 
-    IFS=" " read -ra paths <<< "$(
-        dialog --ascii-lines --no-shadow --no-tags --erase-on-exit --output-fd 1 --radiolist "Please select applications" 0 0 0 \
-            "os/linux_deb/$type" "os-system" off \
-            "imagick/$type" "image magick" off \
-            "postgrespro/$type" "image magick" off \
-            "jdk/$type" "jdk" off \
-            "1c/$type" "1c platform" off \
-            "1cesb/$type" "1c-esb" off \
-            "1cans/$type" "1c-ans" off \
-            "slc/$type" "slc" off \
-            "hasp/$type" "hasp" off \
-            "step-ca-cli/$type" "step ca (cli)" off
-    )"
+    if [ "${type}" = "compose" ]; then
+        IFS=" " read -ra paths <<< "$(
+            dialog --ascii-lines --no-shadow --no-tags --erase-on-exit --output-fd 1 --radiolist "Please select applications" 0 0 0 \
+                "postgrespro/compose" "image magick" off \
+                "1c/compose/server" "1c platform server" off \
+                "1c/compose/crs" "1c platform cr-server" off \
+                "1c/compose/ibsrv" "1c platform ibsrv" off \
+                "1cesb/compose" "1c-esb" off \
+                "1cans/compose" "1c-ans" off \
+                "slc/compose" "slc" off \
+                "hasp/compose" "hasp" off \
+                "step-ca-cli/compose" "step ca (cli)" off
+        )"
+    else
+        IFS=" " read -ra paths <<< "$(
+            dialog --ascii-lines --no-shadow --no-tags --erase-on-exit --output-fd 1 --radiolist "Please select applications" 0 0 0 \
+                "os/linux_deb/build" "os-system" off \
+                "imagick/build" "image magick" off \
+                "postgrespro/build" "image magick" off \
+                "jdk/build" "jdk" off \
+                "1c/build" "1c platform" off \
+                "1cesb/build" "1c-esb" off \
+                "1cans/build" "1c-ans" off \
+                "slc/build" "slc" off \
+                "hasp/build" "hasp" off \
+                "step-ca-cli/build" "step ca (cli)" off
+        )"
+    fi;
+
+
 
     # shellcheck disable=SC2034
     return_name="${name}"
