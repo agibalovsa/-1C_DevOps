@@ -9,7 +9,7 @@ services:
     # main
     image: ${OC_HASP_TAG}
     hostname: ${OC_HASP_HOSTNAME}
-    command: slc
+    command: hasp
     stdin_open: true
     tty: true
     environment:
