@@ -1,0 +1,24 @@
+services:
+
+  oc_slc:
+
+  # compose
+    container_name: ${OC_SLC_NAME:-oc_slc}
+    restart: always
+
+    # main
+    image: ${OC_SLC_TAG}
+    hostname: ${OC_SLC_HOSTNAME}
+    command: slc
+    environment:
+      TZ: ${TZ}
+    ports:
+      - "${OC_SLC_PORT}:9099"
+    volumes:
+      - oc_slc_lic:/var/1C/licence
+
+# main
+volumes:
+  oc_slc_lic:
+    external: true
+    name: ${OC_VOL_SLC_LIC:-oc_slc_lic}
