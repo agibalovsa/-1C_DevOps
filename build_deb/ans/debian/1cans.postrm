@@ -1,0 +1,14 @@
+#!/bin/bash
+
+set -e
+
+systemd=$(ps --no-headers -o comm 1)
+
+if [ "${systemd}" == "systemd" ]; then
+    systemctl daemon-reload
+    systemctl reset-failed
+fi
+
+if [ "${1}" = "purge" ] && [ -d /var/opt/1cans/ ]; then
+    rm -r /var/opt/1cans/
+fi

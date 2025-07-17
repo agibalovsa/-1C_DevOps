@@ -1,0 +1,48 @@
+ARG OS_EXT_TAG=debian:bookworm-slim
+
+# hadolint ignore=DL3006
+FROM "${OS_EXT_TAG}"
+
+ARG DEBIAN_FRONTEND=noninteractive \
+    DEBCONF_NONINTERACTIVE_SEEN=true
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# hadolint ignore=DL3008
+RUN set -eux; \
+    apt-get update \
+        && apt-get install -yq --no-install-recommends locales procps curl ca-certificates gnupg wget unzip less; \
+    apt-get clean \
+        && rm -rf /var/lib/apt/lists/*;\
+    install -m 0755 -d /etc/apt/keyrings; \
+    sed -i -e "s/# ru_RU.UTF-8.*/ru_RU.UTF-8 UTF-8/" /etc/locale.gen \
+        && dpkg-reconfigure --frontend=noninteractive locales \
+        && update-locale LANG=ru_RU.UTF-8; \
+    echo "deb http://deb.debian.org/debian bookworm contrib non-free non-free-firmware" >> /etc/apt/sources.list.d/contrib.list;
+
+# https://github.com/tianon/gosu/blob/master/INSTALL.md
+ARG GOSU_VERSION=1.17
+
+RUN set -eux; \
+    # installed package
+        dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')"; \
+        wget --progress=dot:giga --timeout=30 -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/${GOSU_VERSION}/gosu-$dpkgArch"; \
+        wget --progress=dot:giga --timeout=30 -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/${GOSU_VERSION}/gosu-$dpkgArch.asc"; \
+        \
+    # verify the signature
+        GNUPGHOME="$(mktemp -d)"; \
+        export GNUPGHOME; \
+        # hkps://keys.openpgp.org, hkps://keyserver.ubuntu.com
+        gpg --batch --keyserver hkps://keyserver.ubuntu.com --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4; \
+        gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu; \
+        gpgconf --kill all; \
+        rm -rf "${GNUPGHOME}" /usr/local/bin/gosu.asc; \
+        \
+    # verify that the binary works
+        chmod +x /usr/local/bin/gosu; \
+        gosu --version; \
+        gosu nobody true
+
+ENV LANG=ru_RU.UTF-8 \
+    LANGUAGE=ru_RU.UTF-8 \
+    LC_ALL=ru_RU.UTF-8

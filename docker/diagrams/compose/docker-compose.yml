@@ -1,0 +1,35 @@
+services:
+
+  plantuml:
+
+    # compose
+    container_name: 'plantuml'
+    restart: always
+
+    # main
+    image: ${PLANTUML_TAG}
+    hostname: 'plantuml'
+    environment:
+      BASE_URL: ${PLANTUML_URL}
+    ports:
+      - "${PLANTUML_PORT}:8080"
+    volumes:
+      - plantuml_temp:/tmp/jetty
+
+  draw-io:
+
+    # compose
+    container_name: 'drawio'
+    restart: always
+
+    # main
+    image: ${DRAWIO_TAG}
+    hostname: 'drawio'
+    environment:
+      PUBLIC_DNS: ${DRAWIO_URL}
+    ports:
+      - "${DRAWIO_PORT}:8080"
+
+# main
+volumes:
+  plantuml_temp:

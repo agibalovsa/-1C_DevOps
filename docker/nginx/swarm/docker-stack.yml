@@ -1,0 +1,42 @@
+services:
+
+  nginx:
+    image: nginx-rproxy:latest
+    hostname: 'nginx'
+    ports:
+      - "80:80"
+      - "443:443"
+      - "${GITLAB_SSH_PORT}:${GITLAB_SSH_PORT}"
+    environment:
+      TZ:                   "Europe/Moscow"
+      HOSTNAME:             "${HOSTNAME}"
+      GITLAB_HOSTNAME:      "${GITLAB_HOSTNAME}"
+      GITLAB_HTTPS_PORT:    "${GITLAB_HTTPS_PORT}"
+      GITLAB_SSH_PORT:      "${GITLAB_SSH_PORT}"
+      SONAR_HOSTNAME:       "${SONAR_HOSTNAME}"
+      SONAR_HTTP_PORT:      "${SONAR_HTTP_PORT}"
+      PORTAINER_HOSTNAME:   "${PORTAINER_HOSTNAME}"
+      PORTAINER_HTTPS_PORT: "${PORTAINER_HTTPS_PORT}"
+      PORTAINER_HTTP_PORT:  "${PORTAINER_HTTP_PORT}"
+    configs:
+      - source: nginx_conf
+        target: /etc/nginx/conf.d/nginx.conf
+      - source: stream_conf
+        target: /etc/nginx/stream.d/stream.conf
+    secrets:
+      - source: nginx_key
+        target: /etc/nginx/ssl/nginx.key
+      - source: nginx_crt
+        target: /etc/nginx/ssl/nginx.crt
+
+configs:
+  nginx_conf:
+    external: true
+  stream_conf:
+    external: true
+
+secrets:
+  nginx_key:
+    external: true
+  nginx_crt:
+    external: true

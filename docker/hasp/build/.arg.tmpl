@@ -1,0 +1,29 @@
+## OS options
+
+OS_TAG="${OS_TAG}"
+
+## Hasp options
+
+HASP_VERSION="${HASP_VERSION:-7.90}"
+HASP_TAG=1c/hasp:${{HASP_VERSION}}
+
+## Install options
+
+INSTALL_MODE="${INSTALL_MODE:-install_from_url}"
+
+### install_from_file
+
+INSTALL_FILES="haspd_${{HASP_VERSION}}-eter2debian_i386.deb \
+    haspd-modules_${{HASP_VERSION}}-eter2debian_i386.deb"
+
+### install_from_repo
+
+INSTALL_PACKS="haspd=${{HASP_VERSION}}-eter2debian \
+    haspd-modules=${{HASP_VERSION}}-eter2debian"
+
+APTLY_REPO_COMPONENTS="${APTLY_REPO_COMPONENTS:-1c main}"
+
+### install_from_url
+
+INSTALL_URLS="https://download.etersoft.ru/pub/Etersoft/HASP/${{HASP_VERSION}}/Debian/10/haspd_${{HASP_VERSION}}-eter2debian_i386.deb \
+    https://download.etersoft.ru/pub/Etersoft/HASP/${{HASP_VERSION}}/Debian/10/haspd-modules_${{HASP_VERSION}}-eter2debian_i386.deb"

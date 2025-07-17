@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+install_packs() {
+
+    # shellcheck source=/dev/null
+    . /context_arg/.arg;
+
+    apt-get update;
+
+    # install ws 1c
+    if [ "${WS}" -eq "1" ]; then
+        apt-get install -yq --no-install-recommends apache2;
+    fi;
+
+    # install client 1c
+    if [ "${CLIENT}" -eq "1" ]; then
+        apt-get install -yq --no-install-recommends libcups2 libgtk-3-0 libxxf86vm1 libsm6 libwebkit2gtk-4.0-37 xvfb;
+    fi;
+
+    apt-get clean && \
+        rm -rf /var/lib/apt/lists/*;
+
+}

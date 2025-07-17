@@ -1,0 +1,56 @@
+#!/bin/bash
+
+service_name="${2%.*}"
+
+if [[ $1 == "daemon-reload" ]];
+then
+    exit 0
+fi
+
+if [[ $1 == "enable" && ( $service_name == "1c-enterprise-esb" || $service_name == "1c-enterprise-esb-with-ide" ) ]];
+then
+    echo > "/usr/share/1cesb/enable_${service_name}"
+    exit 0
+fi
+
+if [[ $1 == "disable" && ( $service_name == "1c-enterprise-esb" || $service_name == "1c-enterprise-esb-with-ide" ) ]] && [[ -f "/usr/share/1cesb/enable_${service_name}" ]];
+then
+    rm "/usr/share/1cesb/enable_${service_name}"
+    exit 0
+fi
+
+if [[ $1 == "show" && ( $service_name == "1c-enterprise-esb" || $service_name == "1c-enterprise-esb-with-ide" ) && -f /usr/share/1cesb/enable_$service_name ]];
+then
+cat <<EOF
+PIDFile=/var/opt/1C/1CE/instances/$service_name/daemon.pid
+ExecStart={ path=/opt/1C/1CE/components/$service_name-VERSION-x86_64/bin/esb ; argv[]=/opt/1C/1CE/components/$service_name-VERSION-x86_64/bin/esb start --daemon --procname $service_name-launcher --servicename $service_name --cout /var/opt/1C/1CE/instances/$service_name/logs/sysout.log --cerr /var/opt/1C/1CE/instances/$service_name/logs/syserr.log --instance /var/opt/1C/1CE/instances/$service_name ; ignore_errors=no ; start_time=[Thu 2024-01-18 08:21:53 MSK] ; stop_time=[Thu 2024-01-18 08:21:53 MSK] ; pid=574 ; code=exited ; status=0 }
+ExecStartEx={ path=/opt/1C/1CE/components/$service_name-VERSION-x86_64/bin/esb ; argv[]=/opt/1C/1CE/components/$service_name-VERSION-x86_64/bin/esb start --daemon --procname $service_name-launcher --servicename $service_name --cout /var/opt/1C/1CE/instances/$service_name/logs/sysout.log --cerr /var/opt/1C/1CE/instances/$service_name/logs/syserr.log --instance /var/opt/1C/1CE/instances/$service_name ; flags= ; start_time=[Thu 2024-01-18 08:21:53 MSK] ; stop_time=[Thu 2024-01-18 08:21:53 MSK] ; pid=574 ; code=exited ; status=0 }
+ExecStop={ path=/opt/1C/1CE/components/$service_name-VERSION-x86_64/bin/esb ; argv[]=/opt/1C/1CE/components/$service_name-VERSION-x86_64/bin/esb stop --pidfile /var/opt/1C/1CE/instances/$service_name/daemon.pid ; ignore_errors=no ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }
+ExecStopEx={ path=/opt/1C/1CE/components/$service_name-VERSION-x86_64/bin/esb ; argv[]=/opt/1C/1CE/components/$service_name-VERSION-x86_64/bin/esb stop --pidfile /var/opt/1C/1CE/instances/$service_name/daemon.pid ; flags= ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }
+ControlGroup=/system.slice/$service_name.service
+Id=$service_name.service
+Names=$service_name.service
+Description=$service_name.service
+LoadState=loaded
+ActiveState=active
+SubState=running
+UnitFileState=enabled
+UnitFilePreset=enabled
+FragmentPath=/etc/systemd/system/$service_name.service
+EOF
+
+elif [[ $1 == "show" && ( $service_name == "1c-enterprise-esb" || $service_name == "1c-enterprise-esb-with-ide" ) ]];
+then
+
+cat <<EOF
+Id=$service_name.service
+Names=$service_name.service
+Description=$service_name.service
+LoadState=not-found
+ActiveState=inactive
+FreezerState=running
+SubState=dead
+LoadError=org.freedesktop.systemd1.NoSuchUnit "Unit $service_name.service not found."
+EOF
+
+fi

@@ -1,0 +1,22 @@
+{
+  "storage": {
+    "file": {
+      "path": "/var/lib/vault/file"
+    }
+  },
+  "listener": [
+    {
+      "tcp": {
+        "address": "vault:8200",
+        "tls_disable": false,
+        "tls_cert_file": "/etc/vault/certs/vault.crt",
+        "tls_key_file":  "/etc/vault/certs/vault.key"
+      }
+    }
+  ],
+  "default_lease_ttl": "168h",
+  "max_lease_ttl": "720h",
+  "ui": true,
+  "disable_mlock": true,
+  "api_addr": "https://vault:8200"
+}

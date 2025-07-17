@@ -1,0 +1,47 @@
+services:
+
+#  1cesb:
+#    image: rarus-samara.ru:5000/1c/1cesb:4.1.4.6
+#    restart: always
+#    ports:
+#      - "9090:9090"
+#    volumes:
+#      - 1cesb_data:/var/opt/1C/1CE/instances/1c-enterprise-esb
+#      - 1cesb_usr1ce:/home/usr1ce
+
+  esbide:
+    image: rarus-samara.ru:5000/1c/esbide:7.0.5.57
+    command: esb
+    restart: always
+    ports:
+      - "9090:9090"
+      - "8080:8080"
+      - "6698:6698"
+    volumes:
+      - esbide_data:/var/opt/1C/1CE/instances/1c-enterprise-esb-with-ide
+      - esbide_usr1ce:/home/usr1ce
+
+  1cesbide:
+    image: rarus-samara.ru:5000/1c/esbide:4.1.4.6
+    restart: always
+    ports:
+      - "9090:9090"
+      - "8080:8080"
+      - "6698:6698"
+    volumes:
+      - 1cesbide_data:/var/opt/1C/1CE/instances/1c-enterprise-esb-with-ide
+      - 1cesbide_usr1ce:/home/usr1ce
+
+volumes:
+#  1cesb_data:
+#    external: true
+#  1cesb_usr1ce:
+#    external: true
+  1cesbide_data:
+    external: true
+  1cesbide_usr1ce:
+    external: true
+  esbide_data:
+    external: true
+  esbide_usr1ce:
+    external: true

@@ -1,0 +1,30 @@
+ARG REGISTRY= \
+    JDK_TAG=debian:bookworm-slim
+
+# hadolint ignore=DL3006
+FROM "${REGISTRY}${JDK_TAG}"
+
+ARG OC_ESB_VERSION \
+    OC_ESB_TYPE=esb
+
+LABEL maintainer="Agibalov Sergei <agibse@rarus.ru>" \
+    version="${OC_ESB_TYPE}:${OC_ESB_VERSION}" \
+    manufacturer="1C"
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# hadolint ignore=SC1091
+RUN --mount=from=common_context,target=/common_context \
+    --mount=from=context_arg,target=/context_arg \
+    set -eux; \
+    . common_context/install; \
+    install_packs
+
+ENV OC_ESB_TYPE=${OC_ESB_TYPE} \
+    OC_ESB_VERSION=${OC_ESB_VERSION}
+
+COPY --chown=usr1ce:grp1ce --chmod=766 [ "entrypoint.sh", "/" ]
+
+HEALTHCHECK CMD /healthcheck.sh
+
+ENTRYPOINT [ "/entrypoint.sh" ]

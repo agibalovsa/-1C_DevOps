@@ -1,0 +1,15 @@
+version: "3"
+
+services:
+
+  1cans:
+    image: rarus-samara.ru:5000/1c/1cans:1.81.1
+    restart: always
+    ports:
+      - "8181:8181"
+    volumes:
+      - 1cans_data:/var/opt/1cans/executable/_data
+
+volumes:
+  1cans_data:
+    external: true

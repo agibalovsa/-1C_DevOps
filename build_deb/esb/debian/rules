@@ -1,0 +1,39 @@
+#!/usr/bin/make -f
+include /usr/share/dpkg/*.mk
+export DH_VERBOSE = 1
+
+binpath=../
+file1cesb=1c_enterprise_esb_$(DEB_VERSION)_linux_x86_64.tar.gz
+file1cesbide=1c_enterprise_esb_with_ide_$(DEB_VERSION)_linux_x86_64.tar.gz
+path1cesbusr=debian/1cesb/usr/share/1cesb/
+path1cesbideusr=debian/1cesbide/usr/share/1cesb/
+path1cesbetc=debian/1cesb/etc
+path1cesbideetc=debian/1cesbide/etc
+
+override_dh_install:
+	mkdir -p $(path1cesbusr)install/
+	mkdir -p $(path1cesbideusr)install/
+	tar -xzf $(binpath)$(file1cesb) -C $(path1cesbusr)install/
+	tar -xzf $(binpath)$(file1cesbide) -C $(path1cesbideusr)install/
+	cp ps $(path1cesbusr)ps
+	cp ps $(path1cesbideusr)ps
+	cp systemctl $(path1cesbusr)systemctl
+	cp systemctl $(path1cesbideusr)systemctl
+	cp postinst debian/1cesb.postinst
+	cp postinst debian/1cesbide.postinst
+	cp postrm debian/1cesb.postrm
+	cp postrm debian/1cesbide.postrm
+	cp prerm debian/1cesb.prerm
+	cp prerm debian/1cesbide.prerm
+	sed -i -e "s/VERSION/$(DEB_VERSION)/g" $(path1cesbusr)systemctl
+	sed -i -e "s/VERSION/$(DEB_VERSION)/g" $(path1cesbideusr)systemctl
+	sed -i -e "s/ESB_SERVICE/1c-enterprise-esb/g" debian/1cesb.postinst
+	sed -i -e "s/ESB_SERVICE/1c-enterprise-esb-with-ide/g" debian/1cesbide.postinst
+	sed -i -e "s/ESB_SERVICE/1c-enterprise-esb/g" debian/1cesb.prerm
+	sed -i -e "s/ESB_SERVICE/1c-enterprise-esb-with-ide/g" debian/1cesbide.prerm
+
+override_dh_strip_nondeterminism:
+	true
+
+%:
+	dh $@

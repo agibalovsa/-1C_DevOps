@@ -1,0 +1,29 @@
+services:
+
+  vault:
+
+    # compose
+    container_name: vault
+    restart: always
+
+    # main
+    image: "${VAULT_TAG}"
+    hostname: vault
+    command: server -config=/etc/vault/config/vault-config.json
+    cap_add:
+      - IPC_LOCK
+    environment:
+      - VAULT_ADDR: "${VAULT_ADDR}"
+      - VAULT_CLUSTER_ADDR: "${VAULT_CLUSTER_ADDR}"
+    ports:
+      - ${VAULT_PORT}:8200
+      - ${VAULT_CLUSTER_PORT}:8201
+    volumes:
+      - vault_data:/var/lib/vault/files
+
+# main
+volumes:
+  vault_data:
+    external: true
+    name: "${VAULT_VOL_DATA:-vault_data}"
+  vault_logs:

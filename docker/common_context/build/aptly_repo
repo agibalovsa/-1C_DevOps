@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+
+# Installing aptly repository
+#  $1 - Repository domain name
+#  $3 - Repository components: distribution component1 component2 component3
+#  $3 - Repository login
+#  $4 - Repository password
+#
+install_aptly_repo () {
+
+    filename=${1////-}
+    filename=${filename/./-}
+    curl -u "${3}:${4}" -fsSL "https://${1}/repo_signing.key" \
+        | gpg --dearmor -o "/etc/apt/keyrings/${filename}.gpg";
+    chmod a+r "/etc/apt/keyrings/${filename}.gpg";
+    echo "deb [signed-by=/etc/apt/keyrings/${filename}.gpg] https://${1} ${2}" \
+        | tee "/etc/apt/sources.list.d/${filename}.list" > /dev/null;
+
+    echo -e "machine ${1}\nlogin ${3}\npassword ${4}" > "/etc/apt/auth.conf.d/auth-${filename}.conf";
+
+}
+
+# Uninstalling aptly repository
+#  $1 - Repository domain name
+#
+uninstall_aptly_repo () {
+
+    filename=${1////-}
+    filename=${filename/./-}
+
+    rm "/etc/apt/keyrings/${filename}.gpg";
+    rm "/etc/apt/sources.list.d/${filename}.list";
+    rm "/etc/apt/auth.conf.d/auth-${filename}.conf";
+
+}

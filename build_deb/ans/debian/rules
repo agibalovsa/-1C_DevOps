@@ -1,0 +1,47 @@
+#!/usr/bin/make -f
+include /usr/share/dpkg/*.mk
+export DH_VERBOSE = 1
+
+binpath=../
+file1cans=Analytics_$(DEB_VERSION).tar.bz2
+path1cans=debian/1cans
+pathtmp=/tmp/
+path1cansvar=/var/opt/1cans/executable/
+pathlibsystemd=/lib/systemd/system/
+
+override_dh_install:
+	ls -al $(binpath)
+	mkdir -p $(path1cans)$(pathtmp)
+	tar -xf $(binpath)$(file1cans) -C $(path1cans)$(pathtmp) --no-same-owner
+	mkdir -p $(path1cans)$(path1cansvar)
+	mkdir -p $(path1cans)$(path1cansvar)_data
+	mkdir -p $(path1cans)$(pathlibsystemd)
+	mv $(path1cans)$(pathtmp)start.sh $(path1cans)$(pathtmp)runner.jar $(path1cans)$(pathtmp)lib $(path1cans)$(pathtmp)bin-lin $(path1cans)$(pathtmp)docs $(path1cans)$(path1cansvar)
+	mv $(path1cans)$(pathtmp)ans.service $(path1cans)$(pathlibsystemd)1cans.service
+	rm -r $(path1cans)$(pathtmp)
+	chmod 755 $(path1cans)$(pathlibsystemd)1cans.service
+	chmod -R 755 $(path1cans)$(path1cansvar)
+	chmod 755 $(path1cans)$(path1cansvar)runner.jar
+	chmod 755 $(path1cans)$(path1cansvar)start.sh
+	chmod -R 755 $(path1cans)$(path1cansvar)bin-lin/
+	sed -i 's/\r//' $(path1cans)$(path1cansvar)start.sh
+	sed -i "s#runner\.jar#$(path1cansvar)runner\.jar#" $(path1cans)$(path1cansvar)start.sh
+	sed -i "s#_data#$(path1cansvar)_data#" $(path1cans)$(path1cansvar)start.sh
+	sed -i 's/\r//' $(path1cans)$(path1cansvar)bin-lin/launcher.yml
+	sed -i 's/\r//' $(path1cans)$(path1cansvar)lib/3rd-party-licenses.txt
+	sed -i 's/\r//' $(path1cans)$(path1cansvar)lib/version
+	sed -i 's/\r//' $(path1cans)$(path1cansvar)docs/apidoc.html
+	sed -i 's/\r//' $(path1cans)$(path1cansvar)docs/redoc.js
+	sed -i 's/\r//' $(path1cans)$(pathlibsystemd)1cans.service
+	sed -i 's#\[Unit\]#\[Unit\]\nAfter=network.target#' $(path1cans)$(pathlibsystemd)1cans.service
+	sed -i 's#\[Service\]#\[Service\]\nType=forking#' $(path1cans)$(pathlibsystemd)1cans.service
+	sed -i 's#Environment=.*#Environment="JAVA_HOME=/usr/lib/jvm/bellsoft-java11-amd64"#' $(path1cans)$(pathlibsystemd)1cans.service
+	sed -i 's#User=.*#User=usrans#' $(path1cans)$(pathlibsystemd)1cans.service
+	sed -i "s#WorkingDirectory=.*#WorkingDirectory=$(path1cansvar)#" $(path1cans)$(pathlibsystemd)1cans.service
+	sed -i "s#ExecStart=.*#ExecStart=$(path1cansvar)start.sh#" $(path1cans)$(pathlibsystemd)1cans.service
+
+override_dh_strip_nondeterminism:
+	true
+
+%:
+	dh $@

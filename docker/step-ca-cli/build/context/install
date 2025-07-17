@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+install_repo() {
+
+    curl -fsSL https://packages.smallstep.com/keys/apt/repo-signing-key.gpg -o /etc/apt/trusted.gpg.d/smallstep.asc && \
+    echo 'deb [signed-by=/etc/apt/trusted.gpg.d/smallstep.asc] https://packages.smallstep.com/stable/debian debs main' \
+    | tee /etc/apt/sources.list.d/smallstep.list
+
+}
+
+uinstall_repo() {
+
+    rm /etc/apt/trusted.gpg.d/smallstep.asc /etc/apt/sources.list.d/smallstep.list
+
+}

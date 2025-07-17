@@ -1,0 +1,45 @@
+# https://hub.docker.com/_/sonarqube
+ARG SONARQUBE_VERSION=lts-community
+
+FROM "sonarqube:${SONARQUBE_VERSION}"
+
+USER root
+
+WORKDIR /opt/sonarqube
+
+# plugins
+# https://github.com/1c-syntax/sonar-l10n-ru
+# https://github.com/1c-syntax/sonar-bsl-plugin-community
+# https://github.com/mc1arke/sonarqube-community-branch-plugin
+
+ARG RUSSIAN_PACK \
+    BSL_PLUGIN_VERSION \
+    BRANCH_PLUGIN_VERSION
+
+RUN set -eux; \
+    curl -#Lo "extensions/plugins/sonar-l10n-ru-plugin-${RUSSIAN_PACK}.jar" "https://github.com/1c-syntax/sonar-l10n-ru/releases/download/v${RUSSIAN_PACK}/sonar-l10n-ru-plugin-${RUSSIAN_PACK}.jar"; \
+    if [ "$BSL_PLUGIN_VERSION" = "nightly*" ]; then \
+        curl -#Lo "/opt/sonarqube/extensions/plugins/sonar-communitybsl-plugin-${BSL_PLUGIN_VERSION}.jar" "https://github.com/1c-syntax/sonar-bsl-plugin-community/releases/download/v999.99.99/sonar-communitybsl-plugin-${BSL_PLUGIN_VERSION}.jar"; \
+    else \
+        curl -#Lo "/opt/sonarqube/extensions/plugins/sonar-communitybsl-plugin-${BSL_PLUGIN_VERSION}.jar" "https://github.com/1c-syntax/sonar-bsl-plugin-community/releases/download/v${BSL_PLUGIN_VERSION}/sonar-communitybsl-plugin-${BSL_PLUGIN_VERSION}.jar"; \
+    fi; \
+    curl -#Lo "/opt/sonarqube/extensions/plugins/sonarqube-community-branch-plugin-${BRANCH_PLUGIN_VERSION}.jar" "https://github.com/mc1arke/sonarqube-community-branch-plugin/releases/download/${BRANCH_PLUGIN_VERSION}/sonarqube-community-branch-plugin-${BRANCH_PLUGIN_VERSION}.jar"; \
+    chown sonarqube:root /opt/sonarqube/extensions/plugins/*;
+
+ENV SONAR_WEB_JAVAADDITIONALOPTS=-javaagent:/opt/sonarqube/extensions/plugins/sonarqube-community-branch-plugin-${BRANCH_PLUGIN_VERSION}.jar=web \
+    SONAR_CE_JAVAADDITIONALOPTS=-javaagent:/opt/sonarqube/extensions/plugins/sonarqube-community-branch-plugin-${BRANCH_PLUGIN_VERSION}.jar=ce
+
+ARG ROOT_CERTS=
+RUN set -eux; \
+    for cert in ${ROOT_CERTS}; do \
+        certFile=$(basename "${cert}"); \
+        curl -#o "/usr/local/share/ca-certificates/${certFile}" "${cert}"; \
+        keytool -importcert -keystore /opt/java/openjdk/lib/security/cacerts \
+            -storepass changeit -file "/usr/local/share/ca-certificates/${certFile}" \
+            -alias "${certFile%.*}" -noprompt; \
+    done; \
+    if [ "${ROOT_CERTS}" ]; then \
+        update-ca-certificates; \
+    fi;
+
+USER sonarqube

@@ -1,0 +1,23 @@
+## OS options
+
+JDK_TAG="${JDK_TAG}"
+
+## ESB options
+
+OC_ESB_VERSION="${OC_ESB_VERSION}"
+# > esb, esbide
+OC_ESB_TYPE="${OC_ESB_TYPE}"
+OC_ESB_TAG="1c/${{OC_ESB_TYPE}}:${{OC_ESB_VERSION/+/.}}"
+
+## Install options
+
+INSTALL_MODE="${INSTALL_MODE:-install_from_file}"
+
+### install_from_file
+
+INSTALL_FILES="1c${{OC_ESB_TYPE}}-${{OC_ESB_VERSION}}_all.deb"
+
+### install_from_repo
+
+APTLY_REPO_COMPONENTS="1c main"
+INSTALL_PACKS="1c${{OC_ESB_TYPE}}=${{OC_ESB_VERSION}}"

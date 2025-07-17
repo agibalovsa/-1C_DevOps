@@ -1,0 +1,18 @@
+services:
+
+  postgres1C:
+    restart: always
+    image: rarus-samara.ru:5000/postgrespro:16.4
+    container_name: pg_1c
+    volumes:
+    - pgdata:/var/lib/pgpro/1c-16/data
+    ports:
+    - '5432:5432'
+    command: postgres -c listen_addresses='*'
+    environment:
+    - POSTGRES_PASSWORD=ibsrv1234
+    - POSTGRES_USER=ibsrv
+
+volumes:
+  pgdata:
+    external: true

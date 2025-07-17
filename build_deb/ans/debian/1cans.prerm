@@ -1,0 +1,19 @@
+#!/bin/bash
+
+set -e
+
+systemd=$(ps --no-headers -o comm 1)
+
+if [ "${systemd}" == "systemd" ]; then
+    systemctl stop 1cans
+    systemctl disable 1cans
+
+    if [ -f /etc/systemd/system/1cans.service ]; then
+        rm /etc/systemd/system/1cans.service
+    fi
+fi
+
+if id usrans > /dev/null 2>@1; then
+    deluser usrans --remove-home
+    delgroup grpans
+fi;
