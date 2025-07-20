@@ -3,7 +3,7 @@ services:
   oc_crserver:
 
     # compose
-    container_name: 'oc_crserver'
+    container_name: ${OC_CRSERVER_NAME:-oc_crserver}
     restart: always
 
     # main
@@ -12,16 +12,16 @@ services:
     command: crserver
     environment:
       TZ: ${TZ}
-      OC_CRSERVER_LOCATION: ${OC_CRSERVER_LOCATION}
+      OC_CRSERVER_LOCATION: ${OC_CRSERVER_LOCATION:-repository/repo.1ccr}
       OC_CRSERVER_HOSTNAME: ${OC_CRSERVER_HOSTNAME}
     ports:
-      - "${HTTP_PORT}:80"
-      - "${OC_CRS_PORT}:1542"
+      - "${HTTP_PORT:-80}:80"
+      - "${OC_CRS_PORT:-1542}:1542"
     volumes:
-      - oc_crserver:/home/usr1cv8/crserver
+      - oc_crs_data:/home/usr1cv8/crserver
 
 # main
 volumes:
-  oc_crserver:
-    name: "${OC_CRSERVER_VOL}"
+  oc_crs_data:
     external: true
+    name: "${OC_VOL_CRS_DATA:-oc_crs_data}"

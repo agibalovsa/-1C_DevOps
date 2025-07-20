@@ -15,9 +15,9 @@ services:
     environment:
       TZ: ${TZ}
     ports:
-      - "${OC_HASP_PORT_MNG}:1947"
-      - "${OC_HASP_PORT_MNG}:1947/udp"
-      - "${OC_HASP_PORT}:475/udp"
+      - "${OC_HASP_PORT_MNG:-1947}:1947"
+      - "${OC_HASP_PORT_MNG:-1947}:1947/udp"
+      - "${OC_HASP_PORT:-475}:475/udp"
     volumes:
       - oc_hasp_conf:/etc/haspd/
 

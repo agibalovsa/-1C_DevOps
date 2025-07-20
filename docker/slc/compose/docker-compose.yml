@@ -13,7 +13,7 @@ services:
     environment:
       TZ: ${TZ}
     ports:
-      - "${OC_SLC_PORT}:9099"
+      - "${OC_SLC_PORT:-9099}:9099"
     volumes:
       - oc_slc_lic:/var/1C/licence
 
