@@ -3,7 +3,7 @@ services:
   oc_ibsrv:
 
     # compose
-    container_name: ${OC_IBSRV_NAME:-'oc_ibsrv'}
+    container_name: ${OC_IBSRV_NAME:-oc_ibsrv}
     restart: always
 
     # main

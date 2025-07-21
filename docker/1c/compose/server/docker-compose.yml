@@ -3,7 +3,7 @@ services:
   oc_server:
 
     # compose
-    container_name: ${OC_SERVER_NAME:-'oc_server'}
+    container_name: ${OC_SERVER_NAME:-oc_server}
     restart: always
 
     # main
