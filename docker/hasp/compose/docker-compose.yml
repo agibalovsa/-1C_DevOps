@@ -12,6 +12,8 @@ services:
     command: hasp
     stdin_open: true
     tty: true
+    devices:
+      - "${OC_HASP_DEVICE}:/dev/bus/usb/001/001"
     environment:
       TZ: ${TZ}
     ports:

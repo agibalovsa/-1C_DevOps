@@ -28,7 +28,7 @@ setup_init() {
 setup_ragent_healthcheck() {
 
     if [ ! -f "/healthcheck.sh" ]; then
-        echo "gosu usr1cv8 rac cluster list localhost:${RAS_PORT:-$DEFAULT_RAS_PORT}" > /healthcheck.sh
+        echo "gosu usr1cv8 rac cluster list localhost:${RAS_PORT:-1545}" > /healthcheck.sh
         chmod 766 /healthcheck.sh
     fi;
 
@@ -52,6 +52,7 @@ setup_ragent_defaults() {
 setup_ragent_exec() {
 
     RAGENT_EXEC="gosu usr1cv8 ragent"
+    RAGENT_EXEC+=" /port ${OC_RAGENT_PORT}"
     RAGENT_EXEC+=" /regport ${OC_RMNGR_PORT}"
     RAGENT_EXEC+=" /range ${OC_RPHOST_PORT}"
     RAGENT_EXEC+=" /seclev ${OC_SECLEVEL}"
