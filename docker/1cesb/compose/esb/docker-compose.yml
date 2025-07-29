@@ -20,7 +20,7 @@ services:
 volumes:
   oc_esb_data:
     external: true
-    name: "${OC_ESB_DATA:-oc_esb_data}"
+    name: "${OC_ESB_DATA_VOL:-oc_esb_data}"
   oc_esb_usr1ce:
     external: true
-    name: "${OC_ESB_USR:-oc_esb_usr1ce}"
+    name: "${OC_ESB_USR_VOL:-oc_esb_usr1ce}"

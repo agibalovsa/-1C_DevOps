@@ -21,4 +21,4 @@ services:
 volumes:
   oc_slc_lic:
     external: true
-    name: ${OC_VOL_SLC_LIC:-oc_slc_lic}
+    name: ${OC_SLC_LIC_VOL:-oc_slc_lic}

@@ -22,7 +22,7 @@ services:
 volumes:
   oc_esbide_data:
     external: true
-    name: "${OC_ESBIDE_DATA:-oc_esbide_data}"
+    name: "${OC_ESBIDE_DATA_VOL:-oc_esbide_data}"
   oc_esbide_usr1ce:
     external: true
-    name: "${OC_ESBIDE_USR:-oc_esbide_usr1ce}"
+    name: "${OC_ESBIDE_USR_VOL:-oc_esbide_usr1ce}"

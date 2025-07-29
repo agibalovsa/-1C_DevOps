@@ -27,4 +27,4 @@ services:
 volumes:
   oc_hasp_conf:
     external: true
-    name: ${OC_VOL_HASP_CONF:-oc_hasp_conf}
+    name: ${OC_HASP_CONF_VOL:-oc_hasp_conf}

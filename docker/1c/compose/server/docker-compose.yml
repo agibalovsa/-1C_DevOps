@@ -31,13 +31,13 @@ services:
 volumes:
   oc_srvinfo:
     external: true
-    name: ${OC_VOL_SRVIFO:-oc_srvinfo}
+    name: ${OC_SRVIFO_VOL:-oc_srvinfo}
   oc_lic:
     external: true
-    name: ${OC_VOL_LIC:-oc_lic}
+    name: ${OC_LIC_VOL:-oc_lic}
   oc_log:
     external: true
-    name: ${OC_VOL_LOG:-oc_log}
+    name: ${OC_LOG_VOL:-oc_log}
   oc_conf:
     external: true
-    name: ${OC_VOL_CONF:-oc_conf}
+    name: ${OC_CONF_VOL:-oc_conf}

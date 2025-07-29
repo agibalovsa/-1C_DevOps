@@ -2,14 +2,23 @@ version: "3"
 
 services:
 
-  1cans:
-    image: rarus-samara.ru:5000/1c/1cans:1.81.1
+  oc_ans:
+
+    # compose
+    container_name: ${OC_ANS_NAME:-oc_ans}
     restart: always
+
+    image: "${OC_ANS_TAG}"
+    hostname: "${OC_ANS_HOSTNAME}"
+    command: esb
+    environment:
+      TZ: ${TZ}
     ports:
-      - "8181:8181"
+      - "${OC_ANS_SERVER_PORT:-8181}:8181"
     volumes:
-      - 1cans_data:/var/opt/1cans/executable/_data
+      - oc_ans_data:/var/opt/1cans/executable/_data
 
 volumes:
-  1cans_data:
+  oc_ans_data:
     external: true
+    name: "${OC_ANS_DATA_VOL:-oc_ans_data}"

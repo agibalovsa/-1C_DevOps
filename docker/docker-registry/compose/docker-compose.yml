@@ -28,13 +28,13 @@ services:
 volumes:
   docker_registry:
     external: true
-    name: ${DOCKER_VOL_REGISTRY:-docker_registry}
+    name: ${DOCKER_REGISTRY_VOL:-docker_registry}
   docker_registry_certs:
     external: true
-    name: ${DOCKER_VOL_CERTS:-docker_registry_certs}
+    name: ${DOCKER_CERTS_VOL:-docker_registry_certs}
   docker_registry_conf:
     external: true
-    name: ${DOCKER_VOL_CONF:-docker_registry_conf}
+    name: ${DOCKER_CONF_VOL:-docker_registry_conf}
   docker_registry_htpasswd:
     external: true
-    name: ${DOCKER_VOL_HTPASSWD:-docker_registry_htpasswd}
+    name: ${DOCKER_HTPASSWD_VOL:-docker_registry_htpasswd}

@@ -12,3 +12,4 @@ services:
 volumes:
   portainer_data:
     external: true
+    name: ${PORTAINER_DATA_VOL:-portainer_data}

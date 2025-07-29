@@ -24,4 +24,4 @@ services:
 volumes:
   oc_crs_data:
     external: true
-    name: "${OC_VOL_CRS_DATA:-oc_crs_data}"
+    name: "${OC_CRS_DATA_VOL:-oc_crs_data}"
