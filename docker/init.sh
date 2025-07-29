@@ -22,7 +22,8 @@ init_stack () {
     if [ "${type}" = "compose" ]; then
         IFS=" " read -ra paths <<< "$(
             dialog --ascii-lines --no-shadow --no-tags --erase-on-exit --output-fd 1 --radiolist "Please select applications" 0 0 0 \
-                "postgrespro/compose" "image magick" off \
+                "portainer/compose" "Portainer" off \
+                "postgrespro/compose" "Postgres 1C" off \
                 "1c/compose/server" "1c platform server" off \
                 "1c/compose/crs" "1c platform cr-server" off \
                 "1c/compose/ibsrv" "1c platform ibsrv" off \

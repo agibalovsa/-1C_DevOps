@@ -13,7 +13,7 @@ services:
     stdin_open: true
     tty: true
     devices:
-      - "${OC_HASP_DEVICE}:/dev/bus/usb/001/001"
+      - "${OC_HASP_DEVICE}:${OC_HASP_DEVICE}"
     environment:
       TZ: ${TZ}
     ports:

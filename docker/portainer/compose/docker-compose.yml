@@ -1,0 +1,14 @@
+services:
+  portainer:
+    image: portainer/portainer-ce:lts
+    command: -H tcp://tasks.agent:9001 --tlsskipverify
+    ports:
+      - "${PORTAINER_HTTPS_PORT:-9443}:9443"
+      - "${PORTAINER_HTTP_PORT:-9000}:9000"
+      - "${PORTAINER_KUBERNET_PORT:-8000}:8000"
+    volumes:
+      - portainer_data:/data
+
+volumes:
+  portainer_data:
+    external: true
