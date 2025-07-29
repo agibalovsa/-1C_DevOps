@@ -10,7 +10,7 @@ services:
 
     image: "${OC_ANS_TAG}"
     hostname: "${OC_ANS_HOSTNAME}"
-    command: esb
+    command: ans
     environment:
       TZ: ${TZ}
     ports:
