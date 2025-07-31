@@ -29,4 +29,4 @@ services:
 volumes:
   oc_ibsrv_data:
     external: true
-    name: ${OC_IBSRV_DATA_VOL}
+    name: ${OC_IBSRV_DATA_VOL:-oc_ibsrv_data}
