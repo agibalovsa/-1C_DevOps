@@ -1,8 +1,8 @@
 ARG REGISTRY= \
-    JDK_TAG=debian:bookworm-slim
+    OS_TAG=debian:bookworm-slim
 
 # hadolint ignore=DL3006
-FROM "${REGISTRY}${JDK_TAG}"
+FROM "${REGISTRY}${OS_TAG}"
 
 ARG OC_ESB_VERSION \
     OC_ESB_TYPE=esb

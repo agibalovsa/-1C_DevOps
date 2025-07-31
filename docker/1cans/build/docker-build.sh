@@ -2,7 +2,7 @@
 
 docker build \
     --build-arg "REGISTRY=${REGISTRY}" \
-    --build-arg "JDK_TAG=${JDK_TAG}" \
+    --build-arg "OS_TAG=${OS_TAG}" \
     --build-arg "OC_ANS_VERSION=${OC_ANS_VERSION}" \
     --build-context common_context=../../common_context/build \
     --build-context "context_arg=${CONTEXT_ARG}" \

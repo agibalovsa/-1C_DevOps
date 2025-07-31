@@ -215,9 +215,6 @@ init_ibsrv_config() {
             mkdir -p "${OC_IBSRV_FILE_BASE_PATH}"
             chown usr1cv8:grp1cv8 "${OC_IBSRV_FILE_BASE_PATH}"
             gosu usr1cv8 ibcmd infobase create --database-path="${OC_IBSRV_FILE_BASE_PATH}"
-            if [ ! -f "${OC_IBSRV_FILE_BASE_PATH}" ]; then
-                gosu usr1cv8 ibcmd infobase create --database-path="${OC_IBSRV_FILE_BASE_PATH}"
-            fi;
         else
             chown -R usr1cv8:grp1cv8 "${OC_IBSRV_FILE_BASE_PATH}"
         fi;

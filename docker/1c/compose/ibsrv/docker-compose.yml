@@ -8,25 +8,25 @@ services:
 
     # main
     image: ${OC_IBSRV_TAG}
-    hostname: ${OC_SERVER_HOSTNAME}
+    hostname: ${OC_IBSRV_HOSTNAME}
     command: ibsrv
 
     environment:
       TZ: ${TZ}
-      OC_IBSRV_CONFIG_PATH: /srv/1c/ibsrv/config_ibsrv.yml
-      OC_IBSRV_BASE_NAME: ${OC_IBSRV_BASE_NAME}
-      OC_IBSRV_HTTP_PORT: ${OC_IBSRV_HTTP_PORT}"
-      OC_IBSRV_HTTP_BASE_NAME: ${OC_IBSRV_HTTP_BASE_NAME}
-      OC_IBSRV_DEBUG: ${OC_IBSRV_BASE_NAME:-tcp}
+      OC_IBSRV_CONFIG_PATH: ${OC_IBSRV_CONFIG_PATH:-/srv/1c/ibsrv/config_ibsrv.yml}
+      OC_IBSRV_BASE_NAME: ${OC_IBSRV_BASE_NAME:-ibsrv}
+      OC_IBSRV_HTTP_PORT: ${OC_IBSRV_HTTP_PORT:-8314}
+      OC_IBSRV_HTTP_BASE_NAME: ${OC_IBSRV_HTTP_BASE_NAME:-/ibsrv}
+      OC_IBSRV_DEBUG: ${OC_IBSRV_DEBUG:-tcp}
     ports:
-      - "${OC_IBSRV_HTTP_PORT}:${OC_IBSRV_HTTP_PORT}"
-      - "${OC_RMNGR_PORT}:1541"
-      - "1550:1550"
-      - "${OC_RPHOST_PORT}-1591:1560-1591"
+      - "${OC_IBSRV_HTTP_PORT:-8314}:8314"
+      - "${OC_IBSRV_PORT:-1541}:1541"
+      - "${OC_IBSRV_DEBUG_PORT:-1550}:1550"
+      - "${OC_IBSRV_RANGE_PORT:-1560-1591}:1560-1591"
     volumes:
       - oc_ibsrv_data:/srv/1c/ibsrv
   
 volumes:
   oc_ibsrv_data:
     external: true
-    name: ${IBSRV_DATA_VOL}
+    name: ${OC_IBSRV_DATA_VOL}
