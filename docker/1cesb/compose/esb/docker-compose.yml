@@ -13,6 +13,7 @@ services:
       TZ: ${TZ}
     ports:
       - "${OC_ESB_SERVER_PORT:-9090}:9090"
+      - "${OC_ESBIDE_BUS_PORT:-6698}:6698"
     volumes:
       - oc_esb_data:/var/opt/1C/1CE/instances/1c-enterprise-esb
       - oc_esb_usr1ce:/home/usr1ce
