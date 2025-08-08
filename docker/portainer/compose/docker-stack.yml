@@ -2,11 +2,9 @@ services:
 
   portainer_agent:
 
-    # main
     networks:
-      - agent_network
+      - portainer_agent_network
 
-    # swarm
     deploy:
       mode: global
       placement:
@@ -14,19 +12,16 @@ services:
 
   portainer:
 
-    # main
     networks:
-      - agent_network
+      - portainer_agent_network
 
-    # swarm
     deploy:
       mode: replicated
       replicas: 1
       placement:
         constraints: [node.role == manager]
 
-# main
 networks:
-  agent_network:
+  portainer_agent_network:
     driver: overlay
     attachable: true

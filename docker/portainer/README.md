@@ -8,6 +8,8 @@
 
 Значимые переменные среды:
 
-- `PORTAINER_HTTPS_PORT`    - порт хоста для указания HTTPS порта приложения.
-- `PORTAINER_HTTP_PORT`     - порт хоста для указания HTTP порта приложения.
-- `PORTAINER_KUBERNET_PORT` - порт хоста для указания порта приложения интеграции с **Kubernetes**.
+- `PORTAINER_AGENT_PORT`    - порт хоста для связи с агентом.
+
+- `PORTAINER_HTTPS_PORT`    - порт хоста для связи с приложением по HTTPS протоколу.
+- `PORTAINER_HTTP_PORT`     - порт хоста для связи с приложением по HTTP протоколу.
+- `PORTAINER_KUBERNET_PORT` - порт хоста для интеграции с **Kubernetes**.

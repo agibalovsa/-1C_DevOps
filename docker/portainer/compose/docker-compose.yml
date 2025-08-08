@@ -1,24 +1,17 @@
 services:
 
+  portainer_agent:
+
+    container_name: "${PORTAINER_AGENT_NAME:-portainer_agent}"
+    restart: always
+    ports:
+      - "${PORTAINER_AGENT_PORT:-9001}:9001"
+    volumes:
+      - /:/host
+    environment:
+      AGENT_PORT: 9001
+
   portainer:
 
-    # compose
-    container_name: "${PORTAINER_NAME:-postgres}"
+    container_name: "${PORTAINER_NAME:-portainer}"
     restart: always
-  
-    # main
-    image: "${PORTAINER_TAG:-portainer/portainer-ce:lts}"
-    hostname: "${PORTAINER_HOSTNAME}"
-    command: -H tcp://tasks.agent:9001 --tlsskipverify
-    ports:
-      - "${PORTAINER_HTTPS_PORT:-9443}:9443"
-      - "${PORTAINER_HTTP_PORT:-9000}:9000"
-      - "${PORTAINER_KUBERNET_PORT:-8000}:8000"
-    volumes:
-      - portainer_data:/data
-
-# main
-volumes:
-  portainer_data:
-    external: true
-    name: "${PORTAINER_DATA_VOL:-portainer_data}"
