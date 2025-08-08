@@ -1,6 +1,14 @@
 services:
+
   portainer:
-    image: portainer/portainer-ce:lts
+
+    # compose
+    container_name: "${PORTAINER_NAME:-postgres}"
+    restart: always
+  
+    # main
+    image: "${PORTAINER_TAG:-portainer/portainer-ce:lts}"
+    hostname: "${PORTAINER_HOSTNAME}"
     command: -H tcp://tasks.agent:9001 --tlsskipverify
     ports:
       - "${PORTAINER_HTTPS_PORT:-9443}:9443"
@@ -9,7 +17,8 @@ services:
     volumes:
       - portainer_data:/data
 
+# main
 volumes:
   portainer_data:
     external: true
-    name: ${PORTAINER_DATA_VOL:-portainer_data}
+    name: "${PORTAINER_DATA_VOL:-portainer_data}"

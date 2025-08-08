@@ -3,7 +3,7 @@
 install_packs() {
 
     apt-get update;
-    apt-get install -yq --no-install-recommends libasound2 libfreetype6 libfontconfig1 libx11-6 libxdmcp6 libxext6 libxrender1 libxtst6 libxi6 libxau6 libxdmcp6 libxcb1;
+    apt-get install -yq --no-install-recommends libasound2 libfreetype6 libfontconfig1 libx11-6 libxdmcp6 libxext6 libxrender1 libxtst6 libxi6 libxau6 libxcb1;
     apt-get clean \
         && rm -rf /var/lib/apt/lists/*;
 
