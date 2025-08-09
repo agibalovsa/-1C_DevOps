@@ -1,0 +1,42 @@
+services:
+
+  gitlab:
+
+    image: "${GITLAB_TAG}"
+    hostname: "${GITLAB_HOSTNAME:-gitlab}"
+    environment:
+      TZ:              "${TZ}"
+      GITLAB_HOSTNAME: "${GITLAB_HOSTNAME}"
+      GITLAB_SSH_PORT: "${GITLAB_SSH_PORT}"
+      GITLAB_EMAIL:    "${GITLAB_EMAIL}"
+    ports:
+      - "${GITLAB_SSH_PORT}:22"
+      - "${GITLAB_HTTPS_PORT}:443"
+    volumes:
+      - gitlab_data:/var/opt/gitlab
+      - gitlab_logs:/var/log/gitlab
+      - gitlab_config:/etc/gitlab
+
+  gitlab-runner:
+
+    image: gitlab/gitlab-runner:alpine
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - gitlab_runner_config:/etc/gitlab-runner
+      - gitlab_runner_temp:/home/gitlab-runner
+
+volumes:
+  gitlab_data:
+    external: true
+    name: ${GITLAB_DATA_VOL:-gitlab_data}
+  gitlab_logs:
+    external: true
+    name: ${GITLAB_LOGS_VOL:-gitlab_logs}
+  gitlab_config:
+    external: true
+    name: ${GITLAB_CONF_VOL:-gitlab_config}
+  gitlab_runner_config:
+    external: true
+    name: ${GITLAB_RUNNER_CONF_VOL:-gitlab_runner_config}
+  gitlab_runner_temp:
+    name: ${GITLAB_RUNNER_TEMP_VOL:-gitlab_runner_temp}

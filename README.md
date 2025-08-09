@@ -42,7 +42,7 @@
   - [Portainer](docker/portainer/README.md)
   - [Nginx](docker/nginx/README.md)
 - Разработка
-  - [Gitlab](docker/gitlab/README.md)
+  - [Gitlab](docker/gitlab-ce/README.md)
   - [Sonarqube](docker/sonarqube/README.md)
 - Моделирование
   - [Diagrams](docker/diagrams/README.md)

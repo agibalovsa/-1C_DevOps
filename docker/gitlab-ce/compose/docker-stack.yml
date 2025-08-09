@@ -1,0 +1,34 @@
+services:
+
+  gitlab:
+
+    environment:
+      GITLAB_OMNIBUS_CONFIG: "from_file('/omnibus_config.rb')"
+
+    configs:
+      - source: gitlab_conf
+        target: /omnibus_config.rb
+    secrets:
+      - gitlab_root_password
+      - source: gitlab_key
+        target: /etc/gitlab/ssl/gitlab.key
+      - source: gitlab_crt
+        target: /etc/gitlab/ssl/gitlab.crt
+
+  gitlab-runner:
+
+    deploy:
+      mode: replicated
+      replicas: 1
+
+configs:
+  gitlab_conf:
+    external: true
+
+secrets:
+  gitlab_root_password:
+    external: true
+  gitlab_key:
+    external: true
+  gitlab_crt:
+    external: true
