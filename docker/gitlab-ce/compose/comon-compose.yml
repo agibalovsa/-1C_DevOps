@@ -5,10 +5,10 @@ services:
     image: "${GITLAB_TAG}"
     hostname: "${GITLAB_HOSTNAME:-gitlab}"
     environment:
-      TZ:              "${TZ}"
-      GITLAB_HOSTNAME: "${GITLAB_HOSTNAME}"
-      GITLAB_SSH_PORT: "${GITLAB_SSH_PORT}"
-      GITLAB_EMAIL:    "${GITLAB_EMAIL}"
+      TZ:                  "${TZ}"
+      GITLAB_EXTERNAL_URL: "${GITLAB_EXTERNAL_URL}"
+      GITLAB_SSH_PORT:     "${GITLAB_SSH_PORT}"
+      GITLAB_EMAIL:        "${GITLAB_EMAIL}"
     ports:
       - "${GITLAB_SSH_PORT}:22"
       - "${GITLAB_HTTPS_PORT}:443"

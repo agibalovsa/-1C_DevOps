@@ -13,15 +13,22 @@ LABEL maintainer="Agibalov Sergei <agibse@rarus.ru>" \
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
+ENV OC_ESB_TYPE=${OC_ESB_TYPE} \
+    OC_ESB_VERSION=${OC_ESB_VERSION}
+
+# hadolint ignore=SC1091
+RUN --mount=from=context,target=/context \
+    --mount=from=context_arg,target=/context_arg \
+    set -eux; \
+    . context/pre_install; \
+    install_packs
+
 # hadolint ignore=SC1091
 RUN --mount=from=common_context,target=/common_context \
     --mount=from=context_arg,target=/context_arg \
     set -eux; \
     . common_context/install; \
     install_packs
-
-ENV OC_ESB_TYPE=${OC_ESB_TYPE} \
-    OC_ESB_VERSION=${OC_ESB_VERSION}
 
 COPY --chown=usr1ce:grp1ce --chmod=766 [ "entrypoint.sh", "/" ]
 
