@@ -1,12 +1,13 @@
 services:
 
   nginx:
+
     image: "${NGINX_TAG}"
     hostname: "${NGINX_HOSTNAME:-nginx}"
     ports:
       - "80:80"
       - "443:443"
-      - "${GITLAB_SSH_PORT}:${GITLAB_SSH_PORT}"
+      - "${GITLAB_SSH_PORT:-22}:${GITLAB_SSH_PORT:-22}"
     environment:
       TZ:                     "${TZ}"
       NGINX_SERVER_NAME:      "${NGINX_SERVER_NAME}"
