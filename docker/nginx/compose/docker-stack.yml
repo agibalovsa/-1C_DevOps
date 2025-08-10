@@ -1,0 +1,33 @@
+services:
+
+  nginx:
+
+    networks:
+      - nginx_network
+    configs:
+      - source: nginx_conf
+        target: /etc/nginx/conf.d/nginx.conf
+      - source: stream_conf
+        target: /etc/nginx/stream.d/stream.conf
+    secrets:
+      - source: nginx_key
+        target: /etc/nginx/ssl/nginx.key
+      - source: nginx_crt
+        target: /etc/nginx/ssl/nginx.crt
+
+networks:
+  nginx_network:
+    name: "${NGINX_NETWORK:-nginx_network}"
+    external: true
+
+configs:
+  nginx_conf:
+    external: true
+  stream_conf:
+    external: true
+
+secrets:
+  nginx_key:
+    external: true
+  nginx_crt:
+    external: true

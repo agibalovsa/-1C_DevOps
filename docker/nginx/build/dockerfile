@@ -1,4 +1,10 @@
-FROM nginx:latest
+ARG OS_TAG=nginx:latest
+
+# hadolint ignore=DL3006
+FROM "${OS_TAG}"
+
+LABEL maintainer="Agibalov Sergei <agibse@rarus.ru>" \
+      manufacturer="Nginx"
 
 COPY [ "stream.conf", "/etc/nginx/" ]
 

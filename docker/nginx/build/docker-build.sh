@@ -1,5 +1,9 @@
 #!/bin/bash
 
 docker build \
-  -t nginx-rproxy:latest \
+  -t "${REGISTRY}${NGINX_TAG}" \
   .
+
+if [ "${1}" = "push" ] && [ -n "${REGISTRY}" ]; then
+    docker push "${REGISTRY}${NGINX_TAG}"
+fi

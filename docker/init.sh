@@ -37,6 +37,8 @@ init_stack () {
         IFS=" " read -ra paths <<< "$(
             dialog --ascii-lines --no-shadow --no-tags --erase-on-exit --output-fd 1 --radiolist "Please select applications" 0 0 0 \
                 "os/linux_deb/build" "os-system" off \
+                "nginx/build" "nginx" off \
+                "sonarqube/build" "sonarqube" off \
                 "imagick/build" "image magick" off \
                 "postgrespro/build" "image magick" off \
                 "jdk/build" "jdk" off \

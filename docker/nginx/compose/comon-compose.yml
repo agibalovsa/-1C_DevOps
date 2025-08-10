@@ -1,0 +1,19 @@
+services:
+
+  nginx:
+    image: "${NGINX_TAG}"
+    hostname: "${NGINX_HOSTNAME:-nginx}"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "${GITLAB_SSH_PORT}:${GITLAB_SSH_PORT}"
+    environment:
+      TZ:                     "${TZ}"
+      NGINX_SERVER_NAME:      "${NGINX_SERVER_NAME}"
+      GITLAB_EXTERNAL_URL:    "${GITLAB_EXTERNAL_URL}"
+      GITLAB_HTTPS_PORT:      "${GITLAB_HTTPS_PORT}"
+      GITLAB_SSH_PORT:        "${GITLAB_SSH_PORT}"
+      SONAR_EXTERNAL_URL:     "${SONAR_EXTERNAL_URL}"
+      SONAR_HTTP_PORT:        "${SONAR_HTTP_PORT}"
+      PORTAINER_EXTERNAL_URL: "${PORTAINER_EXTERNAL_URL}"
+      PORTAINER_HTTPS_PORT:   "${PORTAINER_HTTPS_PORT}"
