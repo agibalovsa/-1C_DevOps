@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+
+# https://github.com/1c-syntax/sonar-l10n-ru
+# https://github.com/1c-syntax/sonar-bsl-plugin-community
+# https://github.com/mc1arke/sonarqube-community-branch-plugin
+#
+install_plugins() {
+
+    # current directory /opt/sonarqube
+
+    # shellcheck source=/dev/null
+    . ../../context_arg/.arg;
+
+    apt-get update \
+        && apt-get install -yq --no-install-recommends unzip wget \
+        && apt-get clean \
+        && rm -rf /var/lib/apt/lists/*;
+    wget --progress=dot:giga --timeout=30 -O "./extensions/plugins/sonar-l10n-ru-plugin-${RUSSIAN_PACK_VERSION}.jar" "https://github.com/1c-syntax/sonar-l10n-ru/releases/download/v${RUSSIAN_PACK_VERSION}/sonar-l10n-ru-plugin-${RUSSIAN_PACK_VERSION}.jar";
+    if [ "$BSL_PLUGIN_VERSION" = "nightly*" ]; then
+        wget --progress=dot:giga --timeout=30 -O "./extensions/plugins/sonar-communitybsl-plugin-${BSL_PLUGIN_VERSION}.jar" "https://github.com/1c-syntax/sonar-bsl-plugin-community/releases/download/v999.99.99/sonar-communitybsl-plugin-${BSL_PLUGIN_VERSION}.jar";
+    else
+        wget --progress=dot:giga --timeout=30 -O "./extensions/plugins/sonar-communitybsl-plugin-${BSL_PLUGIN_VERSION}.jar" "https://github.com/1c-syntax/sonar-bsl-plugin-community/releases/download/v${BSL_PLUGIN_VERSION}/sonar-communitybsl-plugin-${BSL_PLUGIN_VERSION}.jar";
+    fi;
+    wget --progress=dot:giga --timeout=30 -O "./extensions/plugins/sonarqube-community-branch-plugin-${BRANCH_PLUGIN_VERSION}.jar" "https://github.com/mc1arke/sonarqube-community-branch-plugin/releases/download/${BRANCH_PLUGIN_VERSION}/sonarqube-community-branch-plugin-${BRANCH_PLUGIN_VERSION}.jar";
+    chown sonarqube:root ./extensions/plugins/*;
+    wget --progress=dot:giga --timeout=30 -O "/tmp/sonarqube-webapp.zip" "https://github.com/mc1arke/sonarqube-community-branch-plugin/releases/download/${BRANCH_PLUGIN_VERSION}/sonarqube-webapp.zip";
+    chmod -R 770 "./web" && rm -rf "./web/*";
+    unzip -o "/tmp/sonarqube-webapp.zip" -d "./web";
+    rm -f "/tmp/sonarqube-webapp.zip";
+    chmod -R 550 "./web"
+
+}
+
+install_cert() {
+
+    # current directory /opt/sonarqube
+
+    # shellcheck source=/dev/null
+    . ../../context_arg/.arg;
+    # shellcheck source=/dev/null
+    . ../../common_context/certs;
+
+    install_certs "${ROOT_CERTS}"
+
+}

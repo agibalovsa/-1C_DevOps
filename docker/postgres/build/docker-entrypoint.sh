@@ -103,7 +103,7 @@ docker_init_database_dir() {
 # print large warning if POSTGRES_HOST_AUTH_METHOD is set to 'trust'
 # assumes database is not set up, ie: [ -z "$DATABASE_ALREADY_EXISTS" ]
 docker_verify_minimum_env() {
-	case "${PG_MAJOR:-}" in
+	case "${PGMAJOR:-}" in
 		12 | 13) # https://github.com/postgres/postgres/commit/67a472d71c98c3d2fa322a1b4013080b20720b98
 			# check password first so we can output the warning before postgres
 			# messes it up
@@ -257,7 +257,7 @@ docker_setup_env() {
 	# look specifically for PG_VERSION, as it is expected in the DB dir
 	if [ -s "$PGDATA/PG_VERSION" ]; then
 		DATABASE_ALREADY_EXISTS='true'
-	elif [ "$PGDATA" = "/var/lib/postgresql/$PG_MAJOR/docker" ]; then
+	elif [ "$PGDATA" = "/var/lib/postgresql/$PGMAJOR/docker" ]; then
 		# https://github.com/docker-library/postgres/pull/1259
 		for d in /var/lib/postgresql /var/lib/postgresql/data /var/lib/postgresql/*/docker; do
 			if [ -s "$d/PG_VERSION" ]; then

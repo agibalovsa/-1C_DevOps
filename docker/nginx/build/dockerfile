@@ -1,13 +1,20 @@
-ARG OS_TAG=nginx:latest
+ARG NGINX_REPO=nginx \
+    NGINX_VERSION=latest
 
 # hadolint ignore=DL3006
-FROM "${OS_TAG}"
+FROM "${NGINX_REPO}:${NGINX_VERSION}"
+
+ARG NGINX_VERSION
 
 LABEL maintainer="Agibalov Sergei <agibse@rarus.ru>" \
-      manufacturer="Nginx"
+    version="${NGINX_VERSION}" \
+    manufacturer="Nginx"
 
 COPY [ "stream.conf", "/etc/nginx/" ]
 
-RUN set -eux; \
-    mkdir -p /etc/nginx/stream.d; \
-    echo "include /etc/nginx/stream.conf;" >> /etc/nginx/nginx.conf;
+# hadolint ignore=SC1091
+RUN --mount=from=context,target=/context \
+    --mount=from=context_arg,target=/context_arg \
+    set -eux; \
+    . context/post_install; \
+    set_startup

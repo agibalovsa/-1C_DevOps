@@ -1,45 +1,41 @@
-# https://hub.docker.com/_/sonarqube
-ARG SONARQUBE_VERSION=lts-community
+ARG SONAR_REPO=sonarqube \
+    SONAR_VERSION=lts-community
 
-FROM "sonarqube:${SONARQUBE_VERSION}"
+# hadolint ignore=DL3006
+FROM "${SONAR_REPO}:${SONAR_VERSION}"
+
+ARG SONAR_VERSION \
+    RUSSIAN_PACK_VERSION \
+    BSL_PLUGIN_VERSION \
+    BRANCH_PLUGIN_VERSION
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+LABEL maintainer="Agibalov Sergei <agibse@rarus.ru>" \
+    version="${SONAR_VERSION}" \
+    manufacturer="SonarSource SA" \
+    libs="Russian pack:${RUSSIAN_PACK_VERSION}, BSL plugin:${BSL_PLUGIN_VERSION}, Branch plugin:${BRANCH_PLUGIN_VERSION}"
 
 USER root
 
 WORKDIR /opt/sonarqube
 
-# plugins
-# https://github.com/1c-syntax/sonar-l10n-ru
-# https://github.com/1c-syntax/sonar-bsl-plugin-community
-# https://github.com/mc1arke/sonarqube-community-branch-plugin
+# hadolint ignore=SC1091
+RUN --mount=from=context,target=/context \
+    --mount=from=context_arg,target=/context_arg \
+    set -eux; \
+    . ../../context/post_install; \
+    install_plugins
 
-ARG RUSSIAN_PACK \
-    BSL_PLUGIN_VERSION \
-    BRANCH_PLUGIN_VERSION
+ENV SONAR_WEB_JAVAADDITIONALOPTS="-javaagent:./extensions/plugins/sonarqube-community-branch-plugin-${BRANCH_PLUGIN_VERSION}.jar=web" \
+    SONAR_CE_JAVAADDITIONALOPTS="-javaagent:./extensions/plugins/sonarqube-community-branch-plugin-${BRANCH_PLUGIN_VERSION}.jar=ce"
 
-RUN set -eux; \
-    curl -#Lo "extensions/plugins/sonar-l10n-ru-plugin-${RUSSIAN_PACK}.jar" "https://github.com/1c-syntax/sonar-l10n-ru/releases/download/v${RUSSIAN_PACK}/sonar-l10n-ru-plugin-${RUSSIAN_PACK}.jar"; \
-    if [ "$BSL_PLUGIN_VERSION" = "nightly*" ]; then \
-        curl -#Lo "/opt/sonarqube/extensions/plugins/sonar-communitybsl-plugin-${BSL_PLUGIN_VERSION}.jar" "https://github.com/1c-syntax/sonar-bsl-plugin-community/releases/download/v999.99.99/sonar-communitybsl-plugin-${BSL_PLUGIN_VERSION}.jar"; \
-    else \
-        curl -#Lo "/opt/sonarqube/extensions/plugins/sonar-communitybsl-plugin-${BSL_PLUGIN_VERSION}.jar" "https://github.com/1c-syntax/sonar-bsl-plugin-community/releases/download/v${BSL_PLUGIN_VERSION}/sonar-communitybsl-plugin-${BSL_PLUGIN_VERSION}.jar"; \
-    fi; \
-    curl -#Lo "/opt/sonarqube/extensions/plugins/sonarqube-community-branch-plugin-${BRANCH_PLUGIN_VERSION}.jar" "https://github.com/mc1arke/sonarqube-community-branch-plugin/releases/download/${BRANCH_PLUGIN_VERSION}/sonarqube-community-branch-plugin-${BRANCH_PLUGIN_VERSION}.jar"; \
-    chown sonarqube:root /opt/sonarqube/extensions/plugins/*;
-
-ENV SONAR_WEB_JAVAADDITIONALOPTS=-javaagent:/opt/sonarqube/extensions/plugins/sonarqube-community-branch-plugin-${BRANCH_PLUGIN_VERSION}.jar=web \
-    SONAR_CE_JAVAADDITIONALOPTS=-javaagent:/opt/sonarqube/extensions/plugins/sonarqube-community-branch-plugin-${BRANCH_PLUGIN_VERSION}.jar=ce
-
-ARG ROOT_CERTS=
-RUN set -eux; \
-    for cert in ${ROOT_CERTS}; do \
-        certFile=$(basename "${cert}"); \
-        curl -#o "/usr/local/share/ca-certificates/${certFile}" "${cert}"; \
-        keytool -importcert -keystore /opt/java/openjdk/lib/security/cacerts \
-            -storepass changeit -file "/usr/local/share/ca-certificates/${certFile}" \
-            -alias "${certFile%.*}" -noprompt; \
-    done; \
-    if [ "${ROOT_CERTS}" ]; then \
-        update-ca-certificates; \
-    fi;
+# hadolint ignore=SC1091
+RUN --mount=from=context,target=/context \
+    --mount=from=common_context,target=/common_context \
+    --mount=from=context_arg,target=/context_arg \
+    set -eux; \
+    . ../../context/post_install; \
+    install_cert
 
 USER sonarqube

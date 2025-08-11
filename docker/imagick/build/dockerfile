@@ -12,13 +12,13 @@ RUN --mount=from=context,target=/context \
     . context/pre_install; \
     install_pack
 
+FROM pre_build AS compiler
+
 ARG IM_VERSION \
     AOM_VERSION \
     HEIF_VERSION \
     JXL_VERSION \
     IMEI_VERSION
-
-FROM pre_build AS compiler
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
@@ -31,6 +31,12 @@ RUN --mount=from=context,target=/context \
     compile_deb "/srv/imagick/distr"
 
 FROM pre_build
+
+ARG IM_VERSION \
+    AOM_VERSION \
+    HEIF_VERSION \
+    JXL_VERSION \
+    IMEI_VERSION
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 

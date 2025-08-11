@@ -1,0 +1,28 @@
+services:
+
+  postgres:
+
+    image: "${POSTGRES_TAG}"
+    hostname: "${POSTGRES_HOSTNAME:-postgres}"
+    command: postgres -c listen_addresses='*'
+    shm_size: 128mb
+    environment:
+      # https://hub.docker.com/_/postgres
+      TZ: "${TZ}"
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+    volumes:
+      # For postgres 1c: /var/lib/pgpro/1c-${POSTGRES_MAJOR}/data
+      # For vanila postgres: /var/lib/postgresql/data
+      - "postgres_data:${POSTGRES_DATA_PATH}"
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    networks:
+      - postgres_network
+    secrets:
+      - postgres_password
+
+volumes:
+  postgres_data:
+    external: true
+    name: "${POSTGRES_DATA_VOL:-postgres_data}"

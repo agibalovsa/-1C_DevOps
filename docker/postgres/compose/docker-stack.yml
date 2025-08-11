@@ -1,0 +1,8 @@
+networks:
+  postgres_network:
+    name: "${POSTGRES_NETWORK:-postgres_network}"
+    external: true
+
+secrets:
+  postgres_password:
+    external: true

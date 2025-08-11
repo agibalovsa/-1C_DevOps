@@ -23,7 +23,7 @@ init_stack () {
         IFS=" " read -ra paths <<< "$(
             dialog --ascii-lines --no-shadow --no-tags --erase-on-exit --output-fd 1 --radiolist "Please select applications" 0 0 0 \
                 "portainer/compose" "Portainer" off \
-                "postgrespro/compose" "Postgres 1C" off \
+                "postgres/compose" "Postgres" off \
                 "1c/compose/server" "1c platform server" off \
                 "1c/compose/crs" "1c platform cr-server" off \
                 "1c/compose/ibsrv" "1c platform ibsrv" off \
@@ -40,7 +40,7 @@ init_stack () {
                 "nginx/build" "nginx" off \
                 "sonarqube/build" "sonarqube" off \
                 "imagick/build" "image magick" off \
-                "postgrespro/build" "image magick" off \
+                "postgres/build" "postgres" off \
                 "jdk/build" "jdk" off \
                 "1c/build" "1c platform" off \
                 "1cesb/build" "1c-esb" off \

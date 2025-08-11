@@ -1,0 +1,14 @@
+services:
+
+  postgres:
+
+    container_name: "${POSTGRES_NAME:-postgres}"
+    restart: always
+
+networks:
+  postgres_network:
+    name: "${POSTGRES_NETWORK:-postgres_network}"
+
+secrets:
+  postgres_password:
+    environment: POSTGRES_PASSWORD

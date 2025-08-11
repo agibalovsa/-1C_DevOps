@@ -2,6 +2,9 @@
 
 install_packs() {
 
+    # shellcheck source=/dev/null
+    . /context_arg/.arg;
+
     mkdir /docker-entrypoint-initdb.d;
 
     wget --progress=dot:giga --timeout=30 -O "pgpro-repo-add.sh" "https://repo.postgrespro.ru/1c/1c-${PG_MAJOR_VERSION}/keys/pgpro-repo-add.sh";

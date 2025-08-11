@@ -1,10 +1,14 @@
 ARG REGISTRY= \
-    OS_TAG=debian:bookworm-slim \
-    PG_MAJOR_VERSION= \
-    PG_VERSION=
+    OS_TAG=debian:bookworm-slim
 
 # hadolint ignore=DL3006
 FROM "${REGISTRY}${OS_TAG}"
+
+ARG PG_MAJOR_VERSION \
+    PG_VERSION \
+    PG_PATH \
+    PG_BIN_PATH \
+    PG_SHARE_PATH
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
@@ -15,20 +19,24 @@ LABEL maintainer="Agibalov Sergei <agibse@rarus.ru>" \
 
 # hadolint ignore=SC1091
 RUN --mount=from=context,target=/context \
+    --mount=from=context_arg,target=/context_arg \
     set -eux; \
     . context/pre_install; \
     set_users; \
     set_locals; \
     install_packs
 
-ENV LANG="en_US.utf8"
+ENV LANG="en_US.utf8" \
+    PGMAJOR="${PG_MAJOR_VERSION}" \
+    PATH="${PATH}:${PG_BIN_PATH}" \
+    PGDATA="${PG_PATH}/data" \
+    PGSHARE="${PG_SHARE_PATH}/data"
 
 # hadolint ignore=SC1091
 RUN --mount=from=context,target=/context \
     --mount=from=context_arg,target=/context_arg \
     set -eux; \
     . context/install; \
-    . /context_arg/.arg; \
     install_packs
 
 # hadolint ignore=SC1091
@@ -36,17 +44,12 @@ RUN --mount=from=context,target=/context \
     --mount=from=context_arg,target=/context_arg \
     set -eux; \
     . context/post_install; \
-    . /context_arg/.arg; \
     set_startup
-
-ENV PG_MAJOR="${PG_MAJOR_VERSION}" \
-    PATH="${PATH}:/opt/pgpro/1c-${PG_MAJOR_VERSION}/bin" \
-    PGDATA="/var/lib/postgresql/data"
 
 COPY --chmod=777 [ "docker-entrypoint.sh", "docker-ensure-initdb.sh", "/usr/local/bin/" ]
 RUN ln -sT docker-ensure-initdb.sh /usr/local/bin/docker-enforce-initdb.sh
 
-VOLUME [ "/var/lib/postgresql/data" ]
+VOLUME [ "${PG_PATH}/data" ]
 EXPOSE 5432
 STOPSIGNAL SIGINT
 

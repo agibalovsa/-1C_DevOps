@@ -7,7 +7,7 @@ install_certs () {
 
     for cert in $1; do
         certFile=$(basename "${cert}");
-        wget --timeout=30 -O "/usr/local/share/ca-certificates/${certFile}" "${cert}";
+        wget --progress=dot:giga --timeout=30 -O "/usr/local/share/ca-certificates/${certFile}" "${cert}";
         if command -v java > /dev/null; then
             keytool -importcert -keystore "${JAVA_HOME}/lib/security/cacert" \
                 -storepass changeit -file "/usr/local/share/ca-certificates/${certFile}" \
