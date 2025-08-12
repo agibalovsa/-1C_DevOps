@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Installing certificates
-#  $1 - Сomma-separated сertificates URL
+#  $1 - Comma-separated certificates URL
 #
 install_certs () {
 
@@ -9,7 +9,7 @@ install_certs () {
         certFile=$(basename "${cert}");
         wget --progress=dot:giga --timeout=30 -O "/usr/local/share/ca-certificates/${certFile}" "${cert}";
         if command -v java > /dev/null; then
-            keytool -importcert -keystore "${JAVA_HOME}/lib/security/cacert" \
+            keytool -importcert -keystore "${JAVA_HOME}/lib/security/cacerts" \
                 -storepass changeit -file "/usr/local/share/ca-certificates/${certFile}" \
                 -alias "${certFile%.*}" -noprompt;
         fi;
@@ -21,15 +21,15 @@ install_certs () {
 }
 
 # Uninstalling certificates
-#  $1 - Сomma-separated сertificates URL
+#  $1 - Comma-separated certificates URL
 #
 uninstall_certs () {
 
     for cert in $1; do
         certFile=$(basename "${cert}");
         rm "/usr/local/share/ca-certificates/${certFile}";
-        if command -v java > /dev/null && [ -f /opt/java/openjdk/lib/security/cacerts ]; then
-            keytool -delete -keystore /opt/java/openjdk/lib/security/cacerts \
+        if command -v java > /dev/null && [ -f "${JAVA_HOME}/lib/security/cacerts" ]; then
+            keytool -delete -keystore "${JAVA_HOME}/lib/security/cacerts" \
                 -storepass changeit \
                 -alias "${certFile%.*}" -noprompt;
         fi;

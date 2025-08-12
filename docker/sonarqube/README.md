@@ -30,5 +30,5 @@
 
 Значимые переменные среды:
 
-- `SONAR_WEB_CONTEXT` - дополнительный путь в составе url-адреса сервиса. Например, */sonarqube* для *http://test.ru/sonarqube*.
-- `SONAR_HTTP_PORT  ` - порт хоста для связи с приложением по HTTP протоколу.
+- `SONAR_WEB_CONTEXT` - дополнительный путь в составе url-адреса сервиса. Например, */sonarqube* для *<http://test.ru/sonarqube>*.
+- `SONAR_HTTP_PORT` - порт хоста для связи с приложением по HTTP протоколу.
