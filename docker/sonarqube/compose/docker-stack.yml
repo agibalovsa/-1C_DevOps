@@ -1,0 +1,4 @@
+networks:
+  sonarqube_network:
+    name: "${SONAR_NETWORK:-sonarqube_network}"
+    external: true

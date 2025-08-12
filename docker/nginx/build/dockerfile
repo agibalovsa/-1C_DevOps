@@ -4,8 +4,7 @@ ARG NGINX_REPO=nginx \
 # hadolint ignore=DL3006
 FROM "${NGINX_REPO}:${NGINX_VERSION}"
 
-ARG NGINX_VERSION
-
+# NGINX_VERSION - env from base image
 LABEL maintainer="Agibalov Sergei <agibse@rarus.ru>" \
     version="${NGINX_VERSION}" \
     manufacturer="Nginx"

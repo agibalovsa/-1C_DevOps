@@ -4,6 +4,7 @@ services:
 
     container_name: "${POSTGRES_NAME:-postgres}"
     restart: always
+    shm_size: 128mb
 
 networks:
   postgres_network:
