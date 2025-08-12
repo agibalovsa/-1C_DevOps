@@ -5,7 +5,6 @@ services:
     image: "${POSTGRES_TAG}"
     hostname: "${POSTGRES_HOSTNAME:-postgres}"
     command: postgres -c listen_addresses='*'
-    shm_size: 128mb
     environment:
       # https://hub.docker.com/_/postgres
       TZ: "${TZ}"
