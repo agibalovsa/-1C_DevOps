@@ -2,36 +2,14 @@ services:
 
   docker-registry:
 
-    # compose
     container_name: ${DOCKER_REGISTRY_NAME:-docker-registry}
     restart: always
 
-    # main
-    image: ${DOCKER_REGISTRY_TAG}
-    hostname: ${DOCKER_REGISTRY_HOSTNAME:-docker-registry}
-    environment:
-      TZ:                            "${TZ}"
-      REGISTRY_HTTP_TLS_CERTIFICATE: "/etc/docker/registry/certs/docker-registry.crt"
-      REGISTRY_HTTP_TLS_KEY:         "/etc/docker/registry/certs/docker-registry.key"
-      REGISTRY_AUTH:                 "htpasswd"
-      REGISTRY_AUTH_HTPASSWD_PATH:   "/etc/docker/registry/auth/htpasswd"
-      REGISTRY_AUTH_HTPASSWD_REALM:  "Registry Realm"
-    ports:
-      - "${DOCKER_REGISTRY_PORT:-5000}:5000"
     volumes:
-      - docker_registry:/var/lib/registry
-      - docker_registry_certs:/etc/docker/registry/certs
-      - docker_registry_htpasswd:/etc/docker/registry/auth/
       - docker_registry_conf:/etc/docker/registry
+      - docker_registry_htpasswd:/etc/docker/registry/auth/
 
-# main
 volumes:
-  docker_registry:
-    external: true
-    name: ${DOCKER_REGISTRY_VOL:-docker_registry}
-  docker_registry_certs:
-    external: true
-    name: ${DOCKER_CERTS_VOL:-docker_registry_certs}
   docker_registry_conf:
     external: true
     name: ${DOCKER_CONF_VOL:-docker_registry_conf}

@@ -2,6 +2,8 @@ services:
 
   nginx:
 
+    networks:
+      - nginx_network
     configs:
       - source: nginx_conf
         target: /etc/nginx/conf.d/nginx.conf

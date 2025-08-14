@@ -1,6 +1,7 @@
 services:
 
   sonarqube:
+
     image: "${SONAR_TAG}"
     hostname: "${SONAR_HOSTNAME:-sonarqube}"
     depends_on:
@@ -23,8 +24,6 @@ services:
       - sonarqube_ext:/opt/sonarqube/extensions
       - sonarqube_logs:/opt/sonarqube/logs
       - sonarqube_temp:/opt/sonarqube/temp
-    networks:
-      - sonarqube_network
     ports:
       - "${SONAR_HTTP_PORT}:9000"
 

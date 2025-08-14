@@ -4,7 +4,3 @@ services:
 
     container_name: "${SONAR_NAME:-sonarqube}"
     restart: always
-
-networks:
-  sonarqube_network:
-    name: "${SONAR_NETWORK:-sonarqube_network}"

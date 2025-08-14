@@ -2,23 +2,9 @@ services:
 
   docker-registry:
 
-    # main
-    image: ${DOCKER_REGISTRY_TAG}
-    hostname: ${DOCKER_REGISTRY_HOSTNAME:-docker-registry}
-    environment:
-      TZ:                            "${TZ}"
-      REGISTRY_HTTP_TLS_CERTIFICATE: "/etc/docker/registry/certs/docker-registry.crt"
-      REGISTRY_HTTP_TLS_KEY:         "/etc/docker/registry/certs/docker-registry.key"
-      REGISTRY_AUTH:                 "htpasswd"
-      REGISTRY_AUTH_HTPASSWD_PATH:   "/etc/docker/registry/auth/htpasswd"
-      REGISTRY_AUTH_HTPASSWD_REALM:  "Registry Realm"
-    ports:
-      - "${DOCKER_REGISTRY_PORT:-5000}:5000"
-    volumes:
-      - docker_registry:/var/lib/registry
-      - docker_registry_certs:/etc/docker/registry/certs
+    networks:
+      - docker_registry_network
 
-    # swarm
     configs:
       - source: docker_registry_conf
         target: /etc/docker/registry/config.yml
@@ -31,16 +17,11 @@ services:
         constraints:
           - "node.hostname == ${DOCKER_REGISTRY_NODE}"
 
-# main
-volumes:
-  docker_registry:
+networks:
+  docker_registry_network:
+    name: "${DOCKER_REGISTRY_NETWORK:-docker_registry_network}"
     external: true
-    name: ${DOCKER_VOL_REGISTRY:-docker_registry}
-  docker_registry_certs:
-    external: true
-    name: ${DOCKER_VOL_CERTS:-docker_registry_certs}
 
-# swarm
 configs:
   docker_registry_conf:
     external: true

@@ -4,6 +4,8 @@ services:
 
     environment:
       GITLAB_OMNIBUS_CONFIG: "from_file('/omnibus_config.rb')"
+    networks:
+      - gitlab_network
     configs:
       - source: gitlab_conf
         target: /omnibus_config.rb

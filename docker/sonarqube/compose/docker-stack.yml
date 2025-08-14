@@ -1,3 +1,10 @@
+services:
+
+  sonarqube:
+
+    networks:
+      - sonarqube_network
+
 networks:
   sonarqube_network:
     name: "${SONAR_NETWORK:-sonarqube_network}"

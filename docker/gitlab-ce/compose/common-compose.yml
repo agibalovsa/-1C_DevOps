@@ -12,8 +12,6 @@ services:
     ports:
       - "${GITLAB_SSH_PORT}:22"
       - "${GITLAB_HTTPS_PORT}:443"
-    networks:
-      - gitlab_network
     volumes:
       - gitlab_data:/var/opt/gitlab
       - gitlab_logs:/var/log/gitlab
