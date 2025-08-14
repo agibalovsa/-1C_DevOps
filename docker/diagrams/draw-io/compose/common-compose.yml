@@ -1,11 +1,13 @@
 services:
 
-  draw-io:
+  drawio:
 
     image: ${DRAWIO_TAG:-jgraph/drawio:latest}
     hostname:  ${DRAWIO_HOSTNAME:-drawio}
     environment:
+      TZ: "${TZ}"
       PUBLIC_DNS: ${DRAWIO_URL}
+    networks:
+      - drawio_network
     ports:
-      - TZ: "${TZ}"
       - "${DRAWIO_PORT:-8080}:8080"

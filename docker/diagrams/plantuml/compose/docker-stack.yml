@@ -7,3 +7,8 @@ services:
       placement:
         constraints:
           - "node.hostname == ${PLANTUML_NODE}"
+
+networks:
+  plantuml_network:
+    name: "${PLANTUML_NETWORK:-plantuml_network}"
+    external: true

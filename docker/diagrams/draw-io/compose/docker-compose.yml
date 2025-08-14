@@ -1,6 +1,10 @@
 services:
 
-  draw-io:
+  drawio:
 
     container_name: ${DRAWIO_NAME:-drawio}
     restart: always
+
+networks:
+  drawio_network:
+    name: "${DRAWIO_NETWORK:-drawio_network}"

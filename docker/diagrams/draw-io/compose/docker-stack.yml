@@ -1,9 +1,14 @@
 services:
 
-  draw-io:
+  drawio:
 
     deploy:
       mode: global
       placement:
         constraints:
           - "node.hostname == ${DRAWIO_NODE}"
+
+networks:
+  drawio_network:
+    name: "${DRAWIO_NETWORK:-drawio_network}"
+    external: true
