@@ -16,7 +16,7 @@ install_plugins() {
         && apt-get clean \
         && rm -rf /var/lib/apt/lists/*;
     wget --progress=dot:giga --timeout=30 -O "./extensions/plugins/sonar-l10n-ru-plugin-${RUSSIAN_PACK_VERSION}.jar" "https://github.com/1c-syntax/sonar-l10n-ru/releases/download/v${RUSSIAN_PACK_VERSION}/sonar-l10n-ru-plugin-${RUSSIAN_PACK_VERSION}.jar";
-    if [ "$BSL_PLUGIN_VERSION" = "nightly*" ]; then
+    if [[ ${BSL_PLUGIN_VERSION} =~ nightly* ]]; then
         wget --progress=dot:giga --timeout=30 -O "./extensions/plugins/sonar-communitybsl-plugin-${BSL_PLUGIN_VERSION}.jar" "https://github.com/1c-syntax/sonar-bsl-plugin-community/releases/download/v999.99.99/sonar-communitybsl-plugin-${BSL_PLUGIN_VERSION}.jar";
     else
         wget --progress=dot:giga --timeout=30 -O "./extensions/plugins/sonar-communitybsl-plugin-${BSL_PLUGIN_VERSION}.jar" "https://github.com/1c-syntax/sonar-bsl-plugin-community/releases/download/v${BSL_PLUGIN_VERSION}/sonar-communitybsl-plugin-${BSL_PLUGIN_VERSION}.jar";
