@@ -1,0 +1,9 @@
+services:
+
+  plantuml:
+
+    deploy:
+      mode: global
+      placement:
+        constraints:
+          - "node.hostname == ${PLANTUML_NODE}"

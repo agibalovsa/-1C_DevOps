@@ -1,0 +1,25 @@
+ARG REGISTRY= \
+    OS_TAG=debian:bookworm-slim
+
+# hadolint ignore=DL3006
+FROM "${REGISTRY}${OS_TAG}"
+
+ARG OC_EXECUTOR_VERSION
+
+LABEL maintainer="Agibalov Sergei <agibse@rarus.ru>" \
+    version="${OC_EXECUTOR_VERSION}" \
+    manufacturer="1C"
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+ENV OC_EXECUTOR_VERSION=${OC_EXECUTOR_VERSION}
+
+# hadolint ignore=SC1091
+RUN --mount=from=common_context,target=/common_context \
+    --mount=from=context,target=/context \
+    --mount=from=context_arg,target=/context_arg \
+    set -eux; \
+    . common_context/install; \
+    install_packs; \
+    . context/post_install; \
+    install_check

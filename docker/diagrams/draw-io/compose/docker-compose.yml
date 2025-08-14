@@ -1,0 +1,6 @@
+services:
+
+  draw-io:
+
+    container_name: ${DRAWIO_NAME:-drawio}
+    restart: always

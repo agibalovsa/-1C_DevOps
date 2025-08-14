@@ -1,0 +1,5 @@
+#!/bin/bash
+
+set -e
+
+ln -s /var/opt/executor/executor /bin

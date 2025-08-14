@@ -42,9 +42,10 @@ init_stack () {
                 "imagick/build" "image magick" off \
                 "postgres/build" "postgres" off \
                 "jdk/build" "jdk" off \
-                "1c/build" "1c platform" off \
+                "1c/build" "1c-platform" off \
                 "1cesb/build" "1c-esb" off \
                 "1cans/build" "1c-ans" off \
+                "1cexecutor/build" "1c-executor" off \
                 "slc/build" "slc" off \
                 "hasp/build" "hasp" off \
                 "step-ca-cli/build" "step ca (cli)" off
@@ -68,13 +69,12 @@ init_stack () {
 #
 make_compose_stack () {
 
-    stack_path="users/compose/${1}"
+    script_dir=$(dirname "$(readlink -f "$0")")
+    stack_path="${script_dir}/users/compose/${1}"
 
     if [ ! -d "${stack_path}" ]; then
         mkdir -p "${stack_path}"
     fi
-
-    script_dir=$(dirname "$(readlink -f "$0")")
 
     set -a
 
@@ -125,7 +125,7 @@ make_compose_stack () {
         {
             echo "# ${path}"
             echo ""
-            envsubst < "${path}/.env.tmpl"
+            envsubst < "${script_dir}/${path}/.env.tmpl"
             echo ""
         } >> "${stack_path}/.env.tmp"
     done
@@ -153,13 +153,12 @@ make_compose_stack () {
 #
 make_build_stack () {
 
-    stack_path="users/builds/${1}"
+    script_dir=$(dirname "$(readlink -f "$0")")
+    stack_path="${script_dir}/users/builds/${1}"
 
     if [ ! -d "${stack_path}" ]; then
         mkdir -p "${stack_path}"
     fi
-
-    script_dir=$(dirname "$(readlink -f "$0")")
 
     set -a
 
@@ -213,7 +212,7 @@ make_build_stack () {
         {
             echo "# ${path}"
             echo ""
-            envsubst < "${path}/.arg.tmpl"
+            envsubst < "${script_dir}/${path}/.arg.tmpl"
             echo ""
         } >> "${stack_path}/.arg.tmp"
     done

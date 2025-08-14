@@ -1,0 +1,16 @@
+services:
+
+  plantuml:
+
+    image: ${PLANTUML_TAG:-plantuml/plantuml-server:jetty}
+    hostname: ${PLANTUML_HOSTNAME:-plantuml}
+    environment:
+      BASE_URL: ${PLANTUML_URL}
+    ports:
+      - TZ: "${TZ}"
+      - "${PLANTUML_PORT:-8080}:8080"
+    volumes:
+      - plantuml_temp:/tmp/jetty
+
+volumes:
+  plantuml_temp:

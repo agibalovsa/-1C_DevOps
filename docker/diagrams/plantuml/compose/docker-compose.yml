@@ -1,0 +1,6 @@
+services:
+
+  plantuml:
+
+    container_name: ${PLANTUML_NAME:-plantuml}
+    restart: always

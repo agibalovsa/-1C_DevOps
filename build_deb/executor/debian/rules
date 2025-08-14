@@ -1,0 +1,25 @@
+#!/usr/bin/make -f
+include /usr/share/dpkg/*.mk
+export DH_VERBOSE = 1
+
+binpath=../
+file1cext=executor_x_linux_$(DEB_VERSION).zip
+path1cext=debian/1cext
+pathtmp=/tmp/
+path1cextopt=/var/opt/executor/
+
+override_dh_install:
+	ls -al $(binpath)
+	mkdir -p $(path1cext)$(pathtmp)
+	unzip -o $(binpath)$(file1cext) -d $(path1cext)$(pathtmp)
+	mkdir -p $(path1cext)$(path1cextopt)
+	mv $(path1cext)$(pathtmp)* $(path1cext)$(path1cextopt)
+	rm -r $(path1cext)$(pathtmp)
+	chmod 755 $(path1cext)$(path1cextopt)executor
+	chmod 755 $(path1cext)$(path1cextopt)/bin/executor-x
+
+override_dh_strip_nondeterminism:
+	true
+
+%:
+	dh $@

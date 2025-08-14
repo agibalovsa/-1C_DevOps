@@ -1,0 +1,9 @@
+services:
+
+  draw-io:
+
+    deploy:
+      mode: global
+      placement:
+        constraints:
+          - "node.hostname == ${DRAWIO_NODE}"
