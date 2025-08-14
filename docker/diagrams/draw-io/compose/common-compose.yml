@@ -7,7 +7,5 @@ services:
     environment:
       TZ: "${TZ}"
       PUBLIC_DNS: ${DRAWIO_URL}
-    networks:
-      - drawio_network
     ports:
       - "${DRAWIO_PORT:-8080}:8080"

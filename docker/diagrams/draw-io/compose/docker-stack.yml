@@ -2,6 +2,9 @@ services:
 
   drawio:
 
+    networks:
+      - drawio_network
+
     deploy:
       mode: global
       placement:

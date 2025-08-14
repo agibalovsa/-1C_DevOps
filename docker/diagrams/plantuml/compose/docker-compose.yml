@@ -4,7 +4,3 @@ services:
 
     container_name: ${PLANTUML_NAME:-plantuml}
     restart: always
-
-networks:
-  plantuml_network:
-    name: "${PLANTUML_NETWORK:-plantuml_network}"

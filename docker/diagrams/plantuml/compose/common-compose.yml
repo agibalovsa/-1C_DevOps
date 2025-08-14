@@ -9,8 +9,6 @@ services:
       BASE_URL: ${PLANTUML_URL}
     volumes:
       - plantuml_temp:/tmp/jetty
-    networks:
-      - plantuml_network
     ports:
       - "${PLANTUML_PORT:-8080}:8080"
 

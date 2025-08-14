@@ -2,6 +2,9 @@ services:
 
   plantuml:
 
+    networks:
+      - plantuml_network
+
     deploy:
       mode: global
       placement:
