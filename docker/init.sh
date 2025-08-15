@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Initialisation dockers stack building script
+# Initialization dockers stack building script
 #
 init_stack () {
 
@@ -21,34 +21,35 @@ init_stack () {
 
     if [ "${type}" = "compose" ]; then
         IFS=" " read -ra paths <<< "$(
-            dialog --ascii-lines --no-shadow --no-tags --erase-on-exit --output-fd 1 --radiolist "Please select applications" 0 0 0 \
+            dialog --ascii-lines --no-shadow --no-tags --erase-on-exit --output-fd 1 --checklist "Please select applications" 0 0 0 \
+                "1c/compose/crs" "1C Platform (cr-server)" off \
+                "1c/compose/ibsrv" "1C Platform (ibsrv)" off \
+                "1c/compose/server" "1C Platform (server)" off \
+                "1cans/compose" "1C Ans" off \
+                "1cesb/compose" "1C Esb" off \
+                "hasp/compose" "Hasp" off \
                 "portainer/compose" "Portainer" off \
                 "postgres/compose" "Postgres" off \
-                "1c/compose/server" "1c platform server" off \
-                "1c/compose/crs" "1c platform cr-server" off \
-                "1c/compose/ibsrv" "1c platform ibsrv" off \
-                "1cesb/compose" "1c-esb" off \
-                "1cans/compose" "1c-ans" off \
-                "slc/compose" "slc" off \
-                "hasp/compose" "hasp" off \
-                "step-ca-cli/compose" "step ca (cli)" off
+                "slc/compose" "Slc" off \
+                "sonarqube/compose" "Sonarqube" off \
+                "step-ca-cli/compose" "Step CA (cli)" off
         )"
     else
         IFS=" " read -ra paths <<< "$(
             dialog --ascii-lines --no-shadow --no-tags --erase-on-exit --output-fd 1 --radiolist "Please select applications" 0 0 0 \
-                "os/linux_deb/build" "os-system" off \
-                "nginx/build" "nginx" off \
-                "sonarqube/build" "sonarqube" off \
-                "imagick/build" "image magick" off \
-                "postgres/build" "postgres" off \
-                "jdk/build" "jdk" off \
-                "1c/build" "1c-platform" off \
-                "1cesb/build" "1c-esb" off \
-                "1cans/build" "1c-ans" off \
-                "1cexecutor/build" "1c-executor" off \
-                "slc/build" "slc" off \
-                "hasp/build" "hasp" off \
-                "step-ca-cli/build" "step ca (cli)" off
+                "1c/build" "1C Platform" off \
+                "1cans/build" "1C Ans" off \
+                "1cesb/build" "1C Esb" off \
+                "1cexecutor/build" "1C Executor" off \
+                "hasp/build" "Hasp" off \
+                "imagick/build" "Image Magick" off \
+                "jdk/build" "JDK" off \
+                "nginx/build" "Nginx" off \
+                "os/linux_deb/build" "OS System" off \
+                "postgres/build" "Postgres" off \
+                "slc/build" "Slc" off \
+                "sonarqube/build" "Sonarqube" off \
+                "step-ca-cli/build" "Step CA (cli)" off
         )"
     fi;
 
@@ -97,6 +98,9 @@ make_compose_stack () {
         "script_dir=\$(dirname \"\$(readlink -f \"\$0\")\")" \
         "" \
         "# make context file" \
+        "if [ -d \"\${script_dir}/context\" ]; then" \
+        "    rm -r \"\${script_dir}/context\";" \
+        "fi;" \
         "mkdir -p \"\${script_dir}/context\"" \
         "CONTEXT_ENV=\$(realpath \"\${script_dir}/context\")" \
         "{" \
@@ -107,20 +111,35 @@ make_compose_stack () {
             "cat \"\${script_dir}/.env\"" \
         "} >> \"\${CONTEXT_ENV}/.env\"" \
         "" \
-        | tee "${stack_path}/docker-compose.sh.tmp" > /dev/null
+        | tee "${stack_path}/docker-compose-up.sh.tmp" > /dev/null;
 
-    make_docker_compose=0
+    printf "%s\n" \
+        "#!/bin/bash" \
+        "" \
+        "set -Eeoa pipefail" \
+        "" \
+        "script_dir=\$(dirname \"\$(readlink -f \"\$0\")\")" \
+        "CONTEXT_ENV=\$(realpath \"\${script_dir}/context\")" \
+        "" \
+    | tee "${stack_path}/docker-compose-down.sh.tmp" > /dev/null;
+
+    compose_files=""
 
     paths=( "${!2}" )
     for path in "${paths[@]}"
     do
+        proj_name=$(echo "${path}" | awk -F/ '{print $1}')
+        if [ -f "${script_dir}/${path}/common-compose.yml" ]; then
+            {
+                echo "cp ${script_dir}/${path}/common-compose.yml \"\${CONTEXT_ENV}/common-compose-${proj_name}.yml\""
+                compose_files="${compose_files} -f common-compose-${proj_name}.yml"
+            } >> "${stack_path}/docker-compose-up.sh.tmp"
+        fi
         if [ -f "${script_dir}/${path}/docker-compose.yml" ]; then
             {
-                echo "cd \"\${CONTEXT_ENV}\""
-                echo "cp ${script_dir}/${path}/docker-compose.yml \"\${CONTEXT_ENV}/docker-compose.yml\""
-                echo "docker compose up -d"
-            } >> "${stack_path}/docker-compose.sh.tmp"
-            make_docker_compose=1
+                echo "cp ${script_dir}/${path}/docker-compose.yml \"\${CONTEXT_ENV}/docker-compose-${proj_name}.yml\""
+                compose_files="${compose_files} -f docker-compose-${proj_name}.yml"
+            } >> "${stack_path}/docker-compose-up.sh.tmp"
         fi
         {
             echo "# ${path}"
@@ -130,6 +149,21 @@ make_compose_stack () {
         } >> "${stack_path}/.env.tmp"
     done
 
+    if [ -n "${compose_files}" ]; then
+        {
+            echo ""
+            echo "cd \"\${CONTEXT_ENV}\""
+            echo "docker compose ${compose_files} up -d"
+            echo "cd .."
+        }  >> "${stack_path}/docker-compose-up.sh.tmp"
+
+        {
+            echo "cd \"\${CONTEXT_ENV}\""
+            echo "docker compose ${compose_files} down"
+            echo "cd .."
+        }  >> "${stack_path}/docker-compose-down.sh.tmp"
+    fi
+
     set +a
 
     sed -i 's/{{/{/g' "${stack_path}/.env.tmp"
@@ -137,12 +171,14 @@ make_compose_stack () {
 
     mv "${stack_path}/.env.tmp" "${stack_path}/.env"
 
-    if [ ${make_docker_compose} = 1 ]; then
-        echo "rm -r \"\${CONTEXT_ENV}\"" >> "${stack_path}/docker-compose.sh.tmp"
-        mv "${stack_path}/docker-compose.sh.tmp" "${stack_path}/docker-compose.sh"
-        chmod 744 "${stack_path}/docker-compose.sh"
+    if [ -n "${compose_files}" ]; then
+        mv "${stack_path}/docker-compose-up.sh.tmp" "${stack_path}/docker-compose-up.sh"
+        chmod 744 "${stack_path}/docker-compose-up.sh"
+        mv "${stack_path}/docker-compose-down.sh.tmp" "${stack_path}/docker-compose-down.sh"
+        chmod 744 "${stack_path}/docker-compose-down.sh"
     else
-        rm "${stack_path}/docker-compose.sh.tmp"
+        rm "${stack_path}/docker-compose-up.sh.tmp"
+        rm "${stack_path}/docker-compose-down.sh.tmp"
     fi
 
 }

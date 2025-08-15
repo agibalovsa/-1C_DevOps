@@ -1,3 +1,10 @@
+services:
+
+  postgres:
+  
+    networks:
+      - postgres_network
+
 networks:
   postgres_network:
     name: "${POSTGRES_NETWORK:-postgres_network}"

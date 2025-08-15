@@ -6,10 +6,6 @@ services:
     restart: always
     shm_size: 128mb
 
-networks:
-  postgres_network:
-    name: "${POSTGRES_NETWORK:-postgres_network}"
-
 secrets:
   postgres_password:
     environment: POSTGRES_PASSWORD
