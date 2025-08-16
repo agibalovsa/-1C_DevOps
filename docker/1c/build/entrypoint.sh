@@ -361,7 +361,7 @@ setup_xvfb_exec() {
 
 setup_client_exec() {
 
-    CLIENT_EXEC=""
+    CLIENT_EXEC="DISPLAY=:99.0 ${1}"
 
 }
 
@@ -383,14 +383,14 @@ run_client_exec() {
 client() {
 
     setup_client_healthcheck
-
     setup_xvfb_exec
-    setup_client_exec "$1"
-
     setup_init
-
     run_xvfb_exec_background
-    run_client_exec
+
+    if [ -n "${1}" ]; then
+        setup_client_exec "${1}"
+        run_client_exec
+    fi;
 
 }
 

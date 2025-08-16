@@ -14,7 +14,7 @@ install_packs() {
 
     # install client 1c
     if [ "${CLIENT}" -eq "1" ]; then
-        apt-get install -yq --no-install-recommends libcups2 libgtk-3-0 libxxf86vm1 libsm6 libwebkit2gtk-4.0-37 xvfb;
+        apt-get install -yq --no-install-recommends libglu1-mesa libcups2 libgtk-3-0 libxxf86vm1 libsm6 libwebkit2gtk-4.0-37 xvfb;
     fi;
 
     apt-get clean && \
