@@ -8,6 +8,7 @@ docker build \
     --build-arg "PG_PATH=${PG_PATH}" \
     --build-arg "PG_BIN_PATH=${PG_BIN_PATH}" \
     --build-arg "PG_SHARE_PATH=${PG_SHARE_PATH}" \
+    --build-context common_context=../../common_context/build \
     --build-context context=context \
     --build-context "context_arg=${CONTEXT_ARG}" \
     -t "${REGISTRY}${PG_TAG}" \

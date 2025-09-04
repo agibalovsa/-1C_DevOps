@@ -10,7 +10,8 @@ RUN --mount=from=context,target=/context \
     . context/pre_install; \
     install_packs
 
-ARG OC_VERSION \
+ARG DEBIAN_FRONTEND=noninteractive \
+    OC_VERSION \
     OC_MODE \
     OC_GID \
     OC_UID

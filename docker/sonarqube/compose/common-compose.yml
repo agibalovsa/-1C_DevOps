@@ -2,14 +2,14 @@ services:
 
   sonarqube:
 
-    image: "${SONAR_TAG}"
+    image: "${SONAR_TAG:-sonarqube:lts-community}"
     hostname: "${SONAR_HOSTNAME:-sonarqube}"
     depends_on:
       - postgres
     ulimits:
-     nofile:
-      soft: 131072
-      hard: 131072
+      nofile: # Maximum number of open files for the sonarqube user
+        soft: 131072
+        hard: 131072
     environment:
       SONAR_JDBC_URL: "jdbc:postgresql://${POSTGRES_HOSTNAME}:${POSTGRES_PORT}/${POSTGRES_USER}"
       SONAR_JDBC_USERNAME: "${POSTGRES_USER}"
@@ -25,7 +25,7 @@ services:
       - sonarqube_logs:/opt/sonarqube/logs
       - sonarqube_temp:/opt/sonarqube/temp
     ports:
-      - "${SONAR_HTTP_PORT}:9000"
+      - "${SONAR_HTTP_PORT:9000}:9000"
 
 volumes:
   sonarqube_conf:

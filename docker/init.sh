@@ -28,6 +28,7 @@ init_stack () {
                 "1cans/compose" "1C Ans" off \
                 "1cesb/compose" "1C Esb" off \
                 "hasp/compose" "Hasp" off \
+                "opensearch/compose" "OpenSearch" off \
                 "portainer/compose" "Portainer" off \
                 "postgres/compose" "Postgres" off \
                 "slc/compose" "Slc" off \

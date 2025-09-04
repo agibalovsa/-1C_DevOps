@@ -1,6 +1,6 @@
 #!/bin/bash
 
-docker build \
+docker build --progress=plain \
     --build-arg "REGISTRY=${REGISTRY}" \
     --build-arg "OS_TAG=${OS_TAG}" \
     --build-arg "OC_EXECUTOR_VERSION=${OC_EXECUTOR_VERSION}" \

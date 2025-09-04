@@ -18,13 +18,16 @@ LABEL maintainer="Agibalov Sergei <agibse@rarus.ru>" \
       libs="https://github.com/docker-library/postgres/blob/master/Dockerfile-debian.template"
 
 # hadolint ignore=SC1091
-RUN --mount=from=context,target=/context \
+RUN --mount=from=common_context,target=/common_context \
+    --mount=from=context,target=/context \
     --mount=from=context_arg,target=/context_arg \
     set -eux; \
     . context/pre_install; \
+    install_packs; \
     set_users; \
     set_locals; \
-    install_packs
+    . common_context/gosu; \
+    install_gosu
 
 ENV LANG="en_US.utf8" \
     PGMAJOR="${PG_MAJOR_VERSION}" \

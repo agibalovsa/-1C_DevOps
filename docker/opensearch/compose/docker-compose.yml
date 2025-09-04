@@ -1,0 +1,11 @@
+services:
+
+  opensearch:
+  
+    container_name: "${OPENSEARCH_NAME:-opensearch}"
+    restart: always
+
+  opensearch-dashboards:
+
+    container_name: ${OPENSEARCH_DASHBOARD_NAME:-opensearch-dashboards}
+    restart: always

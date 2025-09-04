@@ -31,6 +31,19 @@
   - .arg
   - users
 
+## Системные настройки для работы репозитория
+
+- Необходимо установить docker <https://docs.docker.com/engine/install/debian/#install-using-the-repository>.
+- Необходимо установить расширенную программу envsubst.
+  > Внимание. Без этой программы будет не совсем корректно работать скрипт init.sh (см. ниже)
+  
+  ```bash
+  curl -L https://github.com/a8m/envsubst/releases/download/v1.2.0/envsubst-`uname -s`-`uname -m` -o envsubst
+  chmod +x envsubst
+  mv envsubst /usr/local/bin
+  envsubst
+  ```
+
 ## Порядок работы с репозиторием
 
 - Инициализация
@@ -68,6 +81,25 @@
 - Список параметров запуска приложения и значения переменных среды можно получить из файлов `.env.tpml`.
 
 > **Важно**. В настройках переменных среды в диалоговом окне portainer ОБЯЗАТЕЛЬНО убрать все кавычки, которые есть в `.env.tpml`. Над унификацией этого вопроса я еще работаю.
+
+## Особенности оформления dockerfile
+
+### Монтирование скриптов
+
+```dockerfile
+RUN --mount=from=context,target=/context
+```
+
+Чтобы не передавать скрипты в образ с помощью секции `COPY` монтируется каталог со скриптами в секции `RUN` с помощью параметра `--mount`. Благодаря чему, уменьшается число слоев.
+
+### Без лишних вопросов
+
+```dockerfile
+ARG DEBIAN_FRONTEND=noninteractive
+```
+
+Переменная среды `DEBIAN_FRONTEND` выставляется в неинтерактивный режим, чтобы избежать предупреждений вида:
+*TERM is not set, so the dialog frontend is not usable.*
 
 ## Развитие репозитория
 

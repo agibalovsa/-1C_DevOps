@@ -4,7 +4,8 @@ ARG REGISTRY= \
 # hadolint ignore=DL3006
 FROM "${REGISTRY}${OS_TAG}"
 
-ARG OC_EXECUTOR_VERSION
+ARG DEBIAN_FRONTEND=noninteractive \
+    OC_EXECUTOR_VERSION
 
 LABEL maintainer="Agibalov Sergei <agibse@rarus.ru>" \
     version="${OC_EXECUTOR_VERSION}" \
@@ -19,6 +20,8 @@ RUN --mount=from=common_context,target=/common_context \
     --mount=from=context,target=/context \
     --mount=from=context_arg,target=/context_arg \
     set -eux; \
+    . context/pre_install; \
+    install_packs; \
     . common_context/install; \
     install_packs; \
     . context/post_install; \

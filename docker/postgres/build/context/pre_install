@@ -46,7 +46,11 @@ install_packs() {
         libnss-wrapper \
         xz-utils \
         zstd \
-        less;
+        less \
+        locales \
+        gnupg \
+        ca-certificates \
+        wget;
 
     apt-get clean \
         && rm -rf /var/lib/apt/lists/*;

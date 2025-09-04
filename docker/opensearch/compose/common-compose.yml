@@ -1,0 +1,51 @@
+services:
+
+  opensearch:
+  
+    image: "${OPENSEARCH_TAG:-opensearchproject/opensearch:latest}"
+    hostname: "${OPENSEARCH_HOSTNAME:-opensearch}"
+    ulimits:
+      memlock: # Set memlock to unlimited (no soft or hard limit)
+        soft: -1
+        hard: -1
+      nofile: # Maximum number of open files for the opensearch user - set to at least 65536
+        soft: 65536
+        hard: 65536
+    environment:
+      node.name: "${OPENSEARCH_NODE_NAME:-opensearch_node}"
+      node.roles: "${OPENSEARCH_NODE_ROLE}"
+      cluster.name: "${OPENSEARCH_CLUSTER_NAME}"
+      cluster.initial_cluster_manager_nodes: "${OPENSEARCH_MANAGER_NODES}"
+      discovery.type: "${OPENSEARCH_TYPE}"
+      discovery.seed_hosts: "${OPENSEARCH_SEED_HOSTS}"
+      plugins.ml_commons.sync_up_job_interval_in_seconds: 0 # turn off sync up ML job
+      bootstrap.memory_lock: true # Disable JVM heap memory swapping
+      OPENSEARCH_JAVA_OPTS: -Xms512m -Xmx512m # Set min and max JVM heap sizes to at least 50% of system RAM
+      OPENSEARCH_INITIAL_ADMIN_PASSWORD: ${OPENSEARCH_INITIAL_ADMIN_PASSWORD}
+    volumes:
+      - opensearch-data:/usr/share/opensearch/data
+      - opensearch-config:/usr/share/opensearch/config
+    ports:
+      - "${OPENSEARCH_API_PORT:-9200}:9200"
+      - "${OPENSEARCH_PERFOM_PORT:-9600}:9600"
+
+  opensearch-dashboards:
+
+    image: ${OPENSEARCH_DASHBOARD_TAG:-opensearchproject/opensearch-dashboards:latest}
+    hostname: "${OPENSEARCH_DASHBOARD_HOSTNAME:-opensearch-dashboards}"
+    depends_on:
+      - opensearch
+    environment:
+      OPENSEARCH_HOSTS: "${OPENSEARCH_DASHBOARD_HOSTS:-[ \"https://opensearch:9200\" ]}"
+    ports:
+      - "${OPENSEARCH_DASHBOARD_PORT:-5601}:5601"
+    expose:
+      - "5601"
+
+volumes:
+  opensearch-data:
+    external: true
+    name: "${OPENSEARCH_DATA_VOL:-opensearch-data}"
+  opensearch-config:
+    external: true
+    name: "${OPENSEARCH_CONFIG_VOL:-opensearch-config}"
