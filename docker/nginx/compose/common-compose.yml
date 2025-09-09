@@ -4,6 +4,9 @@ services:
 
     image: "${NGINX_TAG}"
     hostname: "${NGINX_HOSTNAME:-nginx}"
+    logging:
+      options:
+        max-size: "${NGINX_LOG_SIZE:100M}"
     environment:
       TZ:                     "${TZ}"
       NGINX_SERVER_NAME:      "${NGINX_SERVER_NAME}"
