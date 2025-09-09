@@ -3,9 +3,11 @@
 install_packs() {
 
     apk add --no-cache \
+        ca-certificates \
         bash \
         curl \
         grep \
-        jq;
+        jq \
+    && rm -rf /var/cache/apk/*;
 
 }

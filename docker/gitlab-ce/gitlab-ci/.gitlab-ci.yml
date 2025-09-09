@@ -1,0 +1,19 @@
+stages:
+  - create-mr
+
+create-mr:
+  tags:
+     - sonar
+  image: 
+    name: gitlab-mr
+    pull_policy: if-not-present
+  variables:
+    GIT_STRATEGY: none # We do not need a clone of the GIT repository to create a Merge Request
+  stage: create-mr
+  rules:
+    - if: $CI_COMMIT_BRANCH =~ '/^CodeReview.*$/'
+  before_script:
+    - cp /etc/gitlab-runner/certs/gitlab-chaine.crt /usr/local/share/ca-certificates/gitlab-chaine.crt
+    - update-ca-certificates
+  script:
+    - /entrypoint.sh create_mr
