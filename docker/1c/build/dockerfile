@@ -28,6 +28,7 @@ RUN set -eux; \
     mkdir -p /var/1C/licenses /var/log/1C /home/usr1cv8/.1cv8/1C/1cv8/conf /home/usr1cv8/crserver /opt/1cv8/conf; \
     chown -R usr1cv8:grp1cv8 /var/1C/licenses /var/log/1C /home/usr1cv8 /opt/1cv8/conf;
 
+# hadolint ignore=DL3044
 ENV OC_VERSION=${OC_VERSION} \
     OC_PATH="/opt/1cv8/x86_64/${OC_VERSION}"
 

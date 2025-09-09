@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+install_packs() {
+
+    apk add --no-cache \
+        bash \
+        curl \
+        grep \
+        jq;
+
+}

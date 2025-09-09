@@ -1,0 +1,19 @@
+ARG REGISTRY= \
+    OS_TAG=alpine
+
+# hadolint ignore=DL3006
+FROM "${REGISTRY}${OS_TAG}"
+
+LABEL maintainer="Agibalov Sergei <agibse@rarus.ru>" \
+    version="1.1" \
+    manufacturer="1C"
+
+# hadolint ignore=SC1091
+RUN --mount=from=context,target=/context \
+    set -eux; \
+    . context/pre_install; \
+    install_packs
+
+COPY --chmod=766 [ "entrypoint.sh", "/" ]
+
+ENTRYPOINT [ "/entrypoint.sh" ]

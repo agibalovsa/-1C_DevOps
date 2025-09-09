@@ -1,0 +1,12 @@
+services:
+
+  fluent-bit:
+    image: "${FLUENTBIT_TAG:-fluent/fluent-bit}"
+    hostname: "${FLUENTBIT_HOSTNAME:-fluent-bit}"
+    volumes:
+      - fluentbit-config:/fluent-bit/etc
+
+volumes:
+  fluentbit-config:
+    #external: true
+    name: "${FLUENTBIT_CONF_VOL:-fluentbit-config}"

@@ -28,7 +28,8 @@ init_stack () {
                 "1cans/compose" "1C Ans" off \
                 "1cesb/compose" "1C Esb" off \
                 "hasp/compose" "Hasp" off \
-                "opensearch/compose" "OpenSearch" off \
+                "fluent-bit/compose" "Fluent Bit" off \
+                "opensearch/compose" "Open Search" off \
                 "portainer/compose" "Portainer" off \
                 "postgres/compose" "Postgres" off \
                 "slc/compose" "Slc" off \
@@ -42,6 +43,7 @@ init_stack () {
                 "1cans/build" "1C Ans" off \
                 "1cesb/build" "1C Esb" off \
                 "1cexecutor/build" "1C Executor" off \
+                "gitlab-ce/build/gitlab-auto-mr" "Gitlab MR" off \
                 "hasp/build" "Hasp" off \
                 "imagick/build" "Image Magick" off \
                 "jdk/build" "JDK" off \
