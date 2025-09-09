@@ -6,7 +6,7 @@ services:
     hostname: "${GITLAB_HOSTNAME:-gitlab}"
     logging:
       options:
-        max-size: "${GITLAB_LOG_SIZE:100M}"
+        max-size: "${GITLAB_LOG_SIZE:-100M}"
     environment:
       TZ:                  "${TZ}"
       GITLAB_EXTERNAL_URL: "${GITLAB_EXTERNAL_URL}"
