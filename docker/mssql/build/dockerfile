@@ -1,0 +1,35 @@
+ARG REGISTRY= \
+    OS_TAG=mcr.microsoft.com/windows/servercore:ltsc2022
+
+# hadolint ignore=DL3006
+FROM "${REGISTRY}${OS_TAG}"
+
+ARG MSSQL_VERSION
+
+LABEL maintainer="Agibalov Sergei <agibse@rarus.ru>" \
+      version="${MSSQL_VERSION}" \
+      manufacturer="Microsoft"
+
+SHELL [ "pwsh", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'Continue'; $verbosePreference='Continue';" ]
+
+COPY [ "context", "/context" ]
+
+ARG DISTR_URL=https://download.microsoft.com/download/3/8/d/38de7036-2433-4207-8eae-06e247e17b25/ \
+    DISTR_NAME=SQLServer2022-x64-ENU \
+    # https://sqlserverbuilds.blogspot.com/#sql2022x
+    UPD_URL
+
+RUN . ./context/install.ps1; \
+    install_packs ${Env:DISTR_URL} ${Env:DISTR_NAME};
+
+RUN . ./context/install.ps1; \
+    install_update ${Env:UPD_URL};
+
+RUN rm context -Recurse; \
+    mi -Path 'C:/Program Files/Microsoft SQL Server/MSSQL16.MSSQLSERVER/MSSQL' -Destination 'C:/Program Files/Microsoft SQL Server/MSSQL16.MSSQLSERVER/MSSQL_temp'
+
+COPY [ "entrypoint.ps1", "/" ]
+
+HEALTHCHECK CMD /healthcheck.ps1
+
+ENTRYPOINT [ "pwsh", "/entrypoint.ps1" ]

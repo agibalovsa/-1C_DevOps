@@ -1,28 +1,28 @@
-## OS options
+# ## OS options
 
 OS_TAG="${OS_TAG}"
 
-## SLC options
+# ## SLC options
 
 SLC_VERSION="${SLC_VERSION}"
 SLC_TAG=1c/slc:${{SLC_VERSION/-/.}}
 
-## Install options
+# ## Install options
 
 INSTALL_MODE="${INSTALL_MODE:-install_from_url}"
 
-### install_from_file
+# ### install_from_file
 
 INSTALL_FILES="licenceserver-${{SLC_VERSION/-/.}}.amd64.deb \
     licenceaddin-${{SLC_VERSION/-/.}}.amd64.deb"
 
-### install_from_repo
+# ### install_from_repo
 
 INSTALL_PACKS="licenceserver=${{SLC_VERSION}} \
     licenceaddin=${{SLC_VERSION}}"
 
 APTLY_REPO_COMPONENTS="${APTLY_REPO_COMPONENTS:-1c main}"
 
-### install_from_url
+# ### install_from_url
 
 INSTALL_URLS="https://licencecenter.ru/downloads/licence/${{SLC_VERSION:0:3}}/${{SLC_VERSION/-/.}}/licence-${{SLC_VERSION/-/.}}.deb.amd64.zip"

@@ -1,0 +1,27 @@
+{
+    "LogConfig": {
+      "sources": [
+        {
+          "type": "EventLog",
+          "startAtOldestRecord": true,
+          "eventFormatMultiLine": false,
+          "channels": [
+            {
+              "name": "system",
+              "level": "Information"
+            },
+            {
+              "name": "application",
+              "level": "Error"
+            }
+          ]
+        },
+        {
+          "type": "File",
+          "directory": "C:\\logs",
+          "filter": "*.log",
+          "includeSubdirectories": true
+        }
+      ]
+    }
+  }

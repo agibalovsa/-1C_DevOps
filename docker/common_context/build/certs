@@ -9,9 +9,16 @@ install_certs () {
         certFile=$(basename "${cert}");
         wget --progress=dot:giga --timeout=30 -O "/usr/local/share/ca-certificates/${certFile}" "${cert}";
         if command -v java > /dev/null; then
-            keytool -importcert -keystore -cacerts \
-                -storepass changeit -file "/usr/local/share/ca-certificates/${certFile}" \
-                -alias "${certFile%.*}" -noprompt;
+            java_version=$(java -version 2>&1 | awk -F '"' '/version/ {print $2}' | awk -F '.' '{ print $1"."$2 }')
+            if [ "$java_version" == "1.8" ]; then
+                keytool -importcert -keystore "${JAVA_HOME}/lib/security/cacerts" \
+                    -storepass changeit -file "/usr/local/share/ca-certificates/${certFile}" \
+                    -alias "${certFile%.*}" -noprompt;
+            else
+                keytool -importcert -cacerts \
+                    -storepass changeit -file "/usr/local/share/ca-certificates/${certFile}" \
+                    -alias "${certFile%.*}" -noprompt;
+            fi
         fi;
     done;
     if [ "$1" ]; then
@@ -29,9 +36,16 @@ uninstall_certs () {
         certFile=$(basename "${cert}");
         rm "/usr/local/share/ca-certificates/${certFile}";
         if command -v java > /dev/null && [ -f "${JAVA_HOME}/lib/security/cacerts" ]; then
-            keytool -delete -keystore -cacerts \
-                -storepass changeit \
-                -alias "${certFile%.*}" -noprompt;
+            java_version=$(java -version 2>&1 | awk -F '"' '/version/ {print $2}' | awk -F '.' '{ print $1"."$2 }')
+            if [ "$java_version" == "1.8" ]; then
+                keytool -delete -keystore "${JAVA_HOME}/lib/security/cacerts" \
+                    -storepass changeit\
+                    -alias "${certFile%.*}" -noprompt;
+            else
+                keytool -delete -cacerts \
+                    -storepass changeit\
+                    -alias "${certFile%.*}" -noprompt;
+            fi
         fi;
     done;
     if [ "$1" ]; then

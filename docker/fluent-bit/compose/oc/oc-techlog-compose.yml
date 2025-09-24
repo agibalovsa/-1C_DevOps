@@ -1,0 +1,33 @@
+services:
+
+  fluent-bit:
+    command: fluent-bit --config /fluent-bit/etc/oc/oc_techlog.conf --parser /fluent-bit/etc/oc/oc_techlog_parsers.conf
+    environment:
+      OC_LOG_PATH: /var/log/1C/*.log
+      FLUENTBIT_STDOUT: "${FLUENTBIT_STDOUT:-off}"
+      OPENSEARCH_HOSTNAME: "${OPENSEARCH_HOSTNAME:-opensearch}"
+      OPENSEARCH_API_PORT: "${OPENSEARCH_API_PORT:-9200}"
+      OPENSEARCH_LOGIN: "${OPENSEARCH_LOGIN:-admin}"
+      OPENSEARCH_PASSWORD: "${OPENSEARCH_PASSWORD:-admin}"
+    volumes:
+      - oc_log:/var/log/1C
+    configs:
+      - source: oc_techlog
+        target: /fluent-bit/etc/oc/oc_techlog.conf
+      - source: oc_techlog_parsers
+        target: /fluent-bit/etc/oc/oc_techlog_parsers.conf
+      - source: oc_techlog_filter
+        target: /fluent-bit/etc/oc/oc_techlog_filter.lua
+
+volumes:
+  oc_log:
+    external: true
+    name: ${OC_LOG_VOL:-oc_log}
+
+configs:
+  oc_techlog:
+    file: ./oc_techlog.conf
+  oc_techlog_parsers:
+    file: ./oc_techlog_parsers.conf
+  oc_techlog_filter:
+    file: ./oc_techlog_filter.lua

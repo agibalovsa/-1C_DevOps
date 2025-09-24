@@ -1,19 +1,19 @@
-## OS options
+# ## OS options
 
 OS_TAG="${OS_TAG}"
 
-## Postgres options
+# ## Postgres options
 
 PG_MAJOR_VERSION="${PG_MAJOR_VERSION}"
 PG_VERSION="${PG_VERSION}"
-# For postgres 1c: /var/lib/pgpro/1c-${{PG_MAJOR_VERSION}}
-# For vanilla postgres: /var/lib/postgresql
+# > For postgres 1c: /var/lib/pgpro/1c-${{PG_MAJOR_VERSION}}
+# > For vanilla postgres: /var/lib/postgresql
 PG_PATH="${PG_PATH}"
-# For postgres 1c: /opt/pgpro/1c-${{PG_MAJOR_VERSION}}/bin
-# For vanilla postgres: /usr/lib/postgresql/${{PG_MAJOR_VERSION}}/bin
+# > For postgres 1c: /opt/pgpro/1c-${{PG_MAJOR_VERSION}}/bin
+# > For vanilla postgres: /usr/lib/postgresql/${{PG_MAJOR_VERSION}}/bin
 PG_BIN_PATH="${PG_BIN_PATH}"
-# For postgres 1c: /opt/pgpro/1c-${{PG_MAJOR_VERSION}}/share
-# For vanilla postgres: /usr/share/postgresql/${{PG_MAJOR_VERSION}}
+# > For postgres 1c: /opt/pgpro/1c-${{PG_MAJOR_VERSION}}/share
+# > For vanilla postgres: /usr/share/postgresql/${{PG_MAJOR_VERSION}}
 PG_SHARE_PATH="${PG_SHARE_PATH}"
 
 PG_TAG="1c/postgres:${{PG_VERSION}}"

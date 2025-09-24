@@ -1,0 +1,6 @@
+services:
+
+  sonarqube:
+
+    depends_on:
+      - postgres

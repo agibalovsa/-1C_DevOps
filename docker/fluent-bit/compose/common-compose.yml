@@ -3,6 +3,11 @@ services:
   fluent-bit:
     image: "${FLUENTBIT_TAG:-fluent/fluent-bit}"
     hostname: "${FLUENTBIT_HOSTNAME:-fluent-bit}"
+    logging:
+      options:
+        max-size: "${FLUENTBIT_LOG_SIZE:-100M}"
+    environment:
+      TZ: "${TZ}"
     volumes:
       - fluentbit-config:/fluent-bit/etc
 

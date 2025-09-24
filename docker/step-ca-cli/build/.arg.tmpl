@@ -1,25 +1,25 @@
-## OS options
+# ## OS options
 
 OS_TAG="${OS_TAG}"
 
-## Step ca options
+# ## Step ca options
 
 STEP_CA_VERSION="${STEP_CA_VERSION}"
 STEP_CA_TAG=step-ca/cli:${{STEP_CA_VERSION}}
 
-## Install options
+# ## Install options
 
 INSTALL_MODE="${INSTALL_MODE:-install_from_url}"
 
-### install_from_file
+# ### install_from_file
 
 INSTALL_FILES="step-cli_${{STEP_CA_VERSION}}-1_amd64.deb"
 
-### install_from_repo
+# ### install_from_repo
 
 INSTALL_PACKS="step-cli=${{STEP_CA_VERSION}}"
 
-### install_from_url
+# ### install_from_url
 
 #INSTALL_URLS="https://github.com/smallstep/cli/releases/download/v${{STEP_CA_VERSION}}/step-cli_${{STEP_CA_VERSION}}-1_amd64.deb"
 INSTALL_URLS="https://dl.smallstep.com/gh-release/cli/gh-release-header/v${{STEP_CA_VERSION}}/step-cli_${{STEP_CA_VERSION}}-1_amd64.deb"

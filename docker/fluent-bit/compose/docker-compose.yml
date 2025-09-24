@@ -1,0 +1,6 @@
+services:
+
+  fluent-bit:
+  
+    container_name: "${FLUENTBIT_NAME:-fluent-bit}"
+    restart: always

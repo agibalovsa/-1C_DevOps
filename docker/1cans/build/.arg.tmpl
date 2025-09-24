@@ -1,21 +1,21 @@
-## OS options
+# ## OS options
 
 OS_TAG="${OS_TAG}"
 
-## ANS options
+# ## ANS options
 
 OC_ANS_VERSION="${OC_ANS_VERSION}"
 OC_ANS_TAG="1c/ans:${{OC_ANS_VERSION}}"
 
-## Install options
+# ## Install options
 
 INSTALL_MODE="${INSTALL_MODE:-install_from_file}"
 
-### install_from_file
+# ### install_from_file
 
 INSTALL_FILES="1cans_${{OC_ANS_VERSION}}_all.deb"
 
-### install_from_repo
+# ### install_from_repo
 
 APTLY_REPO_COMPONENTS="1c main"
 INSTALL_PACKS="1cans=${{OC_ANS_VERSION}}"

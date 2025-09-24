@@ -11,7 +11,11 @@ services:
       nofile: # Maximum number of open files for the opensearch user - set to at least 65536
         soft: 65536
         hard: 65536
+    logging:
+      options:
+        max-size: "${OPENSEARCH_LOG_SIZE:-100M}"
     environment:
+      TZ: "${TZ}"
       node.name: "${OPENSEARCH_NODE_NAME:-opensearch_node}"
       node.roles: "${OPENSEARCH_NODE_ROLE}"
       cluster.name: "${OPENSEARCH_CLUSTER_NAME}"
@@ -27,7 +31,7 @@ services:
       - opensearch-config:/usr/share/opensearch/config
     ports:
       - "${OPENSEARCH_API_PORT:-9200}:9200"
-      - "${OPENSEARCH_PERFOM_PORT:-9600}:9600"
+      - "${OPENSEARCH_PERFMON_PORT:-9600}:9600"
 
   opensearch-dashboards:
 
@@ -35,6 +39,9 @@ services:
     hostname: "${OPENSEARCH_DASHBOARD_HOSTNAME:-opensearch-dashboards}"
     depends_on:
       - opensearch
+    logging:
+      options:
+        max-size: "${OPENSEARCH_LOG_SIZE:-100M}"
     environment:
       OPENSEARCH_HOSTS: "${OPENSEARCH_DASHBOARD_HOSTS:-[ \"https://opensearch:9200\" ]}"
     ports:

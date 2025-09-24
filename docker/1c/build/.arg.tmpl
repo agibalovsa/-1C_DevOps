@@ -1,8 +1,8 @@
-## OS options
+# ## OS options
 
 OS_TAG="${OS_TAG}"
 
-## 1C options
+# ## 1C options
 
 OC_VERSION="${OC_VERSION}"
 
@@ -14,11 +14,11 @@ CLIENT="${CLIENT:-0}"
 
 OC_TAG="1c/${{OC_MODE}}:${{OC_VERSION}}"
 
-## Install options
+# ## Install options
 
 INSTALL_MODE="${INSTALL_MODE:-install_from_file}"
 
-### install_from_file
+# ### install_from_file
 
 INSTALL_FILES="1c-enterprise-${{OC_VERSION}}-common.deb"
 [[ "${{SERVER}}" = "1" ]] && INSTALL_FILES="${{INSTALL_FILES}} 1c-enterprise-${{OC_VERSION}}-server.deb" || :
@@ -26,7 +26,7 @@ INSTALL_FILES="1c-enterprise-${{OC_VERSION}}-common.deb"
 [[ "${{CRS}}" = "1" ]] && INSTALL_FILES="${{INSTALL_FILES}} 1c-enterprise-${{OC_VERSION}}-crs.deb" || :
 [[ "${{CLIENT}}" = "1" ]] && INSTALL_FILES="${{INSTALL_FILES}} 1c-enterprise-${{OC_VERSION}}-client.deb" || :
 
-### install_from_repo
+# ### install_from_repo
 
 APTLY_REPO_COMPONENTS="1c main"
 INSTALL_PACKS="1c-enterprise-${{OC_VERSION}}-common" || : 

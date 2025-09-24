@@ -4,16 +4,14 @@ services:
 
     image: "${SONAR_TAG:-sonarqube:lts-community}"
     hostname: "${SONAR_HOSTNAME:-sonarqube}"
-    depends_on:
-      - postgres
     ulimits:
       nofile: # Maximum number of open files for the sonarqube user
         soft: 131072
         hard: 131072
     environment:
-      SONAR_JDBC_URL: "jdbc:postgresql://${POSTGRES_HOSTNAME}:${POSTGRES_PORT}/${POSTGRES_USER}"
-      SONAR_JDBC_USERNAME: "${POSTGRES_USER}"
-      SONAR_JDBC_PASSWORD: "${POSTGRES_PASSWORD}"
+      SONAR_JDBC_URL: "${SONAR_JDBC_URL:-jdbc:postgresql://postgres:5432/sonar}"
+      SONAR_JDBC_USERNAME: "${SONAR_JDBC_USERNAME}"
+      SONAR_JDBC_PASSWORD: "${SONAR_JDBC_PASSWORD}"
       SONAR_WEB_JAVAOPTS: -Xms512m -Xmx2g -XX:+HeapDumpOnOutOfMemoryError
       SONAR_CE_JAVAOPTS: -Xms1024m -Xmx6g -XX:+HeapDumpOnOutOfMemoryError
       SONAR_SEARCH_JAVAOPTS: -Xms2g -Xmx2g -XX:+HeapDumpOnOutOfMemoryError
@@ -25,7 +23,7 @@ services:
       - sonarqube_logs:/opt/sonarqube/logs
       - sonarqube_temp:/opt/sonarqube/temp
     ports:
-      - "${SONAR_HTTP_PORT:9000}:9000"
+      - "${SONAR_HTTP_PORT:-9000}:9000"
 
 volumes:
   sonarqube_conf:

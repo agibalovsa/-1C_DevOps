@@ -1,0 +1,15 @@
+ARG OS_EXT_TAG=mcr.microsoft.com/windows/servercore:ltsc2022
+
+# hadolint ignore=DL3006
+FROM "${OS_EXT_TAG}"
+
+SHELL [ "powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'Continue'; $verbosePreference='Continue';" ]
+
+COPY [ "LogMonitorConfig.json", "/LogMonitor/LogMonitorConfig.json" ]
+COPY [ "context", "/context" ]
+
+RUN . ./context/pre_install.ps1; \
+    install_packs; \
+    rm context -Recurse;
+
+ENTRYPOINT [ "pwsh" ]

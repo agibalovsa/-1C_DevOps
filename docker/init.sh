@@ -8,20 +8,30 @@ init_stack () {
     local -n return_type=$2
     local -n return_paths=$3
 
+    [[ $(dialog --help | grep -- "--erase-on-exit") ]] && ERASE_ON_EXIT="--erase-on-exit" || :
+
     name=$(\
-        dialog --ascii-lines --no-shadow --erase-on-exit --output-fd 1 --title "Enter docker build stack" \
+        dialog --ascii-lines --no-shadow ${ERASE_ON_EXIT} --output-fd 1 --title "Enter docker build stack" \
             --inputbox "" 8 40 \
     )
 
+    if [ -z "${ERASE_ON_EXIT}" ]; then
+        clear;
+    fi
+
     type=$(\
-        dialog --ascii-lines --no-shadow --no-tags --erase-on-exit --output-fd 1 --radiolist "Please select type" 0 0 0 \
+        dialog --ascii-lines --no-shadow --no-tags ${ERASE_ON_EXIT} --output-fd 1 --radiolist "Please select type" 0 0 0 \
             "build" "build" off \
             "compose" "compose" off
     )
 
+    if [ -z "${ERASE_ON_EXIT}" ]; then
+        clear;
+    fi
+
     if [ "${type}" = "compose" ]; then
         IFS=" " read -ra paths <<< "$(
-            dialog --ascii-lines --no-shadow --no-tags --erase-on-exit --output-fd 1 --checklist "Please select applications" 0 0 0 \
+            dialog --ascii-lines --no-shadow --no-tags ${ERASE_ON_EXIT} --output-fd 1 --checklist "Please select applications" 0 0 0 \
                 "1c/compose/crs" "1C Platform (cr-server)" off \
                 "1c/compose/ibsrv" "1C Platform (ibsrv)" off \
                 "1c/compose/server" "1C Platform (server)" off \
@@ -38,7 +48,7 @@ init_stack () {
         )"
     else
         IFS=" " read -ra paths <<< "$(
-            dialog --ascii-lines --no-shadow --no-tags --erase-on-exit --output-fd 1 --radiolist "Please select applications" 0 0 0 \
+            dialog --ascii-lines --no-shadow --no-tags ${ERASE_ON_EXIT} --output-fd 1 --radiolist "Please select applications" 0 0 0 \
                 "1c/build" "1C Platform" off \
                 "1cans/build" "1C Ans" off \
                 "1cesb/build" "1C Esb" off \
@@ -56,8 +66,36 @@ init_stack () {
         )"
     fi;
 
+    if [ -z "${ERASE_ON_EXIT}" ]; then
+        clear;
+    fi
 
+    if [ "${type}" = "compose" ]; then
 
+        add_compose=()
+
+        for path in "${paths[@]}"
+        do
+            search_compose="${path}/*/*compose.yml"
+            for compose_file in ${search_compose};
+            do
+                if [ ! "${compose_file}" == "${search_compose}" ] ; then
+                    add_compose+=(" $( dirname "${compose_file}") $( basename "${compose_file}") off\n")
+                fi
+            done
+        done
+
+        selected_files=$(dialog --ascii-lines --no-shadow --no-tags ${ERASE_ON_EXIT} --output-fd 1 --checklist "Please select additional compose" 0 0 0 $add_compose )
+        if [ -n "${selected_files}" ]; then
+            paths+=( "${selected_files[@]}" )
+        fi
+
+        if [ -z "${ERASE_ON_EXIT}" ]; then
+            clear;
+        fi
+        
+    fi
+    
     # shellcheck disable=SC2034
     return_name="${name}"
     # shellcheck disable=SC2034
@@ -89,8 +127,20 @@ make_compose_stack () {
         rm "${stack_path}/.env"
     fi
 
-    if [ -f "${stack_path}/docker-compose.sh" ]; then
-        rm "${stack_path}/docker-compose.sh"
+    if [ -f "${stack_path}/docker-compose-up.sh" ]; then
+        rm "${stack_path}/docker-compose-up.sh"
+    fi
+
+    if [ -f "${stack_path}/docker-compose-down.sh" ]; then
+        rm "${stack_path}/docker-compose-down.sh"
+    fi
+
+    if [ -f "${stack_path}/docker-compose-logs.sh" ]; then
+        rm "${stack_path}/docker-compose-logs.sh"
+    fi
+
+    if [ -d "${stack_path}/context" ]; then
+        rm -r "${stack_path}/context"
     fi
 
     printf "%s\n" \
@@ -126,30 +176,55 @@ make_compose_stack () {
         "" \
     | tee "${stack_path}/docker-compose-down.sh.tmp" > /dev/null;
 
+    printf "%s\n" \
+        "#!/bin/bash" \
+        "" \
+        "set -Eeoa pipefail" \
+        "" \
+        "script_dir=\$(dirname \"\$(readlink -f \"\$0\")\")" \
+        "CONTEXT_ENV=\$(realpath \"\${script_dir}/context\")" \
+        "" \
+    | tee "${stack_path}/docker-compose-logs.sh.tmp" > /dev/null;
+
     compose_files=""
 
     paths=( "${!2}" )
     for path in "${paths[@]}"
     do
         proj_name=$(echo "${path}" | awk -F/ '{print $1}')
-        if [ -f "${script_dir}/${path}/common-compose.yml" ]; then
-            {
-                echo "cp ${script_dir}/${path}/common-compose.yml \"\${CONTEXT_ENV}/common-compose-${proj_name}.yml\""
-                compose_files="${compose_files} -f common-compose-${proj_name}.yml"
-            } >> "${stack_path}/docker-compose-up.sh.tmp"
-        fi
-        if [ -f "${script_dir}/${path}/docker-compose.yml" ]; then
-            {
-                echo "cp ${script_dir}/${path}/docker-compose.yml \"\${CONTEXT_ENV}/docker-compose-${proj_name}.yml\""
-                compose_files="${compose_files} -f docker-compose-${proj_name}.yml"
-            } >> "${stack_path}/docker-compose-up.sh.tmp"
-        fi
-        {
-            echo "# ${path}"
-            echo ""
-            envsubst < "${script_dir}/${path}/.env.tmpl"
-            echo ""
-        } >> "${stack_path}/.env.tmp"
+        for file in "${script_dir}/${path}/"* "${script_dir}/${path}/".*
+        do
+            if [ -d "${file}" ]; then
+                continue
+            elif [[ "${file}" == *"stack.yml" ]]; then
+                continue
+            elif [[ "${file}" == *"common-compose.yml" ]]; then
+                {
+                    echo "cp ${file} \"\${CONTEXT_ENV}/common-compose-${proj_name}.yml\""
+                    compose_files="${compose_files} -f common-compose-${proj_name}.yml"
+                } >> "${stack_path}/docker-compose-up.sh.tmp"
+            elif [[ "${file}" == *"docker-compose.yml" ]]; then
+                {
+                    echo "cp ${file} \"\${CONTEXT_ENV}/docker-compose-${proj_name}.yml\""
+                    compose_files="${compose_files} -f docker-compose-${proj_name}.yml"
+                } >> "${stack_path}/docker-compose-up.sh.tmp"
+            elif [[ "${file}" == *".env.tmpl" ]]; then
+                {
+                    echo "# # ${path}"
+                    echo ""
+                    envsubst < "${script_dir}/${path}/.env.tmpl"
+                    echo ""
+                } >> "${stack_path}/.env.tmp"
+            else
+                {
+                    filename=$(basename "${file}")
+                    echo "cp ${file} \"\${CONTEXT_ENV}/${filename}\""
+                    if [[ "${file}" == *"compose.yml" ]]; then
+                        compose_files="${compose_files} -f ${filename}"
+                    fi
+                } >> "${stack_path}/docker-compose-up.sh.tmp"
+            fi
+        done
     done
 
     if [ -n "${compose_files}" ]; then
@@ -161,10 +236,22 @@ make_compose_stack () {
         }  >> "${stack_path}/docker-compose-up.sh.tmp"
 
         {
-            echo "cd \"\${CONTEXT_ENV}\""
-            echo "docker compose ${compose_files} down"
-            echo "cd .."
+            echo "if [ -d \"\${CONTEXT_ENV}\" ]; then"
+            echo "    cd \"\${CONTEXT_ENV}\""
+            echo "    docker compose ${compose_files} down"
+            echo "    cd .."
+            echo "    rm -r \"\${CONTEXT_ENV}\""
+            echo "fi"
         }  >> "${stack_path}/docker-compose-down.sh.tmp"
+
+        {
+            echo "if [ -d \"\${CONTEXT_ENV}\" ]; then"
+            echo "    cd \"\${CONTEXT_ENV}\""
+            echo "    docker compose ${compose_files} logs --follow"
+            echo "    cd .."
+            echo "    rm -r \"\${CONTEXT_ENV}\""
+            echo "fi"
+        }  >> "${stack_path}/docker-compose-logs.sh.tmp"
     fi
 
     set +a
@@ -179,9 +266,12 @@ make_compose_stack () {
         chmod 744 "${stack_path}/docker-compose-up.sh"
         mv "${stack_path}/docker-compose-down.sh.tmp" "${stack_path}/docker-compose-down.sh"
         chmod 744 "${stack_path}/docker-compose-down.sh"
+        mv "${stack_path}/docker-compose-logs.sh.tmp" "${stack_path}/docker-compose-logs.sh"
+        chmod 744 "${stack_path}/docker-compose-logs.sh"
     else
         rm "${stack_path}/docker-compose-up.sh.tmp"
         rm "${stack_path}/docker-compose-down.sh.tmp"
+        rm "${stack_path}/docker-compose-logs.sh.tmp"
     fi
 
 }
@@ -249,7 +339,7 @@ make_build_stack () {
             make_docker_build=1
         fi
         {
-            echo "# ${path}"
+            echo "# # ${path}"
             echo ""
             envsubst < "${script_dir}/${path}/.arg.tmpl"
             echo ""
