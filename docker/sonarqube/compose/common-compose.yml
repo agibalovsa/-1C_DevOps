@@ -33,7 +33,6 @@ volumes:
     external: true
     name: ${SONAR_DATA_VOL:-sonarqube_data}
   sonarqube_ext:
-    external: true
     name: ${SONAR_EXT_VOL:-sonarqube_ext}
   sonarqube_logs:
     name: ${SONAR_LOGS_VOL:-sonarqube_logs}
