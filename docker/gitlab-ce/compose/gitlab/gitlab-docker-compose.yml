@@ -1,0 +1,6 @@
+services:
+
+  gitlab:
+
+    container_name: ${GITLAB_NAME:-gitlab}
+    restart: always

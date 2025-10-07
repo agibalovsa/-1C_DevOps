@@ -1,19 +1,15 @@
 services:
 
-  oc_esb:
-
-    # compose
-    container_name: ${OC_ESB_NAME:-oc_esb}
-    restart: always
+  oc-esb:
 
     image: "${OC_ESB_TAG}"
-    hostname: "${OC_ESB_HOSTNAME}"
+    hostname: "${OC_ESB_HOSTNAME:-oc-esb}"
     command: esb
     environment:
       TZ: ${TZ}
     ports:
       - "${OC_ESB_SERVER_PORT:-9090}:9090"
-      - "${OC_ESBIDE_BUS_PORT:-6698}:6698"
+      - "${OC_ESB_BUS_PORT:-6698}:6698"
     volumes:
       - oc_esb_data:/var/opt/1C/1CE/instances/1c-enterprise-esb
       - oc_esb_usr1ce:/home/usr1ce

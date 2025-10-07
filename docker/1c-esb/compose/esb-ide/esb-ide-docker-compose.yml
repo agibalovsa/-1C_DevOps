@@ -1,0 +1,6 @@
+services:
+
+  oc-esbide:
+
+    container_name: ${OC_ESBIDE_NAME:-oc-esbide}
+    restart: always

@@ -8,10 +8,11 @@ init_stack () {
     local -n return_type=$2
     local -n return_paths=$3
 
+    # shellcheck disable=SC2143
     [[ $(dialog --help | grep -- "--erase-on-exit") ]] && ERASE_ON_EXIT="--erase-on-exit" || :
 
     name=$(\
-        dialog --ascii-lines --no-shadow ${ERASE_ON_EXIT} --output-fd 1 --title "Enter docker build stack" \
+        dialog --ascii-lines --no-shadow "${ERASE_ON_EXIT}" --output-fd 1 --title "Enter docker build stack" \
             --inputbox "" 8 40 \
     )
 
@@ -20,7 +21,7 @@ init_stack () {
     fi
 
     type=$(\
-        dialog --ascii-lines --no-shadow --no-tags ${ERASE_ON_EXIT} --output-fd 1 --radiolist "Please select type" 0 0 0 \
+        dialog --ascii-lines --no-shadow --no-tags "${ERASE_ON_EXIT}" --output-fd 1 --radiolist "Please select type" 0 0 0 \
             "build" "build" off \
             "compose" "compose" off
     )
@@ -31,12 +32,13 @@ init_stack () {
 
     if [ "${type}" = "compose" ]; then
         IFS=" " read -ra paths <<< "$(
-            dialog --ascii-lines --no-shadow --no-tags ${ERASE_ON_EXIT} --output-fd 1 --checklist "Please select applications" 0 0 0 \
+            dialog --ascii-lines --no-shadow --no-tags "${ERASE_ON_EXIT}" --output-fd 1 --checklist "Please select applications" 0 0 0 \
                 "1c/compose/crs" "1C Platform (cr-server)" off \
                 "1c/compose/ibsrv" "1C Platform (ibsrv)" off \
                 "1c/compose/server" "1C Platform (server)" off \
-                "1cans/compose" "1C Ans" off \
-                "1cesb/compose" "1C Esb" off \
+                "1c-ans/compose" "1C Ans" off \
+                "1c-esb/compose" "1C ESB" off \
+                "gitlab-ce/compose" "Gitlab" off \
                 "hasp/compose" "Hasp" off \
                 "fluent-bit/compose" "Fluent Bit" off \
                 "opensearch/compose" "Open Search" off \
@@ -48,11 +50,11 @@ init_stack () {
         )"
     else
         IFS=" " read -ra paths <<< "$(
-            dialog --ascii-lines --no-shadow --no-tags ${ERASE_ON_EXIT} --output-fd 1 --radiolist "Please select applications" 0 0 0 \
+            dialog --ascii-lines --no-shadow --no-tags "${ERASE_ON_EXIT}" --output-fd 1 --radiolist "Please select applications" 0 0 0 \
                 "1c/build" "1C Platform" off \
-                "1cans/build" "1C Ans" off \
-                "1cesb/build" "1C Esb" off \
-                "1cexecutor/build" "1C Executor" off \
+                "1c-ans/build" "1C Ans" off \
+                "1c-esb/build" "1C ESB" off \
+                "1c-element-script/build" "1C Element (Script)" off \
                 "gitlab-ce/build/gitlab-auto-mr" "Gitlab MR" off \
                 "hasp/build" "Hasp" off \
                 "imagick/build" "Image Magick" off \
@@ -73,19 +75,26 @@ init_stack () {
     if [ "${type}" = "compose" ]; then
 
         add_compose=()
-
+        
         for path in "${paths[@]}"
         do
             search_compose="${path}/*/*compose.yml"
             for compose_file in ${search_compose};
             do
                 if [ ! "${compose_file}" == "${search_compose}" ] ; then
-                    add_compose+=(" $( dirname "${compose_file}") $( basename "${compose_file}") off\n")
+                    compose_path="$( dirname "${compose_file}") $( dirname "${compose_file}") off\n"
+                    # shellcheck disable=SC2076
+                    if [[ ! $(IFS=$'|'; echo "|${add_compose[*]}|") =~ "|${compose_path}|" ]]; then
+                        add_compose+=( "${compose_path}" )
+                    fi
                 fi
             done
         done
 
-        selected_files=$(dialog --ascii-lines --no-shadow --no-tags ${ERASE_ON_EXIT} --output-fd 1 --checklist "Please select additional compose" 0 0 0 $add_compose )
+        if [ ${#add_compose[@]} -gt 0 ]; then
+            # shellcheck disable=SC2068
+            selected_files=$(dialog --ascii-lines --no-shadow --no-tags "${ERASE_ON_EXIT}" --output-fd 1 --checklist "Please select additional compose" 0 0 0 ${add_compose[@]} )
+        fi;
         if [ -n "${selected_files}" ]; then
             paths+=( "${selected_files[@]}" )
         fi
@@ -111,11 +120,12 @@ init_stack () {
 #
 make_compose_stack () {
 
+    stack_name="${1}"
     script_dir=$(dirname "$(readlink -f "$0")")
-    stack_path="${script_dir}/users/compose/${1}"
+    stack_path="${script_dir}/users/compose/${stack_name}"
 
-    if [ ! -d "${stack_path}" ]; then
-        mkdir -p "${stack_path}"
+    if [ ! -d "${stack_path:?}" ]; then
+        mkdir -p "${stack_path:?}"
     fi
 
     set -a
@@ -139,8 +149,8 @@ make_compose_stack () {
         rm "${stack_path}/docker-compose-logs.sh"
     fi
 
-    if [ -d "${stack_path}/context" ]; then
-        rm -r "${stack_path}/context"
+    if [ -d "${stack_path:?}/${stack_name}" ]; then
+        rm -r "${stack_path:?}/${stack_name}"
     fi
 
     printf "%s\n" \
@@ -151,11 +161,11 @@ make_compose_stack () {
         "script_dir=\$(dirname \"\$(readlink -f \"\$0\")\")" \
         "" \
         "# make context file" \
-        "if [ -d \"\${script_dir}/context\" ]; then" \
-        "    rm -r \"\${script_dir}/context\";" \
+        "if [ -d \"\${script_dir}/${stack_name}\" ]; then" \
+        "    rm -r \"\${script_dir}/${stack_name}\";" \
         "fi;" \
-        "mkdir -p \"\${script_dir}/context\"" \
-        "CONTEXT_ENV=\$(realpath \"\${script_dir}/context\")" \
+        "mkdir -p \"\${script_dir}/${stack_name}\"" \
+        "CONTEXT_ENV=\$(realpath \"\${script_dir}/${stack_name}\")" \
         "{" \
             "echo \"CONTEXT_ENV=\${CONTEXT_ENV}\"" \
             "echo \"\"" \
@@ -172,7 +182,7 @@ make_compose_stack () {
         "set -Eeoa pipefail" \
         "" \
         "script_dir=\$(dirname \"\$(readlink -f \"\$0\")\")" \
-        "CONTEXT_ENV=\$(realpath \"\${script_dir}/context\")" \
+        "CONTEXT_ENV=\$(realpath \"\${script_dir}/${stack_name}\")" \
         "" \
     | tee "${stack_path}/docker-compose-down.sh.tmp" > /dev/null;
 
@@ -182,7 +192,7 @@ make_compose_stack () {
         "set -Eeoa pipefail" \
         "" \
         "script_dir=\$(dirname \"\$(readlink -f \"\$0\")\")" \
-        "CONTEXT_ENV=\$(realpath \"\${script_dir}/context\")" \
+        "CONTEXT_ENV=\$(realpath \"\${script_dir}/${stack_name}\")" \
         "" \
     | tee "${stack_path}/docker-compose-logs.sh.tmp" > /dev/null;
 
@@ -195,6 +205,9 @@ make_compose_stack () {
         for file in "${script_dir}/${path}/"* "${script_dir}/${path}/".*
         do
             if [ -d "${file}" ]; then
+                continue
+            elif [[ "${file}" == *".*" ]]; then
+                # Returning ".*" in altLinux
                 continue
             elif [[ "${file}" == *"stack.yml" ]]; then
                 continue
@@ -212,6 +225,7 @@ make_compose_stack () {
                 {
                     echo "# # ${path}"
                     echo ""
+                    # https://github.com/a8m/envsubst (interpolating default values in file)
                     envsubst < "${script_dir}/${path}/.env.tmpl"
                     echo ""
                 } >> "${stack_path}/.env.tmp"
@@ -256,10 +270,11 @@ make_compose_stack () {
 
     set +a
 
-    sed -i 's/{{/{/g' "${stack_path}/.env.tmp"
-    sed -i 's/}}/}/g' "${stack_path}/.env.tmp"
-
-    mv "${stack_path}/.env.tmp" "${stack_path}/.env"
+    if [ -f "${stack_path}/.env.tmp" ]; then
+        sed -i 's/{{/{/g' "${stack_path}/.env.tmp"
+        sed -i 's/}}/}/g' "${stack_path}/.env.tmp"
+        mv "${stack_path}/.env.tmp" "${stack_path}/.env"
+    fi
 
     if [ -n "${compose_files}" ]; then
         mv "${stack_path}/docker-compose-up.sh.tmp" "${stack_path}/docker-compose-up.sh"
@@ -285,8 +300,8 @@ make_build_stack () {
     script_dir=$(dirname "$(readlink -f "$0")")
     stack_path="${script_dir}/users/builds/${1}"
 
-    if [ ! -d "${stack_path}" ]; then
-        mkdir -p "${stack_path}"
+    if [ ! -d "${stack_path:?}" ]; then
+        mkdir -p "${stack_path:?}"
     fi
 
     set -a
@@ -341,6 +356,7 @@ make_build_stack () {
         {
             echo "# # ${path}"
             echo ""
+            # https://github.com/a8m/envsubst (interpolating default values in file)
             envsubst < "${script_dir}/${path}/.arg.tmpl"
             echo ""
         } >> "${stack_path}/.arg.tmp"

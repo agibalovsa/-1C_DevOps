@@ -1,0 +1,6 @@
+services:
+
+  oc-esb:
+
+    container_name: ${OC_ESB_NAME:-oc-esb}
+    restart: always

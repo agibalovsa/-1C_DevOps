@@ -1,0 +1,6 @@
+services:
+
+  oc-ans:
+
+    container_name: ${OC_ANS_NAME:-oc-ans}
+    restart: always

@@ -1,0 +1,16 @@
+services:
+
+  gitlab-runner:
+
+    image: "${GITLAB_RUNNER_TAG}"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - gitlab_runner_config:/etc/gitlab-runner
+      - gitlab_runner_temp:/home/gitlab-runner
+
+volumes:
+  gitlab_runner_config:
+    external: true
+    name: ${GITLAB_RUNNER_CONF_VOL:-gitlab_runner_config}
+  gitlab_runner_temp:
+    name: ${GITLAB_RUNNER_TEMP_VOL:-gitlab_runner_temp}

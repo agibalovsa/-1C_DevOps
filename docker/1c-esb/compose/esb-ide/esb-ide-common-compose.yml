@@ -1,13 +1,9 @@
 services:
 
-  oc_esbide:
-
-    # compose
-    container_name: ${OC_ESBIDE_NAME:-oc_esbide}
-    restart: always
+  oc-esbide:
 
     image: "${OC_ESBIDE_TAG}"
-    hostname: "${OC_ESBIDE_HOSTNAME}"
+    hostname: "${OC_ESBIDE_HOSTNAME:-oc-esbide}"
     command: esb
     environment:
       TZ: ${TZ}

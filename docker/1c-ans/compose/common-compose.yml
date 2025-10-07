@@ -1,15 +1,9 @@
-version: "3"
-
 services:
 
-  oc_ans:
-
-    # compose
-    container_name: ${OC_ANS_NAME:-oc_ans}
-    restart: always
+  oc-ans:
 
     image: "${OC_ANS_TAG}"
-    hostname: "${OC_ANS_HOSTNAME}"
+    hostname: "${OC_ANS_HOSTNAME:-oc-ans}"
     command: ans
     environment:
       TZ: ${TZ}
