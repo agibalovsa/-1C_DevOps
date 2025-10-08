@@ -6,14 +6,16 @@
 <p><b>Автор</b>: Агибалов Сергей</p>
 <p><b>Дата</b>: 08.10.2025</p>
 </div>
-<div><a href="https://yoomoney.ru/to/4100119287125731" style="Font-family: segoe script; Font-size: 20px; text-decoration: none; color: #000000; Font-weight: bold"><img src=".\organization_of_work_with_sonarqube\samurai.webp" width="80" height="80">Donate</a></div>
+<div><a href="https://yoomoney.ru/to/4100119287125731" style="Font-family: segoe script; Font-size: 20px; text-decoration: none; color: #000000; Font-weight: bold"><img src="./organization_of_work_with_sonarqube/samurai.webp" width="80" height="80">Donate</a></div>
 </div>
+
 ----
 
 ## Подготовка среды исполнения Sonarqube
 
 Для разворачивания Sonarqube подойдет как виртуальная машина, так и LXC контейнер в рамках которых будет функционировать docker-контейнер. Для создания docker-контейнера необходимо развернуть **Docker engine**.
 
+> [!NOTE]
 > См. статью [**Создание LXC контейнера Linux на основе шаблона Turnkey**]() (*будет добавлена позже...*)
 
 На виртуальной машине или на хостовой машине контейнера **LXC** необходимо проверить следующие параметры:
@@ -61,28 +63,28 @@ $> git clone https://github.com/agibalovsa/-1C_DevOps 1c_devops
 
 ## Создание образа контейнера Sonarqube
 
-В репозитории **dockerfile** для **Sonarqube** можно найти по пути [docker/sonarqube/build](..\\..\\..\\..\docker\sonarqube\build\dockerfile).
+В репозитории **dockerfile** для **Sonarqube** можно найти по пути [docker/sonarqube/build](..//..//..//../docker/sonarqube/build/dockerfile).
 
 Для инициализации сборки необходимо запустить файл `docker/init.sh`.
 
 Шаг.1. Откроется окно ввода названия проекта сборки
 
-![BuildInit](.\organization_of_work_with_sonarqube\BuildInit.png)
+![BuildInit](./organization_of_work_with_sonarqube/BuildInit.png)
 
 Шаг.2. Необходимо выбрать тип проекта `build`
 
-![BuildInit](.\organization_of_work_with_sonarqube\BuildInit2.png)
+![BuildInit](./organization_of_work_with_sonarqube/BuildInit2.png)
 
 Шаг.3. Необходимо выбрать приложение `sonarqube`
 
-![BuildInit](.\organization_of_work_with_sonarqube\BuildInit3.png)
+![BuildInit](./organization_of_work_with_sonarqube/BuildInit3.png)
 
 В каталоге репозитория `docker/users/builds/sonarqube` сформируются:
 
 - `docker-build.sh` - Скрипт для сборки.
-- `.arg` - Файл с аргументами сборки (Аргументы сборки описаны в [здесь](..\\..\\..\\..\docker\sonarqube\README.md#создание-образа)).
+- `.arg` - Файл с аргументами сборки (Аргументы сборки описаны в [здесь](..//..//..//../docker/sonarqube/README.md#создание-образа)).
 
-![BuildArg](.\organization_of_work_with_sonarqube\BuildArg.png)
+![BuildArg](./organization_of_work_with_sonarqube/BuildArg.png)
 
 Для сборки образа необходимо:
 
@@ -93,15 +95,16 @@ $> git clone https://github.com/agibalovsa/-1C_DevOps 1c_devops
 
 ### Инициализация compose
 
-Файлы **compose** для **Sonarqube** можно найти в репозитории по пути [docker/sonarqube/compose](..\\..\\..\\..\docker\sonarqube\compose). Здесь можно увидеть:
+Файлы **compose** для **Sonarqube** можно найти в репозитории по пути [docker/sonarqube/compose](..//..//..//../docker/sonarqube/compose). Здесь можно увидеть:
 
 - `common-compose.yml` - файл с параметрами развертывания среды общими для **compose** и для **swarm**.
 - `docker-compose.yml` - файл с параметрами развертывания среды только для **compose**.
 - `depends_on_postgres/depends_on_postgres-compose.yml` - файл приоритета запуска, в случае запуска **sonarqube** вместе с **postgres**.>
 
-> **Информация.** Файлы **compose** созданы согласно [документации **Sonarqube**](https://docs.sonarsource.com/sonarqube-server/latest/server-installation/from-docker-image/starting-sonarqube-container).
+> [!NOTE]
+> Файлы **compose** созданы согласно [документации **Sonarqube**](https://docs.sonarsource.com/sonarqube-server/latest/server-installation/from-docker-image/starting-sonarqube-container).
 
-Файлы **compose** для **Postgres** можно найти в репозитории по пути [docker/postgres/compose](..\\..\\..\\..\docker\postgres\compose).
+Файлы **compose** для **Postgres** можно найти в репозитории по пути [docker/postgres/compose](..//..//..//../docker/postgres/compose).
 
 Для формирования скриптов запуска контейнера необходимо снова запустить `docker/init.sh`.
 
@@ -109,24 +112,25 @@ $> git clone https://github.com/agibalovsa/-1C_DevOps 1c_devops
 
 Шаг.2. Необходимо выбрать тип проекта `compose`.
 
-![ComposeInit](.\organization_of_work_with_sonarqube\ComposeInit2.png)
+![ComposeInit](./organization_of_work_with_sonarqube/ComposeInit2.png)
 
 Шаг.3. Можно выбрать 1 или 2 приложения: `sonarqube` и `postgres`.
 
-![ComposeInit](.\organization_of_work_with_sonarqube\ComposeInit3.png)
+![ComposeInit](./organization_of_work_with_sonarqube/ComposeInit3.png)
 
-> **Информация.** Приложение **postgres** можно не выбирать, если оно уже установлено, и путь до него известен
+> [!NOTE]
+> Приложение **postgres** можно не выбирать, если оно уже установлено, и путь до него известен
 
 Шаг.4. В случае установки 2х приложений необходимо выбрать дополнительную настройку `depends_on_postgres`
 
-![ComposeInit](.\organization_of_work_with_sonarqube\ComposeInit4.png)
+![ComposeInit](./organization_of_work_with_sonarqube/ComposeInit4.png)
 
 В каталоге репозитория `docker/users/compose/sonarqube` сформируются:
 
 - `docker-compose-up.sh` - Скрипт развертывания среды.
 - `docker-compose-down.sh` - Скрипт свертывания среды.
 - `docker-compose-logs.sh` - Скрипт просмотра логов среды.
-- `.env` - Файл с переменными среды (Переменные среды запуска описаны в [здесь](..\\..\\..\\..\docker\sonarqube\README.md#создание-контейнера)).
+- `.env` - Файл с переменными среды (Переменные среды запуска описаны в [здесь](..//..//..//../docker/sonarqube/README.md#создание-контейнера)).
 
 ### Переменные среды
 
@@ -176,7 +180,7 @@ ulimits:
 - `port` - это порт, который был задан в файле `common-compose.yml`.
 - `/sonarqube` - если задана переменная среды окружения `SONAR_WEB_CONTEXT`
 
-![SonarqubeAuth](.\organization_of_work_with_sonarqube\SonarqubeAuth.png)
+![SonarqubeAuth](./organization_of_work_with_sonarqube/SonarqubeAuth.png)
 
 Первоначальные учетные данные **admin**/**admin**.
 
@@ -186,7 +190,7 @@ ulimits:
 
 На скриншоте показан бэкап **LXC**-контейнера в **Proxmox**.
 
-![ProxmoxLXCBackup](.\organization_of_work_with_sonarqube\ProxmoxLXCBackup.png)
+![ProxmoxLXCBackup](./organization_of_work_with_sonarqube/ProxmoxLXCBackup.png)
 
 После создания архива необходимо выполнить следующие шаги:
 
@@ -196,7 +200,7 @@ ulimits:
 
 3. Необходимо проверить наименование переменных среды, и исправить **dockerfile**, файлы **compose** в случае необходимости
 
-   > **Например**. При переходе с 8.9 на 9.9 были переименования с `SONARQUBE_JDBC_URL` на `SONAR_JDBC_URL`.
+   > При переходе с 8.9 на 9.9 были переименования с `SONARQUBE_JDBC_URL` на `SONAR_JDBC_URL`.
 
 4. Изменить `.arg`, в котором указать:
 
@@ -318,9 +322,9 @@ PING sonarqube (192.168.0.2) 56(84) bytes of data.
 
 После проверки доменных имен необходимо указать параметр `Server base URL` в общих настройках **Sonarqube**
 
-![SonarqubeSettings](.\organization_of_work_with_sonarqube\SonarqubeSettings.png)
+![SonarqubeSettings](./organization_of_work_with_sonarqube/SonarqubeSettings.png)
 
-![SonarqubeServerBaseURL](.\organization_of_work_with_sonarqube\SonarqubeServerBaseURL.png)
+![SonarqubeServerBaseURL](./organization_of_work_with_sonarqube/SonarqubeServerBaseURL.png)
 
 По сути дела, он должен быть таким же, как путь в браузере.
 
@@ -335,7 +339,7 @@ PING sonarqube (192.168.0.2) 56(84) bytes of data.
 
 Первый токен для авторизации необходимо сделать для приложения **Gitlab**. Для этого необходимо зайти в панель `Admin` в `Applications`.
 
-![GitLabApplications](.\organization_of_work_with_sonarqube\GitLabApplications.png)
+![GitLabApplications](./organization_of_work_with_sonarqube/GitLabApplications.png)
 
 Далее необходимо создать новое приложение с помощью кнопки `New application`, задав следующие настройки
 
@@ -348,7 +352,7 @@ PING sonarqube (192.168.0.2) 56(84) bytes of data.
 
 После генерации токена необходимо скопировать `Application ID` и `Secret`.
 
-![GitLabApplication](.\organization_of_work_with_sonarqube\GitLabApplication.png)
+![GitLabApplication](./organization_of_work_with_sonarqube/GitLabApplication.png)
 
 #### Доступ к проектам **Gitlab**
 
@@ -356,7 +360,7 @@ PING sonarqube (192.168.0.2) 56(84) bytes of data.
 
 Для этого, необходимо авторизоваться под этим системным пользователем и зайти в настройки профайла и далее в раздел `AccessTokens`.
 
-![GitLabAccessTokens](.\organization_of_work_with_sonarqube\GitLabAccessTokens.png)
+![GitLabAccessTokens](./organization_of_work_with_sonarqube/GitLabAccessTokens.png)
 
 Далее необходимо создать новый токен с помощью кнопки `Create personal access token`, задав следующие настройки
 
@@ -366,7 +370,7 @@ PING sonarqube (192.168.0.2) 56(84) bytes of data.
 
 После генерации токена, его необходимо скопировать сразу же, иначе, позже он не будет больше доступен.
 
-![GitLabNewAccessToken](.\organization_of_work_with_sonarqube\GitLabNewAccessToken.png)
+![GitLabNewAccessToken](./organization_of_work_with_sonarqube/GitLabNewAccessToken.png)
 
 ## Настройка интеграции с ALM в Sonarqube
 
@@ -374,7 +378,7 @@ PING sonarqube (192.168.0.2) 56(84) bytes of data.
 
 1. Настройка конфигурации интеграции.
 
-   ![SonarqubeIntALM](.\organization_of_work_with_sonarqube\SonarqubeIntALM.png)
+   ![SonarqubeIntALM](./organization_of_work_with_sonarqube/SonarqubeIntALM.png)
 
    1. Необходимо нажать кнопку `Создать конфигурацию`.
    2. Ввести имя конфигурации, например, *Gitlab*.
@@ -384,7 +388,7 @@ PING sonarqube (192.168.0.2) 56(84) bytes of data.
 
 2. Аутентификация **GitLab**.
 
-   ![SonarqubeGitlabAuth](.\organization_of_work_with_sonarqube\SonarqubeGitlabAuth.png)
+   ![SonarqubeGitlabAuth](./organization_of_work_with_sonarqube/SonarqubeGitlabAuth.png)
 
    1. Необходимо задать путь к сервису **Gitlab**, который будет состоять из доменного имени. Например, <https://hostname/gitlab>.
    2. Необходимо заполнить `Application ID` сгенерированным раннее значением.
@@ -424,7 +428,7 @@ PING sonarqube (192.168.0.2) 56(84) bytes of data.
 
 2. Выйдет окно ввода токена доступа
 
-   ![CreateProjectToken](.\organization_of_work_with_sonarqube\CreateProjectToken.png)
+   ![CreateProjectToken](./organization_of_work_with_sonarqube/CreateProjectToken.png)
 
 3. В этот раз нужно сгенерировать теперь токен доступа также как в разделе [Доступ к проектам **Gitlab**](#доступ-к-проектам-gitlab), но только для текущего пользователя (а не системного)
 
@@ -432,19 +436,20 @@ PING sonarqube (192.168.0.2) 56(84) bytes of data.
 
 4. После ввода персонального токена выйдет список проектов из **Gitlab**, необходимо выбрать нужный.
 
-   > **Внимание.** Проверьте, что в **Gitlab** необходимые проекты доступны и текущему и системному пользователям.
+> [!WARNING]
+> Проверьте, что в **Gitlab** необходимые проекты доступны и текущему и системному пользователям.
 
-   ![SonarqubeImport](.\organization_of_work_with_sonarqube\SonarqubeImport.png)
+   ![SonarqubeImport](./organization_of_work_with_sonarqube/SonarqubeImport.png)
 
 5. При нажатии на кнопку `Импорт`, необходимо указать настройку соответствия чистому коду. Можно спокойно указывать `Использовать глобальную настройку`.
 
 6. На следующем шаге необходимо указать метод анализа **Gitlab CI**.
 
-   ![SonarqubeMethodALM](.\organization_of_work_with_sonarqube\SonarqubeMethodALM.png)
+   ![SonarqubeMethodALM](./organization_of_work_with_sonarqube/SonarqubeMethodALM.png)
 
 7. После чего откроется окно задания настроек интеграции с **Gitlab**
 
-   ![SonarqubeALMSetting](.\organization_of_work_with_sonarqube\SonarqubeALMSetting.png)
+   ![SonarqubeALMSetting](./organization_of_work_with_sonarqube/SonarqubeALMSetting.png)
 
    1. Сгенерировать токен доступа `SONAR_TOKEN` к **Sonarqube** из **Gitlab-runner**:
 
@@ -452,7 +457,7 @@ PING sonarqube (192.168.0.2) 56(84) bytes of data.
 
       - Можно сгенерировать общий для нескольких проектов из настроек учетной записи пользователя с администраторскими правами.
 
-        ![SonarqubeToken](.\organization_of_work_with_sonarqube\SonarqubeToken.png)
+        ![SonarqubeToken](./organization_of_work_with_sonarqube/SonarqubeToken.png)
 
    2. Задать переменные в `SONAR_HOST_URL` и `SONAR_TOKEN` в **Gitlab**(см. ниже).
 
@@ -485,7 +490,7 @@ PING sonarqube (192.168.0.2) 56(84) bytes of data.
 - В настройках группы
 - В настройках проекта
 
-![GitlabSettingCICD](.\organization_of_work_with_sonarqube\GitlabSettingCICD.png)
+![GitlabSettingCICD](./organization_of_work_with_sonarqube/GitlabSettingCICD.png)
 
 Параметры переменных
 
@@ -498,7 +503,8 @@ PING sonarqube (192.168.0.2) 56(84) bytes of data.
   - `Protected` - False
   - `Masked` - True
 
-> **Информация.** Если значение для `SONAR_TOKEN`было сгенерировано индивидуально для проекта, то его следует разместить в переменных CICD проекта, иначе значение следует разместить в в общих переменных CICD или в переменных группы.
+> [!IMPORTANT]
+> Если значение для `SONAR_TOKEN`было сгенерировано индивидуально для проекта, то его следует разместить в переменных CICD проекта, иначе значение следует разместить в в общих переменных CICD или в переменных группы.
 
 #### Настройка файла конфигурации проекта `sonar-project.properties`
 
@@ -516,22 +522,23 @@ PING sonarqube (192.168.0.2) 56(84) bytes of data.
 
 - `sonar.login` - (не обязательно)  - токен для авторизации в **Sonarqube**.
 
-  > Информация. Параметры `sonar.host.url` и `sonar.login` указываются если на сервере **Sonarqube** включено требование принудительной авторизации и/или запрет анонимного анализа проектов.
+> [!NOTE]
+> Параметры `sonar.host.url` и `sonar.login` указываются если на сервере **Sonarqube** включено требование принудительной авторизации и/или запрет анонимного анализа проектов.
 
 - `sonar.sourceEncoding` - кодировка файлов проекта.
 
 - `sonar.sources` - пути к файлам проекта.
 
-  > **Обратите внимание**:
-  >
-  > - Все русскоязычные пути должны быть [преобразованы](https://unicode-table.com/ru/tools/decoder/) в юникод формат.
-  > - Для проектов 1С, необходимо указать путь к файлам основной конфигурации, и пути к файлам каждого расширения отдельно.
+> [!CAUTION]
+> - Все русскоязычные пути должны быть [преобразованы](https://unicode-table.com/ru/tools/decoder/) в юникод формат.
+> - Для проектов 1С, необходимо указать путь к файлам основной конфигурации, и пути к файлам каждого расширения отдельно.
 
 - `sonar.inclusions` - те файлы, которые необходимо анализировать.
 
 - `sonar.exclusions` - те файлы, которые необходимо пропускать при проверке.
 
-  > **Информация.** Для проектов 1С сюда можно прописать файлы регламентированной отчетности, что сократит время проверки типовых конфигураций в разы.
+> [!TIP]
+> Для проектов 1С сюда можно прописать файлы регламентированной отчетности, что сократит время проверки типовых конфигураций в разы.
 
 - `sonar.lang.patterns.xml` -  определяет какие файлы относятся к **xml**.
 
@@ -630,7 +637,7 @@ sonarqube-check:
 
    - Переходим `Admin` -  `CI/CD`
 
-     ![GitlabRunners](.\organization_of_work_with_sonarqube\GitlabRunners.png)
+     ![GitlabRunners](./organization_of_work_with_sonarqube/GitlabRunners.png)
 
    - Создаем новый **runner**
 
@@ -640,11 +647,12 @@ sonarqube-check:
 
    - После создания runner выходит информация о регистрации, запомним ее
 
-     ![GitlabRunnerRegister](.\organization_of_work_with_sonarqube\GitlabRunnerRegister.png)
+     ![GitlabRunnerRegister](./organization_of_work_with_sonarqube/GitlabRunnerRegister.png)
 
 2. Настроить **runner** на машине исполнения
 
-   > **Информация.** Можно настроить на той же машине, где настроен sonarqube.
+> [!NOTE]
+> Можно настроить на той же машине, где настроен sonarqube.
 
    - **Runner** будет настроен через среду **compose**
 
@@ -728,7 +736,7 @@ sonarqube-check:
 
 Также в кабинете **gitlab** настройках ранее зарегистрированного **runner**  можно указать какие проекты он обслуживает.
 
-![GitlabProjectEnableRunner](.\organization_of_work_with_sonarqube\GitlabProjectEnableRunner.png)
+![GitlabProjectEnableRunner](./organization_of_work_with_sonarqube/GitlabProjectEnableRunner.png)
 
 ### Первый запуск проверки Sonarqube
 
@@ -747,7 +755,7 @@ sonarqube-check:
 <p><b>Почта</b>: agibalovsa@gmail.com</p>
 <p><b>Telegram</b>: @agibse</p>
 </div>
-<div><a href="https://yoomoney.ru/to/4100119287125731" style="Font-family: segoe script; Font-size: 20px; text-decoration: none; color: #000000; Font-weight: bold"><img src=".\organization_of_work_with_sonarqube\samurai2.webp" width="80" height="80">Donate</a></div>
+<div><a href="https://yoomoney.ru/to/4100119287125731" style="Font-family: segoe script; Font-size: 20px; text-decoration: none; color: #000000; Font-weight: bold"><img src="./organization_of_work_with_sonarqube/samurai2.webp" width="80" height="80">Donate</a></div>
 </div>
 
 ----
