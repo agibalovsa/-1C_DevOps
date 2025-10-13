@@ -16,7 +16,7 @@ services:
         max-size: "${OPENSEARCH_LOG_SIZE:-100M}"
     environment:
       TZ: "${TZ}"
-      node.name: "${OPENSEARCH_NODE_NAME:-opensearch_node}"
+      node.name: "${OPENSEARCH_NODE_NAME:-opensearch-node}"
       node.roles: "${OPENSEARCH_NODE_ROLE}"
       cluster.name: "${OPENSEARCH_CLUSTER_NAME}"
       cluster.initial_cluster_manager_nodes: "${OPENSEARCH_MANAGER_NODES}"
@@ -44,10 +44,10 @@ services:
         max-size: "${OPENSEARCH_LOG_SIZE:-100M}"
     environment:
       OPENSEARCH_HOSTS: "${OPENSEARCH_DASHBOARD_HOSTS:-[ \"https://opensearch:9200\" ]}"
+      SERVER_REWRITEBASEPATH: "${SERVER_REWRITEBASEPATH:-false}"
+      SERVER_BASEPATH: "${SERVER_BASEPATH}"
     ports:
       - "${OPENSEARCH_DASHBOARD_PORT:-5601}:5601"
-    expose:
-      - "5601"
 
 volumes:
   opensearch-data:

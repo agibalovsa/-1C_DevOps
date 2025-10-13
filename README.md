@@ -123,6 +123,8 @@ ARG DEBIAN_FRONTEND=noninteractive
 - Разработка
   - [Gitlab](docker/gitlab-ce/README.md)
   - [Sonarqube](docker/sonarqube/README.md)
+- Анализ
+  - [Opensearch](docker/opensearch/README.md)
 - Моделирование
   - [Diagrams](docker/diagrams/README.md)
 
