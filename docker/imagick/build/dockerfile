@@ -10,7 +10,7 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN --mount=from=context,target=/context \
     set -eux; \
     . context/pre_install; \
-    install_pack
+    install_packs
 
 FROM pre_build AS compiler
 
@@ -29,6 +29,11 @@ RUN --mount=from=context,target=/context \
     . /context_arg/.arg; \
     . context/compile; \
     compile_deb "/srv/imagick/distr"
+
+# hadolint ignore=DL3006
+FROM scratch AS deb
+
+COPY --from=compiler [ "/srv/imagick/distr", "/" ]
 
 FROM pre_build
 
