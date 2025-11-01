@@ -1,0 +1,26 @@
+services:
+
+  step-ca-cli:
+
+    image: ${STEP_TAG}
+    hostname: ${STEP_CA_HOSTNAME:-step-ca-cli}
+    command: step_ca
+    environment:
+      DOMAIN_NAME:      "${DOMAIN_NAME}"
+      STEP_URL:         "${STEP_URL}"
+      STEP_FINGERPRINT: "${STEP_FINGERPRINT}"
+    ports:
+      - "80:80"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /etc/localtime:/etc/localtime
+      - step_ca_certs:/root/.step/certs
+      - step_ca_config:/root/.step/config
+
+volumes:
+  step_ca_certs:
+    external: true
+    name: ${STEP_CA_CERTS_VOL:-step_ca_certs}
+  step_ca_config:
+    external: true
+    name: ${STEP_CA_CONF_VOL:-step_ca_config}

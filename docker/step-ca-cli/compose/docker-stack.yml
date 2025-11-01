@@ -1,0 +1,17 @@
+services:
+
+  step-ca-cli:
+
+    networks:
+      - step_ca_cli_network
+
+    deploy:
+      mode: global
+      placement:
+        constraints:
+          - "node.hostname == ${STEP_CA_NODE}"
+
+networks:
+  step_ca_cli_network:
+    name: "${STEP_CA_NETWORK:-step_ca_cli_network}"
+    external: true
