@@ -8,7 +8,15 @@ install_packs() {
         libjpeg-dev \
         libtiff-dev \
         libltdl-dev \
-        ghostscript;
+        libwebp-dev \
+        librsvg2-dev \
+        libgraphviz-dev \
+        libwmf-dev \
+        libraw-dev \
+        ffmpeg \
+        ghostscript \
+        gsfonts \
+        libgs-dev;
 
     # dep heif
     apt-get install -y --no-install-recommends \
@@ -17,13 +25,14 @@ install_packs() {
 
     # dep jxl
     apt-get install -y --no-install-recommends \
-        libgif7 \
+        libgif-dev \
         libopenexr-dev \
         libbrotli-dev;
 
     # dep imagemagick
     apt-get install -y --no-install-recommends \
         libraqm0 \
+        libraqm-dev \
         libgomp1 \
         libfftw3-dev \
         libxext6 \
@@ -31,7 +40,14 @@ install_packs() {
         libzip-dev \
         libice-dev \
         libsm-dev \
-        libxml2-dev;
+        libxml2 \
+        libxml2-dev \
+        libopenjp2-7-dev \
+        liblcms2-dev \
+        libbz2-dev \
+        libzstd-dev \
+        libpango1.0-dev \
+        libdjvulibre-dev;
 
     rm -rf /var/lib/apt/lists/*;
 

@@ -7,9 +7,9 @@ FROM "${REGISTRY}${OS_TAG}" AS pre_build
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 # hadolint ignore=SC1091
-RUN --mount=from=context,target=/context \
+RUN --mount=from=context,source=pre_install,target=/pre_install \
     set -eux; \
-    . context/pre_install; \
+    . /pre_install; \
     install_packs
 
 FROM pre_build AS compiler
@@ -23,11 +23,11 @@ ARG IM_VERSION \
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 # hadolint ignore=SC1091
-RUN --mount=from=context,target=/context \
+RUN --mount=from=context,source=compile,target=/compile \
     --mount=from=context_arg,target=/context_arg \
     set -eux; \
     . /context_arg/.arg; \
-    . context/compile; \
+    . /compile; \
     compile_deb "/srv/imagick/distr"
 
 # hadolint ignore=DL3006
@@ -60,7 +60,7 @@ RUN --mount=from=common_context,target=/common_context \
     install_packs
 
 # hadolint ignore=SC1091
-RUN --mount=from=context,target=/context \
+RUN --mount=from=context,source=post_install,target=/post_install \
     set -eux; \
-    . context/post_install; \
+    . /post_install; \
     set_startup

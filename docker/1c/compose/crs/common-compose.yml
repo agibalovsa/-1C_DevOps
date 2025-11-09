@@ -1,0 +1,21 @@
+services:
+
+  oc_crserver:
+
+    image: "${OC_CRSERVER_TAG}"
+    hostname: "${OC_CRSERVER_HOSTNAME}"
+    command: crserver
+    environment:
+      TZ: ${TZ}
+      OC_CRSERVER_LOCATION: ${OC_CRSERVER_LOCATION:-repository/repo.1ccr}
+      OC_CRSERVER_HOSTNAME: ${OC_CRSERVER_HOSTNAME}
+    ports:
+      - "${HTTP_PORT:-80}:80"
+      - "${OC_CRS_PORT:-1542}:1542"
+    volumes:
+      - oc_crs_data:/home/usr1cv8/crserver
+
+volumes:
+  oc_crs_data:
+    external: true
+    name: "${OC_CRS_DATA_VOL:-oc_crs_data}"

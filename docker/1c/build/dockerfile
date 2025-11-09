@@ -5,9 +5,9 @@ ARG REGISTRY= \
 FROM "${REGISTRY}${OS_TAG}"
 
 # hadolint ignore=SC1091
-RUN --mount=from=context,target=/context \
+RUN --mount=from=context,source=pre_install,target=/pre_install \
     set -eux; \
-    . context/pre_install; \
+    . /pre_install; \
     install_packs
 
 ARG DEBIAN_FRONTEND=noninteractive \
@@ -33,24 +33,24 @@ ENV OC_VERSION=${OC_VERSION} \
     OC_PATH="/opt/1cv8/x86_64/${OC_VERSION}"
 
 # hadolint ignore=SC1091
-RUN --mount=from=context,target=/context \
+RUN --mount=from=context,source=pre_install_mode,target=/pre_install_mode \
     --mount=from=context_arg,target=/context_arg \
     set -eux; \
-    . context/pre_install_mode; \
+    . /pre_install_mode; \
     install_packs
 
 # hadolint ignore=SC1091
 RUN --mount=from=common_context,target=/common_context \
     --mount=from=context_arg,target=/context_arg \
     set -eux; \
-    . common_context/install; \
+    . /common_context/install; \
     install_packs
 
 # hadolint ignore=SC1091
-RUN --mount=from=context,target=/context \
+RUN --mount=from=context,source=post_install,target=/post_install \
     --mount=from=context_arg,target=/context_arg \
     set -eux; \
-    . context/post_install; \
+    . /post_install; \
     set_startup
 
 COPY --chown=usr1cv8:grp1cv8 --chmod=766 [ "entrypoint.sh", "/" ]

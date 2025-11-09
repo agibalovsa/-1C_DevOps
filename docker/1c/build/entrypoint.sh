@@ -117,7 +117,7 @@ server() {
 setup_ibsrv_healthcheck() {
 
     if [ ! -f "/healthcheck.sh" ]; then
-        echo "curl http://localhost:${OC_IBSRV_HTTP_PORT}${OC_IBSRV_HTTP_BASE_NAME}" > /healthcheck.sh
+        echo "curl http://localhost:${OC_IBSRV_HTTP_PORT}${OC_IBSRV_HTTP_PATH}" > /healthcheck.sh
         chmod 766 /healthcheck.sh
     fi;
 
@@ -131,7 +131,7 @@ setup_ibsrv_defaults() {
 
     OC_IBSRV_HTTP_ADRESS=${OC_IBSRV_HTTP_ADRESS:-"any"}
     OC_IBSRV_HTTP_PORT=${OC_IBSRV_HTTP_PORT:-"8314"}
-    OC_IBSRV_HTTP_BASE_NAME=${OC_IBSRV_HTTP_BASE_NAME:-"/ibsrv"}
+    OC_IBSRV_HTTP_PATH=${OC_IBSRV_HTTP_PATH:-"/ibsrv"}
 
     OC_IBSRV_BASE_NAME=${OC_IBSRV_BASE_NAME:-"ibsrv"}
 
@@ -176,7 +176,7 @@ setup_ibsrv_init_exec() {
     IBSRV_INIT_EXEC="gosu usr1cv8 ibcmd server config init"
     IBSRV_INIT_EXEC+=" --http-address=${OC_IBSRV_HTTP_ADRESS}"
     IBSRV_INIT_EXEC+=" --http-port=${OC_IBSRV_HTTP_PORT}"
-    IBSRV_INIT_EXEC+=" --http-base=${OC_IBSRV_HTTP_BASE_NAME}"
+    IBSRV_INIT_EXEC+=" --http-base=${OC_IBSRV_HTTP_PATH}"
     IBSRV_INIT_EXEC+=" --name=${OC_IBSRV_BASE_NAME}"
     IBSRV_INIT_EXEC+=" --distribute-licenses=allow"
     IBSRV_INIT_EXEC+=" --schedule-jobs=allow"
