@@ -19,8 +19,12 @@ services:
       - "${OC_IBSRV_RANGE_PORT:-1560-1591}:1560-1591"
     volumes:
       - oc_ibsrv_data:/srv/1c/ibsrv
+      - oc_conf:/opt/1cv8/conf
   
 volumes:
   oc_ibsrv_data:
     external: true
     name: ${OC_IBSRV_DATA_VOL:-oc_ibsrv_data}
+  oc_conf:
+    external: true
+    name: ${OC_CONF_VOL:-oc_conf}
