@@ -1,0 +1,27 @@
+## OS options
+
+OS_TAG="${OS_TAG}"
+
+## 1C options
+
+OC_VERSION="${OC_VERSION}"
+
+OC_MODE="${OC_MODE}" # server, ibsrv, crserver, client, other
+OC_MODE_SERVER="${OC_MODE_SERVER}"
+OC_MODE_WS="${OC_MODE_WS}"
+OC_MODE_CRS="${OC_MODE_CRS}"
+OC_MODE_CLIENT="${OC_MODE_CLIENT}"
+
+OC_TAG="1c/windows-${OC_MODE}:${OC_VERSION}"
+
+## Install options
+
+INSTALL_MODE="Install-From-File"
+
+### Install-From-File
+
+INSTALL_FILES="windows64full_${OC_VERSION}.zip"
+
+### Install-From-Repo
+
+# > In work

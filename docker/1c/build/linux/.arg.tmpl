@@ -1,0 +1,36 @@
+# ## OS options
+
+OS_TAG="${OS_TAG}"
+
+# ## 1C options
+
+OC_VERSION="${OC_VERSION}"
+
+OC_MODE="${OC_MODE:-server}" # server, ibsrv, crserver, client, other
+OC_MODE_SERVER="${OC_MODE_SERVER:-1}"
+OC_MODE_WS="${OC_MODE_WS:-0}"
+OC_MODE_CRS="${OC_MODE_CRS:-0}"
+OC_MODE_CLIENT="${OC_MODE_CLIENT:-0}"
+
+OC_TAG="1c/${{OC_MODE}}:${{OC_VERSION}}"
+
+# ## Install options
+
+INSTALL_MODE="${INSTALL_MODE:-install_from_file}"
+
+# ### install_from_file
+
+INSTALL_FILES="1c-enterprise-${{OC_VERSION}}-common.deb"
+[[ "${{OC_MODE_SERVER}}" = "1" ]] && INSTALL_FILES="${{INSTALL_FILES}} 1c-enterprise-${{OC_VERSION}}-server.deb" || :
+[[ "${{OC_MODE_WS}}" = "1" ]] && INSTALL_FILES="${{INSTALL_FILES}} 1c-enterprise-${{OC_VERSION}}-ws.deb" || :
+[[ "${{OC_MODE_CRS}}" = "1" ]] && INSTALL_FILES="${{INSTALL_FILES}} 1c-enterprise-${{OC_VERSION}}-crs.deb" || :
+[[ "${{OC_MODE_CLIENT}}" = "1" ]] && INSTALL_FILES="${{INSTALL_FILES}} 1c-enterprise-${{OC_VERSION}}-client.deb" || :
+
+# ### install_from_repo
+
+APTLY_REPO_COMPONENTS="1c main"
+INSTALL_PACKS="1c-enterprise-${{OC_VERSION}}-common" || : 
+[[ "${{OC_MODE_SERVER}}" = "1" ]] && INSTALL_PACKS="${{INSTALL_PACKS}} 1c-enterprise-${{OC_VERSION}}-server" || :
+[[ "${{OC_MODE_WS}}" = "1" ]] && INSTALL_PACKS="${{INSTALL_PACKS}} 1c-enterprise-${{OC_VERSION}}-ws" || :
+[[ "${{OC_MODE_CRS}}" = "1" ]] && INSTALL_PACKS="${{INSTALL_PACKS}} 1c-enterprise-${{OC_VERSION}}-crs" || :
+[[ "${{OC_MODE_CLIENT}}" = "1" ]] && INSTALL_PACKS="${{INSTALL_PACKS}} 1c-enterprise-${{OC_VERSION}}-client" || :

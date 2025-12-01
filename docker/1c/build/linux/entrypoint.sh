@@ -34,65 +34,90 @@ setup_ragent_healthcheck() {
 
 }
 
-setup_ragent_defaults() {
+setup_defaults() {
 
-    OC_SRVINFO=${OC_SRVINFO:-"/home/usr1cv8/.1cv8"}
+    WWW_PATH=${WWW_PATH:-"/var/www"}
+    OC_SRVINFO=${OC_SRVINFO:-"/home/usr1cv8/srvinfo"}
+
     OC_RAGENT_PORT=${OC_RAGENT_PORT:-"1540"}
     OC_RMNGR_PORT=${OC_RMNGR_PORT:-"1541"}
-    OC_RAS_PORT=${OC_RAS_PORT:-"1545"}
-    OC_DEBAGER_PORT=${OC_DEBAGER_PORT:-"1549"}
     OC_RPHOST_PORT=${OC_RPHOST_PORT:-"1560:1591"}
+    OC_RAS_PORT=${OC_RAS_PORT:-"1545"}
+
+    OC_DEBUG_TYPE=${OC_DEBUG_TYPE:-"-tcp"}
+    OC_DEBUG_PORT=${OC_DEBUG_PORT:-"1549"}
     OC_SECLEVEL=${OC_SECLEVEL:-"0"}
     OC_PING_PERIOD=${OC_PING_PERIOD:-"1000"}
     OC_PING_TIMEOUT=${OC_PING_TIMEOUT:-"5000"}
-    OC_DEBUG_TYPE=${OC_DEBUG_TYPE:-"-tcp"}
+
+    OC_IBSRV_PORT=${OC_IBSRV_PORT:-"1541"}
+    OC_IBSRV_RANGE_PORT=${OC_IBSRV_RANGE_PORT:-"1560:1591"}
+    OC_IBSRV_SECLEVEL=${OC_IBSRV_SECLEVEL:-"0"}
+    OC_IBSRV_HTTP_ADDRESS=${OC_IBSRV_HTTP_ADDRESS:-"any"}
+    OC_IBSRV_HTTP_PORT=${OC_IBSRV_HTTP_PORT:-"8314"}
+    OC_IBSRV_HTTP_PATH=${OC_IBSRV_HTTP_PATH:-"/ibsrv"}
+    OC_IBSRV_BASE_NAME=${OC_IBSRV_BASE_NAME:-"ibsrv"}
+    OC_IBSRV_CONFIG_PATH=${OC_IBSRV_CONFIG_PATH:-"/srv/1c/ibsrv/config_ibsrv.yml"}
+    OC_IBSRV_FILE_BASE_PATH="/srv/1c/ibsrv/${OC_IBSRV_BASE_NAME}";
+
+    # MSSQLServer|PostrgeSQL|IBMDB2|OracleDatabase
+    OC_IBSRV_DBMS_KIND=${OC_IBSRV_DBMS_KIND:-""}
+    OC_IBSRV_DBMS_ADRESS=${OC_IBSRV_DBMS_ADRESS:-"localhost"}
+    OC_IBSRV_DBMS_NAME=${OC_IBSRV_DBMS_NAME:-"ibsrv"}
+    OC_IBSRV_DBMS_LOGIN=${OC_IBSRV_DBMS_LOGIN:-"ibsrv"}
+    OC_IBSRV_DBMS_PASSWORD=${OC_IBSRV_DBMS_PASSWORD:-"ibsrv"}
+
+    # tcp|http|server
+    OC_IBSRV_DEBUG_TYPE=${OC_IBSRV_DEBUG_TYPE:-http}
+    OC_IBSRV_DEBUG_ADDRESS=${OC_IBSRV_DEBUG_ADDRESS:-"any"}
+    OC_IBSRV_DEBUG_PORT=${OC_IBSRV_DEBUG_PORT:-"1550"}
+    OC_IBSRV_DEBUG_PASSWORD=${OC_IBSRV_DEBUG_PASSWORD:-""}
+    OC_IBSRV_DEBUG_URL=${OC_IBSRV_DEBUG_URL:-""}
+
+    OC_CRSERVER_PATH=${OC_CRSERVER_PATH:-"/home/usr1cv8/crserver"}
+    OC_CRSERVER_HOSTNAME=${OC_CRSERVER_HOSTNAME:-"localhost"}
+    OC_CRSERVER_LOCATION=${OC_CRSERVER_LOCATION:-"repository/repository.1ccr"}
+    OC_CRSERVER_PORT=${OC_CRSERVER_PORT:-"1542"}
 
 }
 
 setup_ragent_exec() {
 
-    RAGENT_EXEC="gosu usr1cv8 ragent"
-    RAGENT_EXEC+=" /port ${OC_RAGENT_PORT}"
-    RAGENT_EXEC+=" /regport ${OC_RMNGR_PORT}"
-    RAGENT_EXEC+=" /range ${OC_RPHOST_PORT}"
-    RAGENT_EXEC+=" /seclev ${OC_SECLEVEL}"
-    RAGENT_EXEC+=" /d ${OC_SRVINFO}"
-    RAGENT_EXEC+=" /pingPeriod ${OC_PING_PERIOD}"
-    RAGENT_EXEC+=" /pingTimeout ${OC_PING_TIMEOUT}"
-    if [ -n "$DEBUG" ]; then RAGENT_EXEC+=" /debug ${OC_DEBUG_TYPE}"; fi
-    if [ -n "$DEBUGSERVERADDR" ]; then RAGENT_EXEC+=" /debugServerAddr $DEBUGSERVERADDR"; fi
-    if [ -n "$DEBUG" ]; then RAGENT_EXEC+=" /debugServerPort ${OC_DEBAGER_PORT}"; fi
-    if [ -n "$DEBUGSERVERPWD" ]; then RAGENT_EXEC+=" /debugServerPwd $DEBUGSERVERPWD"; fi
+    RAGENT_EXEC=( gosu usr1cv8 ragent )
+    RAGENT_EXEC+=( /port ${OC_RAGENT_PORT} )
+    RAGENT_EXEC+=( /regport ${OC_RMNGR_PORT} )
+    RAGENT_EXEC+=( /range ${OC_RPHOST_PORT} )
+    RAGENT_EXEC+=( /seclev ${OC_SECLEVEL} )
+    RAGENT_EXEC+=( /d ${OC_SRVINFO} )
+    RAGENT_EXEC+=( /pingPeriod ${OC_PING_PERIOD} )
+    RAGENT_EXEC+=( /pingTimeout ${OC_PING_TIMEOUT} )
+    if [ -n "$DEBUG" ]; then RAGENT_EXEC+=( /debug ${OC_DEBUG_TYPE} /debugServerPort ${OC_DEBUG_PORT} ); fi
+    if [ -n "$DEBUG_SERVER_ADDR" ]; then RAGENT_EXEC+=( /debugServerAddr ${DEBUG_SERVER_ADDR} ); fi
+    if [ -n "$DEBUG_SERVER_PWD" ]; then RAGENT_EXEC+=( /debugServerPwd ${DEBUG_SERVER_PWD} ); fi
 
 }
 
 run_ragent_exec() {
 
-    echo "Begining RAgent"
-    echo "${RAGENT_EXEC}"
-    exec ${RAGENT_EXEC} 2>&1
-
-}
-
-setup_ras_defaults() {
-
-    OC_RAGENT_PORT=${OC_RAGENT_PORT:-"1540"}
+    echo "Begining Ragent"
+    echo "${RAGENT_EXEC[@]}"
+    exec ${RAGENT_EXEC[@]} 2>&1
 
 }
 
 setup_ras_exec() {
 
-    RAS_EXEC="gosu usr1cv8 ras cluster --daemon"
-    RAS_EXEC+=" --port ${OC_RAS_PORT}"
-    RAS_EXEC+=" localhost:${OC_RAGENT_PORT}"
+    RAS_EXEC=( gosu usr1cv8 ras cluster --daemon )
+    RAS_EXEC+=( --port ${OC_RAS_PORT} )
+    RAS_EXEC+=( localhost:${OC_RAGENT_PORT} )
 
 }
 
 run_ras_exec_background() {
 
     echo "Begining Ras in background"
-    echo "${RAS_EXEC}"
-    ${RAS_EXEC} 2>&1 &
+    echo "${RAS_EXEC[@]}"
+    ${RAS_EXEC[@]} 2>&1 &
 
 }
 
@@ -100,9 +125,7 @@ server() {
 
     setup_ragent_healthcheck
 
-    setup_ragent_defaults
     setup_ragent_exec
-    setup_ras_defaults
     setup_ras_exec
 
     setup_init
@@ -123,74 +146,45 @@ setup_ibsrv_healthcheck() {
 
 }
 
-setup_ibsrv_defaults() {
-
-    OC_IBSRV_PORT=${OC_IBSRV_PORT:-"1541"}
-    OC_IBSRV_RANGE_PORT=${OC_IBSRV_RANGE_PORT:-"1560:1591"}
-    OC_IBSRV_SECLEVEL=${OC_IBSRV_SECLEVEL:-"0"}
-
-    OC_IBSRV_HTTP_ADRESS=${OC_IBSRV_HTTP_ADRESS:-"any"}
-    OC_IBSRV_HTTP_PORT=${OC_IBSRV_HTTP_PORT:-"8314"}
-    OC_IBSRV_HTTP_PATH=${OC_IBSRV_HTTP_PATH:-"/ibsrv"}
-
-    OC_IBSRV_BASE_NAME=${OC_IBSRV_BASE_NAME:-"ibsrv"}
-
-    OC_IBSRV_CONFIG_PATH=${OC_IBSRV_CONFIG_PATH:-"/srv/1c/ibsrv/config_ibsrv.yml"}
-    OC_IBSRV_FILE_BASE_PATH="/srv/1c/ibsrv/${OC_IBSRV_BASE_NAME}";
-
-    OC_IBSRV_DBMS_KIND=${OC_IBSRV_DBMS_KIND:-} # MSSQLServer|PostrgeSQL|IBMDB2|OracleDatabase
-    OC_IBSRV_DBMS_ADRESS=${OC_IBSRV_DBMS_ADRESS:-"localhost"}
-    OC_IBSRV_DBMS_NAME=${OC_IBSRV_DBMS_NAME:-"ibsrv"}
-    OC_IBSRV_DBMS_LOGIN=${OC_IBSRV_DBMS_LOGIN:-"ibsrv"}
-    OC_IBSRV_DBMS_PASSWORD=${OC_IBSRV_DBMS_PASSWORD:-"ibsrv"}
-
-    OC_IBSRV_DEBUG=${OC_IBSRV_DEBUG:-} # tcp|http|server
-    OC_IBSRV_DEBUG_ADDRESS=${OC_IBSRV_DEBUG_ADDRESS:-"any"}
-    OC_IBSRV_DEBUG_PORT=${OC_IBSRV_DEBUG_PORT:-"1550"}
-    OC_IBSRV_DEBUG_PASSWORD=${OC_IBSRV_DEBUG_PASSWORD:-}
-    OC_IBSRV_DEBUG_URL=${OC_IBSRV_DEBUG_URL:-}
-
-}
-
 setup_ibsrv_exec() {
 
-    IBSRV_EXEC="gosu usr1cv8 ibsrv"
-    IBSRV_EXEC+=" --direct-regport=${OC_IBSRV_PORT}"
-    IBSRV_EXEC+=" --direct-range=${OC_IBSRV_RANGE_PORT}"
-    IBSRV_EXEC+=" --direct-seclevel=${OC_IBSRV_SECLEVEL}"
-    if [ -n "${OC_IBSRV_DEBUG}" ]; then
-        IBSRV_EXEC+=" --debug=${OC_IBSRV_DEBUG}";
-        IBSRV_EXEC+=" --debug-address=${OC_IBSRV_DEBUG_ADDRESS}";
-        IBSRV_EXEC+=" --debug-port=${OC_IBSRV_DEBUG_PORT}";
-        if [ -n "${OC_IBSRV_DEBUG_PASSWORD}" ]; then IBSRV_INIT_EXEC+=" --debug-password=${OC_IBSRV_DEBUG_PASSWORD}"; fi
-        if [ -n "${OC_IBSRV_DEBUG_URL}" ];      then IBSRV_INIT_EXEC+=" --debug-server-url=${OC_IBSRV_DEBUG_URL}"; fi
+    IBSRV_EXEC=( gosu usr1cv8 ibsrv )
+    IBSRV_EXEC+=( --direct-regport=${OC_IBSRV_PORT} )
+    IBSRV_EXEC+=( --direct-range=${OC_IBSRV_RANGE_PORT} )
+    IBSRV_EXEC+=( --direct-seclevel=${OC_IBSRV_SECLEVEL} )
+    if [ -n "${OC_IBSRV_DEBUG_TYPE}" ] && [[ "tcp|http|server" =~ .*"${OC_IBSRV_DEBUG_TYPE}".* ]]; then
+        IBSRV_EXEC+=( --debug=${OC_IBSRV_DEBUG_TYPE} )
+        IBSRV_EXEC+=( --debug-address=${OC_IBSRV_DEBUG_ADDRESS} )
+        IBSRV_EXEC+=( --debug-port=${OC_IBSRV_DEBUG_PORT} )
+        if [ -n "${OC_IBSRV_DEBUG_PASSWORD}" ]; then IBSRV_EXEC+=( --debug-password=${OC_IBSRV_DEBUG_PASSWORD} ); fi
+        if [ -n "${OC_IBSRV_DEBUG_URL}" ];      then IBSRV_EXEC+=( --debug-server-url=${OC_IBSRV_DEBUG_URL} ); fi
     else
-        IBSRV_EXEC+=" --debug=none";
+        IBSRV_EXEC+=( --debug=none )
     fi
-    IBSRV_EXEC+=" --config=${OC_IBSRV_CONFIG_PATH}"
+    IBSRV_EXEC+=( --config=${OC_IBSRV_CONFIG_PATH} )
 
 }
 
 setup_ibsrv_init_exec() {
 
-    IBSRV_INIT_EXEC="gosu usr1cv8 ibcmd server config init"
-    IBSRV_INIT_EXEC+=" --http-address=${OC_IBSRV_HTTP_ADRESS}"
-    IBSRV_INIT_EXEC+=" --http-port=${OC_IBSRV_HTTP_PORT}"
-    IBSRV_INIT_EXEC+=" --http-base=${OC_IBSRV_HTTP_PATH}"
-    IBSRV_INIT_EXEC+=" --name=${OC_IBSRV_BASE_NAME}"
-    IBSRV_INIT_EXEC+=" --distribute-licenses=allow"
-    IBSRV_INIT_EXEC+=" --schedule-jobs=allow"
-    IBSRV_INIT_EXEC+=" --disable-local-speech-to-text=false"
+    IBSRV_INIT_EXEC=( gosu usr1cv8 ibcmd server config init )
+    IBSRV_INIT_EXEC+=( --http-address=${OC_IBSRV_HTTP_ADDRESS} )
+    IBSRV_INIT_EXEC+=( --http-port=${OC_IBSRV_HTTP_PORT} )
+    IBSRV_INIT_EXEC+=( --http-base=${OC_IBSRV_HTTP_PATH} )
+    IBSRV_INIT_EXEC+=( --name=${OC_IBSRV_BASE_NAME} )
+    IBSRV_INIT_EXEC+=( --distribute-licenses=no )
+    IBSRV_INIT_EXEC+=( --schedule-jobs=allow )
+    IBSRV_INIT_EXEC+=( --disable-local-speech-to-text=false )
     if [ -n "${OC_IBSRV_DBMS_KIND}" ]; then
-        IBSRV_INIT_EXEC+=" --dbms=${OC_IBSRV_DBMS_KIND}";
-        IBSRV_INIT_EXEC+=" --database-server=${OC_IBSRV_DBMS_ADRESS}";
-        IBSRV_INIT_EXEC+=" --database-name=${OC_IBSRV_DBMS_NAME}";
-        IBSRV_INIT_EXEC+=" --database-user=${OC_IBSRV_DBMS_LOGIN}";
-        IBSRV_INIT_EXEC+=" --database-password=${OC_IBSRV_DBMS_PASSWORD}";
+        IBSRV_INIT_EXEC+=( --dbms=${OC_IBSRV_DBMS_KIND} )
+        IBSRV_INIT_EXEC+=( --database-server=${OC_IBSRV_DBMS_ADRESS} )
+        IBSRV_INIT_EXEC+=( --database-name=${OC_IBSRV_DBMS_NAME} )
+        IBSRV_INIT_EXEC+=( --database-user=${OC_IBSRV_DBMS_LOGIN} )
+        IBSRV_INIT_EXEC+=( --database-password=${OC_IBSRV_DBMS_PASSWORD} )
     else
-        IBSRV_INIT_EXEC+=" --database-path=${OC_IBSRV_FILE_BASE_PATH}";
+        IBSRV_INIT_EXEC+=( --database-path=${OC_IBSRV_FILE_BASE_PATH} )
     fi
-    IBSRV_INIT_EXEC+=" --out=${OC_IBSRV_CONFIG_PATH}"
+    IBSRV_INIT_EXEC+=( --out=${OC_IBSRV_CONFIG_PATH} )
 
 }
 
@@ -204,8 +198,8 @@ init_ibsrv_config() {
 
     if [ ! -f "${OC_IBSRV_CONFIG_PATH}" ]; then
         echo "Init ibsrv";
-        echo "${IBSRV_INIT_EXEC}";
-        ${IBSRV_INIT_EXEC} 2>&1;
+        echo "${IBSRV_INIT_EXEC[@]}";
+        ${IBSRV_INIT_EXEC[@]} 2>&1;
     fi;
 
     cat "${OC_IBSRV_CONFIG_PATH}"
@@ -225,15 +219,14 @@ init_ibsrv_config() {
 run_ibsrv_exec() {
 
     echo "Begining ibsrv"
-    echo "${IBSRV_EXEC}"
+    echo "${IBSRV_EXEC[@]}"
 
-    exec ${IBSRV_EXEC} 2>&1
+    exec ${IBSRV_EXEC[@]} 2>&1
 
 }
 
 ibsrv() {
 
-    setup_ibsrv_defaults
     setup_ibsrv_exec
     setup_ibsrv_init_exec
 
@@ -256,34 +249,26 @@ setup_crserver_healthcheck() {
 
 }
 
-setup_defaults_crserver() {
+setup_crserver_exec() {
 
-    WWW_PATH=${WWW_PATH:-"/var/www"}
-
-    OC_CRSERVER_HOSTNAME=${OC_CRSERVER_HOSTNAME:-"localhost"}
-    OC_CRSERVER_LOCATION=${OC_CRSERVER_LOCATION:-"repository/repository.1ccr"}
-    OC_CRS_PORT=${OC_CRS_PORT:-"1542"}
-    OC_CRSERVER_PATH=${WWW_PATH}/${OC_CRSERVER_LOCATION}
+    OC_CRSERVER_EXEC=( gosu usr1cv8 crserver -port ${OC_CRSERVER_PORT} -d ${OC_CRSERVER_PATH} )
 
 }
 
-setup_crserver_exec() {
-
-    OC_CRSERVER_EXEC="gosu usr1cv8 crserver"
-    OC_CRSERVER_EXEC+=" -port ${OC_CRS_PORT}";
-    OC_CRSERVER_EXEC+=" -d /home/usr1cv8/crserver"
+setup_crserver_conf() {
 
     IFS='/' read -r -a OC_CRSERVER_PARTS <<< "${OC_CRSERVER_LOCATION}"
+    OC_CRSERVER_WWW_PATH="${WWW_PATH}/${OC_CRSERVER_LOCATION}"
 
-    if [ ! -f "${OC_CRSERVER_PATH}" ]; then
+    if [ ! -f "${OC_CRSERVER_WWW_PATH}" ]; then
         mkdir -p "${WWW_PATH}/${OC_CRSERVER_PARTS[0]}";
         touch "${WWW_PATH}/${OC_CRSERVER_PARTS[0]}/index.html";
-        touch "${OC_CRSERVER_PATH}";
+        touch "${OC_CRSERVER_WWW_PATH}";
         chown -R www-data:www-data "${WWW_PATH}/${OC_CRSERVER_PARTS[0]}";
         printf "%s\n" \
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" \
             "<repository connectString=\"tcp://${OC_CRSERVER_HOSTNAME}\"/>" \
-        | tee "${OC_CRSERVER_PATH}";
+        | tee "${OC_CRSERVER_WWW_PATH}";
     fi;
 
     if [ ! -f "/etc/apache2/conf-available/${OC_CRSERVER_PARTS[0]}.conf" ]; then
@@ -293,7 +278,7 @@ setup_crserver_exec() {
             "<Directory ${WWW_PATH}/${OC_CRSERVER_PARTS[0]}>" \
             "        DirectorySlash Off" \
             "        SetHandler 1cws-process" \
-            "        ManagedApplicationDescriptor \"${OC_CRSERVER_PATH}\"" \
+            "        ManagedApplicationDescriptor \"${OC_CRSERVER_WWW_PATH}\"" \
             "        Order allow,deny" \
             "        Allow from All" \
             "</Directory>" \
@@ -309,28 +294,28 @@ setup_crserver_exec() {
 
 setup_apache_exec() {
 
-    APACHE_EXEC="service apache2 start"
+    APACHE_EXEC=( service apache2 start )
 
 }
 
 run_apache_service() {
 
     echo "Begining Apache service"
-    ${APACHE_EXEC} 2>&1
+    ${APACHE_EXEC[@]} 2>&1
 
 }
 
 run_crserver_exec() {
 
     echo "Begining CRServer"
-    echo "${OC_CRSERVER_EXEC}"
-    exec ${OC_CRSERVER_EXEC} 2>&1
+    echo "${OC_CRSERVER_EXEC[@]}"
+    exec ${OC_CRSERVER_EXEC[@]} 2>&1
 
 }
 
 crserver() {
 
-    setup_defaults_crserver
+    setup_crserver_conf
     setup_crserver_exec
     setup_apache_exec
 
@@ -399,6 +384,7 @@ if [ "$1" == "sh" ]; then
 elif [ "$1" == "bash" ]; then
     exec /bin/bash
 else
+    setup_defaults
     if [ "$1" = "server" ]; then
         server
     elif [ "$1" = "ibsrv" ]; then

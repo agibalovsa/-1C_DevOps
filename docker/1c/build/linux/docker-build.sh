@@ -6,7 +6,7 @@ docker build \
   --build-arg "OC_VERSION=${OC_VERSION}" \
   --build-arg "OC_MODE=${OC_MODE}" \
   --build-context context=context \
-  --build-context common_context=../../common_context/build \
+  --build-context common_context=../../../common_context/build \
   --build-context "context_arg=${CONTEXT_ARG}" \
   -t "${REGISTRY}${OC_TAG}" \
   .

@@ -6,7 +6,7 @@ set_startup() {
     . /context_arg/.arg;
 
     # install server 1c
-    if [ "${SERVER}" -eq "1" ]; then
+    if [ "${OC_MODE_SERVER}" -eq "1" ]; then
         ln -s "${OC_PATH}/ragent" /usr/local/bin;
         ln -s "${OC_PATH}/ras" /usr/local/bin;
         ln -s "${OC_PATH}/rac" /usr/local/bin;
@@ -15,7 +15,7 @@ set_startup() {
     fi;
 
     # install ws 1c
-    if [ "${WS}" -eq "1" ]; then
+    if [ "${OC_MODE_WS}" -eq "1" ]; then
         ln -s "${OC_PATH}/webinst" /usr/local/bin;
         printf "%s\n" \
             "LoadModule _1cws_module /opt/1cv8/x86_64/${OC_VERSION}/wsap24.so" \
@@ -23,7 +23,7 @@ set_startup() {
     fi;
 
     # install crs 1c
-    if [ "${CRS}" -eq "1" ]; then
+    if [ "${OC_MODE_CRS}" -eq "1" ]; then
         ln -s "${OC_PATH}/crserver" /usr/local/bin;
     fi;
 

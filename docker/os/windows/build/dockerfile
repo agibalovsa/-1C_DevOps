@@ -6,10 +6,10 @@ FROM "${OS_EXT_TAG}"
 SHELL [ "powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'Continue'; $verbosePreference='Continue';" ]
 
 COPY [ "LogMonitorConfig.json", "/LogMonitor/LogMonitorConfig.json" ]
-COPY [ "context", "/context" ]
+COPY [ "build_context", "/build_context" ]
 
-RUN . ./context/pre_install.ps1; \
-    install_packs; \
-    rm context -Recurse;
+RUN . "/build_context/pre_install.ps1" ; \
+    Install-Packs ; \
+    Remove-Item "/build_context" -Recurse ;
 
 ENTRYPOINT [ "pwsh" ]

@@ -51,7 +51,7 @@ init_stack () {
     else
         IFS=" " read -ra paths <<< "$(
             dialog --ascii-lines --no-shadow --no-tags "${ERASE_ON_EXIT}" --output-fd 1 --radiolist "Please select applications" 0 0 0 \
-                "1c/build" "1C Platform" off \
+                "1c/build/linux" "1C Platform" off \
                 "1c-ans/build" "1C Ans" off \
                 "1c-esb/build" "1C ESB" off \
                 "1c-element-script/build" "1C Element (Script)" off \
@@ -60,6 +60,7 @@ init_stack () {
                 "imagick/build" "Image Magick" off \
                 "jdk/build" "JDK" off \
                 "nginx/build" "Nginx" off \
+                "openssl/build" "OpenSSL" off \
                 "os/linux_deb/build" "OS System" off \
                 "postgres/build" "Postgres" off \
                 "slc/build" "Slc" off \

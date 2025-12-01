@@ -1,12 +1,12 @@
+mkdir "build_context" -Force
 
-get-content .arg | foreach {
-    if ( $_ -like '^#.*' ) { continue }
-    if ( $_ )
-    {
-        $name, $value = $_.split('=')
-        New-Variable -Name $name -Value $value -Force
-    }
-}
+Copy-Item "../common_context/build/*" "build_context/" -Force
+Copy-Item "context/*" "build_context/"
+Copy-Item ".arg" "build_context/.arg"
+
+. "build_context/tools.ps1"
+
+Set-Vars-From-File "build_context/.arg"
 
 docker build `
     --build-arg "REGISTRY=${REGISTRY}" `
@@ -18,7 +18,9 @@ docker build `
     -t "${REGISTRY}${MSSQL_TAG}" `
     .
 
-if ( ( $args[0] -eq "push" ) -and ( $REGISTRY ) )
+if ( ( $args.Length -gt 0 ) -and ( $args[0] = "push" ) -and ( ! ( [string]::IsNullOrEmpty($REGISTRY) ) ) )
 {
     docker push "${REGISTRY}${MSSQL_TAG}"
 }
+
+Remove-Item build_context -Force -Recurse

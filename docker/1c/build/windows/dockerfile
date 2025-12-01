@@ -1,0 +1,56 @@
+ARG REGISTRY= \
+    OS_TAG=servercore:2022
+
+# hadolint ignore=DL3006
+FROM "${REGISTRY}${OS_TAG}"
+
+SHELL [ "pwsh", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';" ]
+
+COPY [ "build_context/pre_install.ps1", "/build_context/pre_install.ps1" ]
+
+# hadolint ignore=SC1091
+RUN . ./build_context/pre_install.ps1 ; \
+    Install-Packs ;
+
+ARG OC_VERSION \
+    OC_MODE
+
+LABEL maintainer="Agibalov Sergei <agibse@rarus.ru>" \
+      version="${OC_MODE}:${OC_VERSION}" \
+      manufacturer="1C"
+
+ENV OC_VERSION=${OC_VERSION} \
+    OC_PATH="C:\Program Files\1cv8"
+
+COPY [ "distr", "/distr" ]
+COPY [ "build_context/.arg", "build_context/tools.ps1", "build_context/pre_install_mode.ps1", "/build_context/" ]
+
+# hadolint ignore=SC1091
+RUN . ./build_context/tools.ps1 ; \
+    . ./build_context/pre_install_mode.ps1 ; \
+    Set-Vars-From-File "./build_context/.arg" ; \
+    Install-Packs;
+
+COPY [ "build_context/oc_lib.ps1", "build_context/install.ps1", "/build_context/" ]
+
+# hadolint ignore=SC1091
+RUN . ./build_context/tools.ps1 ; \
+    . ./build_context/install.ps1 ; \
+    Set-Vars-From-File "./build_context/.arg" ; \
+    Install-Packs "./distr/windows64full_${OC_VERSION}.zip" ; \
+    Remove-Item distr -Recurse ; \
+    Remove-Item "build_context/.arg", "build_context/pre_install.ps1", "build_context/pre_install_mode.ps1", "build_context/install.ps1" ; \
+    if ( ${OC_MODE_WS} -gt 0 ){ Move-Item -Path "${IIS_DEF_PATH}" -Destination "${IIS_DEF_PATH}_temp" }; \
+    if ( ${OC_MODE_SERVER} -gt 0 ){ Move-Item -Path "${OC_DEF_SRVINFO}" -Destination "${OC_DEF_SRVINFO}_temp" }; \
+    Move-Item -Path "${OC_PATH}\conf" -Destination "${OC_PATH}\conf_temp"
+
+COPY [ "entrypoint.ps1", "/entrypoint.d/entrypoint_oc.ps1" ]
+COPY [ "build_context/entrypoint.ps1", "/entrypoint.ps1" ]
+
+HEALTHCHECK CMD powershell -command ./healthcheck.ps1
+
+# Entrypoint param:
+# - OC server run:    "oc=server"
+# - OC ibsrv run:     "oc=ibsrv"
+# - OC cr-server run: "oc=crserver"
+ENTRYPOINT [ "pwsh", "/entrypoint.ps1" ]
