@@ -12,27 +12,27 @@ init_stack () {
     [[ $(dialog --help | grep -- "--erase-on-exit") ]] && ERASE_ON_EXIT="--erase-on-exit" || :
 
     name=$(\
-        dialog --ascii-lines --no-shadow "${ERASE_ON_EXIT}" --output-fd 1 --title "Enter docker build stack" \
+        dialog --ascii-lines --no-shadow ${ERASE_ON_EXIT} --output-fd 1 --title "Enter docker build stack" \
             --inputbox "" 8 40 \
     )
 
-    if [ -z "${ERASE_ON_EXIT}" ]; then
+    if [ -z ${ERASE_ON_EXIT} ]; then
         clear;
     fi
 
     type=$(\
-        dialog --ascii-lines --no-shadow --no-tags "${ERASE_ON_EXIT}" --output-fd 1 --radiolist "Please select type" 0 0 0 \
+        dialog --ascii-lines --no-shadow --no-tags ${ERASE_ON_EXIT} --output-fd 1 --radiolist "Please select type" 0 0 0 \
             "build" "build" off \
             "compose" "compose" off
     )
 
-    if [ -z "${ERASE_ON_EXIT}" ]; then
+    if [ -z ${ERASE_ON_EXIT} ]; then
         clear;
     fi
 
     if [ "${type}" = "compose" ]; then
         IFS=" " read -ra paths <<< "$(
-            dialog --ascii-lines --no-shadow --no-tags "${ERASE_ON_EXIT}" --output-fd 1 --checklist "Please select applications" 0 0 0 \
+            dialog --ascii-lines --no-shadow --no-tags ${ERASE_ON_EXIT} --output-fd 1 --checklist "Please select applications" 0 0 0 \
                 "1c/compose/crs" "1C Platform (cr-server)" off \
                 "1c/compose/ibsrv" "1C Platform (ibsrv)" off \
                 "1c/compose/server" "1C Platform (server)" off \
@@ -50,7 +50,7 @@ init_stack () {
         )"
     else
         IFS=" " read -ra paths <<< "$(
-            dialog --ascii-lines --no-shadow --no-tags "${ERASE_ON_EXIT}" --output-fd 1 --radiolist "Please select applications" 0 0 0 \
+            dialog --ascii-lines --no-shadow --no-tags ${ERASE_ON_EXIT} --output-fd 1 --radiolist "Please select applications" 0 0 0 \
                 "1c/build/linux" "1C Platform" off \
                 "1c-ans/build" "1C Ans" off \
                 "1c-esb/build" "1C ESB" off \
@@ -69,7 +69,7 @@ init_stack () {
         )"
     fi;
 
-    if [ -z "${ERASE_ON_EXIT}" ]; then
+    if [ -z ${ERASE_ON_EXIT} ]; then
         clear;
     fi
 
@@ -95,13 +95,13 @@ init_stack () {
 
         if [ ${#add_compose[@]} -gt 0 ]; then
             # shellcheck disable=SC2068
-            selected_files=$(dialog --ascii-lines --no-shadow --no-tags "${ERASE_ON_EXIT}" --output-fd 1 --checklist "Please select additional compose" 0 0 0 ${add_compose[@]} )
+            selected_files=$(dialog --ascii-lines --no-shadow --no-tags ${ERASE_ON_EXIT} --output-fd 1 --checklist "Please select additional compose" 0 0 0 ${add_compose[@]} )
         fi;
         if [ -n "${selected_files}" ]; then
             paths+=( "${selected_files[@]}" )
         fi
 
-        if [ -z "${ERASE_ON_EXIT}" ]; then
+        if [ -z ${ERASE_ON_EXIT} ]; then
             clear;
         fi
         
