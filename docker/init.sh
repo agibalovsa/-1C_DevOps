@@ -76,10 +76,11 @@ init_stack () {
     if [ "${type}" = "compose" ]; then
 
         add_compose=()
+        script_dir=$(dirname "$(readlink -f "$0")")
         
         for path in "${paths[@]}"
         do
-            search_compose="${path}/*/*compose.yml"
+            search_compose="${script_dir}/${path}/*/*compose.yml"
             for compose_file in ${search_compose};
             do
                 if [ ! "${compose_file}" == "${search_compose}" ] ; then
@@ -202,10 +203,15 @@ make_compose_stack () {
     paths=( "${!2}" )
     for path in "${paths[@]}"
     do
-        proj_name=$(echo "${path}" | awk -F/ '{print $1}')
-        for file in "${script_dir}/${path}/"* "${script_dir}/${path}/".*
+        rel_path="${path#${script_dir}/}"
+        proj_name=$(echo "${rel_path/\/compose/}" | tr '/' '-')
+        for file in "${script_dir}/${rel_path}/"* "${script_dir}/${rel_path}/".*
         do
-            if [ -d "${file}" ]; then
+            if [[ "${file}" == *"configs" ]]; then
+                {
+                    echo "cp -r ${file} \"\${CONTEXT_ENV}/\""
+                } >> "${stack_path}/docker-compose-up.sh.tmp"
+            elif [ -d "${file}" ]; then
                 continue
             elif [[ "${file}" == *".*" ]]; then
                 # Returning ".*" in altLinux
@@ -224,10 +230,10 @@ make_compose_stack () {
                 } >> "${stack_path}/docker-compose-up.sh.tmp"
             elif [[ "${file}" == *".env.tmpl" ]]; then
                 {
-                    echo "# # ${path}"
+                    echo "# # ${proj_name}"
                     echo ""
                     # https://github.com/a8m/envsubst (interpolating default values in file)
-                    envsubst < "${script_dir}/${path}/.env.tmpl"
+                    envsubst < "${script_dir}/${rel_path}/.env.tmpl"
                     echo ""
                 } >> "${stack_path}/.env.tmp"
             else
