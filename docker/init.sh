@@ -345,6 +345,10 @@ make_build_stack () {
         "# shellcheck source=/dev/null" \
         "source \"\${CONTEXT_ARG}/.arg\"" \
         "" \
+        "if [ -d \"${script_dir}/distr\" ]; then" \
+        "    cp \"${script_dir}/distr\" \"${script_dir}/${path}\"" \
+        "fi" \
+        "" \
         | tee "${stack_path}/docker-build.sh.tmp" > /dev/null
 
     make_docker_build=0
@@ -354,7 +358,7 @@ make_build_stack () {
     do
         if [ -f "${script_dir}/${path}/docker-build.sh" ]; then
             {
-                echo "cd ${script_dir}/${path}"
+                echo "cd \"${script_dir}/${path}\""
                 echo "${script_dir}/${path}/docker-build.sh \"\$1\""
                 echo ""
             } >> "${stack_path}/docker-build.sh.tmp"
@@ -377,7 +381,12 @@ make_build_stack () {
     mv "${stack_path}/.arg.tmp" "${stack_path}/.arg"
 
     if [ ${make_docker_build} = 1 ]; then
-        echo "rm -r \"\${CONTEXT_ARG}\"" >> "${stack_path}/docker-build.sh.tmp"
+        {
+            echo "rm -r \"\${CONTEXT_ARG}\""
+            echo "if [ -d \"${script_dir}/${path}/distr\" ]; then"
+            echo "    rm -r \"${script_dir}/${path}/distr\""
+            echo "fi"
+        } >> "${stack_path}/docker-build.sh.tmp"
         mv "${stack_path}/docker-build.sh.tmp" "${stack_path}/docker-build.sh"
         chmod 744 "${stack_path}/docker-build.sh"
     else

@@ -1,0 +1,25 @@
+{
+    "cSpell.words": [
+        "cacerts",
+        "changeit",
+        "envsubst",
+        "fluentbit",
+        "giga",
+        "GNUPGHOME",
+        "gosu",
+        "gpgconf",
+        "hkps",
+        "importcert",
+        "keyserver",
+        "keytool",
+        "licenceaddin",
+        "licenceserver",
+        "noninteractive",
+        "noprompt",
+        "nullglob",
+        "openpgp",
+        "Opensearch",
+        "sonarqube",
+        "storepass"
+    ]
+}

@@ -2,7 +2,7 @@
 
 # Installing aptly repository
 #  $1 - Repository domain name in format <http|https>://domainname/
-#  $3 - Repository components: distribution component1 component2 component3
+#  $2 - Repository components: distribution component1 component2 component3
 #  $3 - Repository login
 #  $4 - Repository password
 #

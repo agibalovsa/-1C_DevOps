@@ -35,7 +35,7 @@ elseif ( ( $args[0] -match ".*=.*" ))
 }
 else
 {
-    Write-Error "Wrong parametr: $($args[0])"
+    Write-Error "Wrong parameter: $($args[0])"
     exit 1
 }
 
