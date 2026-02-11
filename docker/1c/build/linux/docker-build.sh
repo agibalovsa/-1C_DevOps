@@ -1,5 +1,9 @@
 #!/bin/bash
 
+if [ ! -d "context/distr" ]; then
+    mkdir "context/distr"
+fi
+
 docker build \
   --build-arg "REGISTRY=${REGISTRY}" \
   --build-arg "OS_TAG=${OS_TAG}" \

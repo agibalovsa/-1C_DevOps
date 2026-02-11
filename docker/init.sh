@@ -356,7 +356,7 @@ make_build_stack () {
             {
                 echo ""
                 echo "if [ -d \"${stack_path}/distr\" ]; then"
-                echo "    cp \"${stack_path}/distr\" \"${script_dir}/${path}/context\""
+                echo "    cp -r \"${stack_path}/distr\" \"${script_dir}/${path}/context\""
                 echo "fi"
                 echo "cd \"${script_dir}/${path}\""
                 echo "${script_dir}/${path}/docker-build.sh \"\$1\""

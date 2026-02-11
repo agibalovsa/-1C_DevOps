@@ -40,7 +40,8 @@ RUN --mount=from=context,source=pre_install_mode,target=/pre_install_mode \
     install_packs
 
 # hadolint ignore=SC1091
-RUN --mount=from=common_context,target=/common_context \
+RUN --mount=from=context,source=distr,target=/distr \
+    --mount=from=common_context,target=/common_context \
     --mount=from=context_arg,target=/context_arg \
     set -eux; \
     . /common_context/install; \
