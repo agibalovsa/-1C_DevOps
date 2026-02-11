@@ -345,10 +345,6 @@ make_build_stack () {
         "# shellcheck source=/dev/null" \
         "source \"\${CONTEXT_ARG}/.arg\"" \
         "" \
-        "if [ -d \"${script_dir}/distr\" ]; then" \
-        "    cp \"${script_dir}/distr\" \"${script_dir}/${path}\"" \
-        "fi" \
-        "" \
         | tee "${stack_path}/docker-build.sh.tmp" > /dev/null
 
     make_docker_build=0
@@ -358,6 +354,10 @@ make_build_stack () {
     do
         if [ -f "${script_dir}/${path}/docker-build.sh" ]; then
             {
+                echo ""
+                echo "if [ -d \"${stack_path}/distr\" ]; then"
+                echo "    cp \"${stack_path}/distr\" \"${script_dir}/${path}/context\""
+                echo "fi"
                 echo "cd \"${script_dir}/${path}\""
                 echo "${script_dir}/${path}/docker-build.sh \"\$1\""
                 echo ""
@@ -383,8 +383,8 @@ make_build_stack () {
     if [ ${make_docker_build} = 1 ]; then
         {
             echo "rm -r \"\${CONTEXT_ARG}\""
-            echo "if [ -d \"${script_dir}/${path}/distr\" ]; then"
-            echo "    rm -r \"${script_dir}/${path}/distr\""
+            echo "if [ -d \"${script_dir}/${path}/context/distr\" ]; then"
+            echo "    rm -r \"${script_dir}/${path}/context/distr\""
             echo "fi"
         } >> "${stack_path}/docker-build.sh.tmp"
         mv "${stack_path}/docker-build.sh.tmp" "${stack_path}/docker-build.sh"

@@ -20,11 +20,12 @@ INSTALL_MODE="${INSTALL_MODE:-install_from_file}"
 
 # ### install_from_file
 
-INSTALL_FILES="1c-enterprise-${{OC_VERSION}}-common.deb"
-[[ "${{OC_MODE_SERVER}}" = "1" ]] && INSTALL_FILES="${{INSTALL_FILES}} 1c-enterprise-${{OC_VERSION}}-server.deb" || :
-[[ "${{OC_MODE_WS}}" = "1" ]] && INSTALL_FILES="${{INSTALL_FILES}} 1c-enterprise-${{OC_VERSION}}-ws.deb" || :
-[[ "${{OC_MODE_CRS}}" = "1" ]] && INSTALL_FILES="${{INSTALL_FILES}} 1c-enterprise-${{OC_VERSION}}-crs.deb" || :
-[[ "${{OC_MODE_CLIENT}}" = "1" ]] && INSTALL_FILES="${{INSTALL_FILES}} 1c-enterprise-${{OC_VERSION}}-client.deb" || :
+SUFFIX="_${{OC_VERSION%.*}}-${{OC_VERSION##*.}}_amd64"
+INSTALL_FILES="1c-enterprise-${{OC_VERSION}}-common${{SUFFIX}}.deb"
+[[ "${{OC_MODE_SERVER}}" = "1" ]] && INSTALL_FILES="${{INSTALL_FILES}} 1c-enterprise-${{OC_VERSION}}-server${{SUFFIX}}.deb" || :
+[[ "${{OC_MODE_WS}}" = "1" ]] && INSTALL_FILES="${{INSTALL_FILES}} 1c-enterprise-${{OC_VERSION}}-ws${{SUFFIX}}.deb" || :
+[[ "${{OC_MODE_CRS}}" = "1" ]] && INSTALL_FILES="${{INSTALL_FILES}} 1c-enterprise-${{OC_VERSION}}-crs${{SUFFIX}}.deb" || :
+[[ "${{OC_MODE_CLIENT}}" = "1" ]] && INSTALL_FILES="${{INSTALL_FILES}} 1c-enterprise-${{OC_VERSION}}-client${{SUFFIX}}.deb" || :
 
 # ### install_from_repo
 
