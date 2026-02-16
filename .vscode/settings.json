@@ -2,6 +2,7 @@
     "cSpell.words": [
         "cacerts",
         "changeit",
+        "Eeoa",
         "envsubst",
         "fluentbit",
         "giga",
@@ -9,17 +10,22 @@
         "gosu",
         "gpgconf",
         "hkps",
+        "ibsrv",
+        "imagick",
         "importcert",
         "keyserver",
         "keytool",
         "licenceaddin",
         "licenceserver",
+        "Magick",
         "noninteractive",
         "noprompt",
         "nullglob",
         "openpgp",
         "Opensearch",
+        "radiolist",
         "sonarqube",
-        "storepass"
+        "storepass",
+        "tmpl"
     ]
 }

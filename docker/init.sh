@@ -162,11 +162,9 @@ make_compose_stack () {
         "" \
         "script_dir=\$(dirname \"\$(readlink -f \"\$0\")\")" \
         "" \
-        "# make context file" \
-        "if [ -d \"\${script_dir}/${stack_name}\" ]; then" \
-        "    rm -r \"\${script_dir}/${stack_name}\";" \
-        "fi;" \
         "mkdir -p \"\${script_dir}/${stack_name}\"" \
+        "# make context file" \
+        "" \
         "CONTEXT_ENV=\$(realpath \"\${script_dir}/${stack_name}\")" \
         "{" \
             "echo \"CONTEXT_ENV=\${CONTEXT_ENV}\"" \
@@ -174,7 +172,7 @@ make_compose_stack () {
             "cat \"\${script_dir}/../common_context/.env\"" \
             "echo \"\"" \
             "cat \"\${script_dir}/.env\"" \
-        "} >> \"\${CONTEXT_ENV}/.env\"" \
+        "} > \"\${CONTEXT_ENV}/.env\"" \
         "" \
         | tee "${stack_path}/docker-compose-up.sh.tmp" > /dev/null;
 
@@ -339,7 +337,7 @@ make_build_stack () {
             "cat \"\${script_dir}/../common_context/.arg\"" \
             "echo \"\"" \
             "cat \"\${script_dir}/.arg\"" \
-        "} >> \"\${CONTEXT_ARG}/.arg\"" \
+        "} > \"\${CONTEXT_ARG}/.arg\"" \
         "" \
         "# shellcheck source=/dev/null" \
         "source \"\${CONTEXT_ARG}/.arg\"" \
