@@ -1,14 +1,14 @@
 #!/bin/bash
 
-docker pull "${OS_EXT_TAG}"
+# shellcheck disable=SC2034
+BUILD_ARGS=(
+"--build-arg" "OS_EXT_TAG=${OS_EXT_TAG}"
+)
 
-docker build \
-  --build-arg "OS_EXT_TAG=${OS_EXT_TAG}" \
-  --build-context common_context=../../../common_context/build \
-  --build-context context=context \
-  -t "${REGISTRY}${OS_TAG}" \
-  .
+TAG="${OS_TAG}"
+REL_PATH="../../../"
 
-if [ "${1}" = "push" ] && [ -n "${REGISTRY}" ]; then
-    docker push "${REGISTRY}${OS_TAG}"
-fi
+# shellcheck disable=SC1091
+source "${REL_PATH}/common_context/build/docker"
+
+docker-build "${1}" "${2}"

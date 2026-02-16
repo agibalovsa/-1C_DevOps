@@ -4,6 +4,12 @@ ARG REGISTRY= \
 # hadolint ignore=DL3006
 FROM "${REGISTRY}${OS_TAG}"
 
+# hadolint ignore=SC1091
+RUN --mount=from=context,target=/context \
+    set -eux; \
+    . context/pre_install; \
+    install_packs
+
 ARG SLC_VERSION
 
 LABEL maintainer="Agibalov Sergei <agibse@rarus.ru>" \
@@ -11,13 +17,6 @@ LABEL maintainer="Agibalov Sergei <agibse@rarus.ru>" \
       manufacturer="Katran Soft"
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
-
-# hadolint ignore=SC1091
-RUN --mount=from=context,target=/context \
-    --mount=from=context_arg,target=/context_arg \
-    set -eux; \
-    . context/pre_install; \
-    install_packs
 
 # hadolint ignore=SC1091
 RUN --mount=from=common_context,target=/common_context \

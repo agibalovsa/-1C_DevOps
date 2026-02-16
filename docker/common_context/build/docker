@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+
+docker-build () {
+
+    PLAIN=
+    PUSH=
+
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            plain)
+                PLAIN="--progress=plain"
+                shift 1
+                ;;
+            push)
+                PUSH="push"
+                shift 1
+                ;;
+            *)
+                shift 1
+                ;;
+        esac
+    done
+
+    if [ ! -d "context/distr" ]; then
+        mkdir -p "context/distr"
+    fi
+
+    docker build ${PLAIN} \
+        --build-arg "REGISTRY=${REGISTRY}" \
+        "${BUILD_ARGS[@]}" \
+        --build-context common_context="${REL_PATH}/common_context/build" \
+        --build-context context=context \
+        --build-context "context_arg=${CONTEXT_ARG}" \
+        -t "${REGISTRY}${TAG}" \
+        .
+
+    if [ -n "${PUSH}" ] && [ -n "${REGISTRY}" ]; then
+        docker push "${REGISTRY}${TAG}"
+    fi
+
+}

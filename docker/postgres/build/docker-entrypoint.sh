@@ -88,8 +88,11 @@ docker_init_database_dir() {
 		set -- --waldir "$POSTGRES_INITDB_WALDIR" "$@"
 	fi
 
+	if [ "$PGRU" = "1" ]; then
+		PGRU_INIT="--data-checksums --encoding=UTF8 --locale=ru_RU.UTF-8 --lc-collate=ru_RU.UTF8 --lc-ctype=ru_RU.UTF-8 --lc-messages=C"
+	fi
 	# --pwfile refuses to handle a properly-empty file (hence the "\n"): https://github.com/docker-library/postgres/issues/1025
-	eval 'initdb --data-checksums --encoding=UTF8 --locale=ru_RU.UTF-8 --lc-collate=ru_RU.UTF8 --lc-ctype=ru_RU.UTF-8 --lc-messages=C --username="$POSTGRES_USER" --pwfile=<(printf "%s\n" "$POSTGRES_PASSWORD") '"$POSTGRES_INITDB_ARGS"' "$@"'
+	eval 'initdb $PGRU_INIT --username="$POSTGRES_USER" --pwfile=<(printf "%s\n" "$POSTGRES_PASSWORD") '"$POSTGRES_INITDB_ARGS"' "$@"'
 
 	# unset/cleanup "nss_wrapper" bits
 	if [[ "${LD_PRELOAD:-}" == */libnss_wrapper.so ]]; then
@@ -103,24 +106,6 @@ docker_init_database_dir() {
 # print large warning if POSTGRES_HOST_AUTH_METHOD is set to 'trust'
 # assumes database is not set up, ie: [ -z "$DATABASE_ALREADY_EXISTS" ]
 docker_verify_minimum_env() {
-	case "${PGMAJOR:-}" in
-		12 | 13) # https://github.com/postgres/postgres/commit/67a472d71c98c3d2fa322a1b4013080b20720b98
-			# check password first so we can output the warning before postgres
-			# messes it up
-			if [ "${#POSTGRES_PASSWORD}" -ge 100 ]; then
-				cat >&2 <<-'EOWARN'
-
-					WARNING: The supplied POSTGRES_PASSWORD is 100+ characters.
-
-					  This will not work if used via PGPASSWORD with "psql".
-
-					  https://www.postgresql.org/message-id/flat/E1Rqxp2-0004Qt-PL%40wrigleys.postgresql.org (BUG #6412)
-					  https://github.com/docker-library/postgres/issues/507
-
-				EOWARN
-			fi
-			;;
-	esac
 	if [ -z "$POSTGRES_PASSWORD" ] && [ 'trust' != "$POSTGRES_HOST_AUTH_METHOD" ]; then
 		# The - option suppresses leading tabs but *not* spaces. :)
 		cat >&2 <<-'EOE'
@@ -168,8 +153,14 @@ docker_error_old_databases() {
 			       Counter to that, there appears to be PostgreSQL data in:
 			         ${OLD_DATABASES[*]}
 
-			       This is usually the result of upgrading the Docker image without upgrading
-			       the underlying database using "pg_upgrade" (which requires both versions).
+			       This is usually the result of upgrading the Docker image without
+			       upgrading the underlying database using "pg_upgrade" (which requires both
+			       versions).
+
+			       The suggested container configuration for 18+ is to place a single mount
+			       at /var/lib/postgresql which will then place PostgreSQL data in a
+			       subdirectory, allowing usage of "pg_upgrade --link" without mount point
+			       boundary issues.
 
 			       See https://github.com/docker-library/postgres/issues/37 for a (long)
 			       discussion around this process, and suggestions for how to do so.
@@ -257,13 +248,16 @@ docker_setup_env() {
 	# look specifically for PG_VERSION, as it is expected in the DB dir
 	if [ -s "$PGDATA/PG_VERSION" ]; then
 		DATABASE_ALREADY_EXISTS='true'
-	elif [ "$PGDATA" = "/var/lib/postgresql/$PGMAJOR/docker" ]; then
+	elif [ "$PGDATA" = "/var/lib/postgresql/$PG_MAJOR/docker" ]; then
 		# https://github.com/docker-library/postgres/pull/1259
 		for d in /var/lib/postgresql /var/lib/postgresql/data /var/lib/postgresql/*/docker; do
 			if [ -s "$d/PG_VERSION" ]; then
 				OLD_DATABASES+=( "$d" )
 			fi
 		done
+		if [ "${#OLD_DATABASES[@]}" -eq 0 ] && [ "$PG_MAJOR" -ge 18 ] && mountpoint -q /var/lib/postgresql/data; then
+			OLD_DATABASES+=( '/var/lib/postgresql/data (unused mount/volume)' )
+		fi
 	fi
 }
 

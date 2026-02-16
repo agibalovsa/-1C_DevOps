@@ -261,7 +261,7 @@ make_compose_stack () {
             echo "    cd \"\${CONTEXT_ENV}\""
             echo "    docker compose ${compose_files} down"
             echo "    cd .."
-            echo "    rm -r \"\${CONTEXT_ENV}\""
+            echo "    rm \"\${CONTEXT_ENV}\"/.env"
             echo "fi"
         }  >> "${stack_path}/docker-compose-down.sh.tmp"
 
@@ -270,7 +270,6 @@ make_compose_stack () {
             echo "    cd \"\${CONTEXT_ENV}\""
             echo "    docker compose ${compose_files} logs --follow"
             echo "    cd .."
-            echo "    rm -r \"\${CONTEXT_ENV}\""
             echo "fi"
         }  >> "${stack_path}/docker-compose-logs.sh.tmp"
     fi
@@ -359,7 +358,7 @@ make_build_stack () {
                 echo "    cp -r \"${stack_path}/distr\" \"${script_dir}/${path}/context\""
                 echo "fi"
                 echo "cd \"${script_dir}/${path}\""
-                echo "${script_dir}/${path}/docker-build.sh \"\$1\""
+                echo "${script_dir}/${path}/docker-build.sh \"\$1\" \"\$2\""
                 echo ""
             } >> "${stack_path}/docker-build.sh.tmp"
             make_docker_build=1

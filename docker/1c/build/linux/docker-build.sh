@@ -1,20 +1,16 @@
 #!/bin/bash
 
-if [ ! -d "context/distr" ]; then
-    mkdir "context/distr"
-fi
+# shellcheck disable=SC2034
+BUILD_ARGS=(
+"--build-arg" "OS_TAG=${OS_TAG}"
+"--build-arg" "OC_VERSION=${OC_VERSION}" \
+"--build-arg" "OC_MODE=${OC_MODE}" \
+)
 
-docker build \
-  --build-arg "REGISTRY=${REGISTRY}" \
-  --build-arg "OS_TAG=${OS_TAG}" \
-  --build-arg "OC_VERSION=${OC_VERSION}" \
-  --build-arg "OC_MODE=${OC_MODE}" \
-  --build-context context=context \
-  --build-context common_context=../../../common_context/build \
-  --build-context "context_arg=${CONTEXT_ARG}" \
-  -t "${REGISTRY}${OC_TAG}" \
-  .
+TAG="${OC_TAG}"
+REL_PATH="../../../"
 
-if [ "${1}" = "push" ] && [ -n "${REGISTRY}" ]; then
-    docker push "${REGISTRY}${OC_TAG}"
-fi
+# shellcheck disable=SC1091
+source "${REL_PATH}/common_context/build/docker"
+
+docker-build "${1}" "${2}"

@@ -1,15 +1,15 @@
 #!/bin/bash
 
-docker build \
-    --build-arg "REGISTRY=${REGISTRY}" \
-    --build-arg "OS_TAG=${OS_TAG}" \
-    --build-arg SLC_VERSION="$SLC_VERSION" \
-    --build-context context=context \
-    --build-context common_context=../../common_context/build \
-    --build-context "context_arg=${CONTEXT_ARG}" \
-    -t "${REGISTRY}${SLC_TAG}" \
-    .
+# shellcheck disable=SC2034
+BUILD_ARGS=(
+"--build-arg" "OS_TAG=${OS_TAG}"
+"--build-arg" "SLC_VERSION=${SLC_VERSION}"
+)
 
-if [ "${1}" = "push" ] && [ -n "${REGISTRY}" ]; then
-    docker push "${REGISTRY}${SLC_TAG}"
-fi
+TAG="${SLC_TAG}"
+REL_PATH="../../"
+
+# shellcheck disable=SC1091
+source "${REL_PATH}/common_context/build/docker"
+
+docker-build "${1}" "${2}"

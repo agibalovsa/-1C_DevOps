@@ -35,3 +35,8 @@ INSTALL_PACKS="1c-enterprise-${{OC_VERSION}}-common" || :
 [[ "${{OC_MODE_WS}}" = "1" ]] && INSTALL_PACKS="${{INSTALL_PACKS}} 1c-enterprise-${{OC_VERSION}}-ws" || :
 [[ "${{OC_MODE_CRS}}" = "1" ]] && INSTALL_PACKS="${{INSTALL_PACKS}} 1c-enterprise-${{OC_VERSION}}-crs" || :
 [[ "${{OC_MODE_CLIENT}}" = "1" ]] && INSTALL_PACKS="${{INSTALL_PACKS}} 1c-enterprise-${{OC_VERSION}}-client" || :
+
+# ### install_from_url
+INSTALL_URLS="stub"
+OC_URL_LOGIN=${{OC_URL_LOGIN:-login}}
+OC_URL_PASSWORD=${{OC_URL_PASSWORD:-password}}

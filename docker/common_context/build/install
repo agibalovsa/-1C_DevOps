@@ -43,33 +43,34 @@ install_from_repo() {
 
 install_from_file() {
 
-    for fileName in ${INSTALL_FILES}; do
-        dpkg -i "/distr/${fileName}";
+    for installFile in ${INSTALL_FILES}; do
+        dpkg -i "/distr/${installFile}";
     done;
 
 }
 
 install_from_url() {
 
+    local savePath="/tmp/install_deb"
+    
     for url in ${INSTALL_URLS}; do
 
-        mkdir -p /tmp/install_deb
-        fileName=$(basename "${url}");
+        mkdir -p "${savePath}"
 
-        wget --progress=dot:giga --timeout=30 -O "/tmp/install_deb/${fileName}" "${url}";
+       fileName=$(basename "${url}")
+       wget --progress=dot:giga --timeout=30 -O "${savePath}/${fileName}" "${url}";
 
         if [ "${fileName##*.}" = "zip" ]; then
-            unzip "/tmp/install_deb/${fileName}" -d /tmp/install_deb;
+            unzip "${savePath}/${fileName}" -d "${savePath}"
         elif [ "${fileName##*.}" = "tar" ]; then
-            tar -xvf "/tmp/install_deb/${fileName}" -C /tmp/install_deb;
+            tar -xvf "${savePath}/${fileName}" -C "${savePath}"
         fi;
 
-        shopt -s globstar nullglob
-        for file_deb in /tmp/install_deb/*.deb; do
-            dpkg -i "${file_deb}";
+        for installFile in ${INSTALL_FILES}; do
+            dpkg -i "${savePath}/${installFile}"
         done;
 
-        rm -r "/tmp/install_deb";
+        rm -r "${savePath}"
 
     done;
 

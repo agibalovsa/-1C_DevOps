@@ -1,5 +1,16 @@
 #!/usr/bin/env bash
 
+# explicitly set user/group IDs
+#
+set_users() {
+
+    groupadd -r grp1cv8 --gid="${OC_GID:-999}";
+    useradd -r -g grp1cv8 --uid="${OC_UID:-999}" --home-dir=/home/usr1cv8 --shell=/bin/bash usr1cv8;
+    mkdir -p /var/1C/licenses /var/log/1C /home/usr1cv8/.1cv8/1C/1cv8/conf /home/usr1cv8/crserver /opt/1cv8/conf;
+    chown -R usr1cv8:grp1cv8 /var/1C/licenses /var/log/1C /home/usr1cv8 /opt/1cv8/conf;
+
+}
+
 install_packs() {
 
     # shellcheck source=/dev/null

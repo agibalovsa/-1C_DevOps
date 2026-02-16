@@ -4,6 +4,12 @@ ARG REGISTRY= \
 # hadolint ignore=DL3006
 FROM "${REGISTRY}${OS_TAG}"
 
+# hadolint ignore=SC1091
+RUN --mount=from=context,target=/context \
+    set -eux; \
+    . context/pre_install; \
+    install_packs
+
 ARG JDK_KIT \
     JDK_VERSION \
     JDK_PROD \
@@ -16,18 +22,12 @@ LABEL maintainer="Agibalov Sergei <agibse@rarus.ru>" \
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 # hadolint ignore=SC1091
-RUN --mount=from=context,target=/context \
-    --mount=from=context_arg,target=/context_arg \
-    set -eux; \
-    . context/pre_install; \
-    install_packs
-
-# hadolint ignore=SC1091
 RUN --mount=from=common_context,target=/common_context \
     --mount=from=context_arg,target=/context_arg \
     set -eux; \
     . common_context/install; \
-    install_packs
+    install_packs; \
+    "${JDK_PATH}/bin/java" -version
 
 ENV JAVA_HOME="${JDK_PATH}" \
     PATH="${PATH}:${JDK_PATH}/bin"

@@ -2,10 +2,27 @@
 
 OS_TAG="${OS_TAG}"
 
+# ## JDK options
+
+# ## Azul Zulu options
+# > https://www.azul.com/downloads
+
+# > jdk, jre, fx-jdk, fx-jre
+JDK_AZUL_KIT="${JDK_AZUL_KIT:-jre}"
+
+# > Version from site Azul Zulu
+# > Example: 17.64.17
+AZUL_VERSION="${AZUL_VERSION}"
+# > Example: 17.0.18+8
+JDK_AZUL_VERSION="${JDK_AZUL_VERSION}"
+
 # ## Axiom options
+# > https://lk.axiomjdk.ru/Axiom-JDK
 
 # > pro, pro-full, runtime-pro, runtime-pro-full
-JDK_AXIOM_TYPE="${JDK_AXIOM_TYPE}"
+JDK_AXIOM_TYPE="${JDK_AXIOM_TYPE:-runtime-pro-full}"
+
+# > Version from site Axiom
 JDK_AXIOM_VERSION="${JDK_AXIOM_VERSION}"
 
 [[ "${{JDK_AXIOM_TYPE:0:3}}" = "pro" ]] && JDK_AXIOM_KIT="jdk" || JDK_AXIOM_KIT="jre"
@@ -13,11 +30,22 @@ JDK_AXIOM_VERSION="${JDK_AXIOM_VERSION}"
 
 # ## JDK options
 
-JDK_VERSION=${{JDK_AXIOM_VERSION}}
-JDK_KIT="${{JDK_AXIOM_KIT}}${{JDK_AXIOM_FULL}}"
-JDK_PROD=Axiom
-JDK_PATH="/usr/lib/jvm/axiomjdk-java${{JDK_VERSION:0:2}}-${{JDK_AXIOM_TYPE}}-amd64"
-JDK_TAG=axiom/${{JDK_KIT}}:${{JDK_VERSION/+/.}}
+# Productions: Axiom, AzulZulu
+JDK_PROD="${JDK_PROD}"
+# First number of version
+JDK_MAJOR_VERSION="${JDK_MAJOR_VERSION}"
+
+[[ "${{JDK_PROD}}" = "Axiom" ]] && {
+    JDK_VERSION="${{JDK_AXIOM_VERSION}}";
+    JDK_KIT="${{JDK_AXIOM_KIT}}${{JDK_AXIOM_FULL}}";
+    JDK_PATH="/usr/lib/jvm/axiomjdk-java${{JDK_MAJOR_VERSION}}-${{JDK_AXIOM_TYPE}}-amd64";
+    JDK_TAG="axiom/${{JDK_KIT}}:${{JDK_VERSION/+/.}}";
+} || { [[ "${{JDK_PROD}}" = "AzulZulu" ]] && {
+    JDK_VERSION="${{JDK_AZUL_VERSION}}";
+    JDK_KIT="${{JDK_AZUL_KIT}}";
+    JDK_PATH="/usr/lib/jvm/zre-${{JDK_MAJOR_VERSION}}-amd64";
+    JDK_TAG="azulzulu/${{JDK_KIT}}:${{JDK_VERSION/+/.}}";
+} }
 
 # ## Install options
 
@@ -25,7 +53,11 @@ INSTALL_MODE="${INSTALL_MODE:-install_from_url}"
 
 # ### install_from_file
 
-INSTALL_FILES="axiomjdk-${{JDK_AXIOM_KIT}}-pro${{JDK_VERSION}}-linux-amd64-full.deb"
+[[ "${{JDK_PROD}}" = "Axiom" ]] && {
+    INSTALL_FILES="axiomjdk-${{JDK_AXIOM_KIT}}-pro${{JDK_VERSION}}-linux-amd64${{JDK_AXIOM_FULL}}.deb"
+} || { [[ "${{JDK_PROD}}" = "AzulZulu" ]] && {
+    INSTALL_FILES="zulu${{AZUL_VERSION}}-ca-${{JDK_KIT}}${{JDK_VERSION%+*}}-linux_amd64.deb"
+} }
 
 # ### install_from_repo
 
@@ -34,5 +66,9 @@ APTLY_REPO_COMPONENTS="${APTLY_REPO_COMPONENTS:-axiom-jdk main}"
 
 # ### install_from_url
 
-# > https://download.axiomjdk.ru/axiomjdk-pro/<version>/axiomjdk-<jdk|jre>-pro<version>-linux-amd64<|full|lite>.deb
-INSTALL_URLS="https://download.axiomjdk.ru/axiomjdk-pro/${{JDK_VERSION}}/axiomjdk-${{JDK_AXIOM_KIT}}-pro${{JDK_VERSION}}-linux-amd64${{JDK_AXIOM_FULL}}.deb"
+[[ "${{JDK_PROD}}" = "Axiom" ]] && {
+    # > https://download.axiomjdk.ru/axiomjdk-pro/<version>/axiomjdk-<jdk|jre>-pro<version>-linux-amd64<|full|lite>.deb
+    INSTALL_URLS="https://download.axiomjdk.ru/axiomjdk-pro/${{JDK_VERSION}}/${{INSTALL_FILES}}"
+} || { [[ "${{JDK_PROD}}" = "AzulZulu" ]] && {
+    INSTALL_URLS="https://cdn.azul.com/zulu/bin/${{INSTALL_FILES}}"
+} }

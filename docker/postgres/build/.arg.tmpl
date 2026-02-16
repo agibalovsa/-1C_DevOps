@@ -4,19 +4,33 @@ OS_TAG="${OS_TAG}"
 
 # ## Postgres options
 
-# > View version on https://repo.postgrespro.ru/1c/
-# > E.G for 1c: 17
+# > View version postgres 1c on https://repo.postgrespro.ru/1c/installers/
+# > View version postgres on https://apt.postgresql.org/pub/repos/apt/pool/main/p/postgresql-17/, https://github.com/docker-library/postgres/blob/master/versions.json
+# > Exam: 17
 PG_MAJOR_VERSION="${PG_MAJOR_VERSION}"
-# > E.G for 1c: 17.5
+
+# > Exam for postgres 1c: 17.8
+# > Exam for postgres: 17.8-1.pgdg12+1
 PG_VERSION="${PG_VERSION}"
+
+# > For postgres 1c: Postgres pro
+# > For postgres: Postgres
+PG_MANUFACTURER="${PG_MANUFACTURER}"
+
 # > For postgres 1c: /var/lib/pgpro/1c-${{PG_MAJOR_VERSION}}
-# > For vanilla postgres: /var/lib/postgresql
+# > For postgres: /var/lib/postgresql
 PG_PATH="${PG_PATH}"
+
 # > For postgres 1c: /opt/pgpro/1c-${{PG_MAJOR_VERSION}}/bin
-# > For vanilla postgres: /usr/lib/postgresql/${{PG_MAJOR_VERSION}}/bin
+# > For postgres: /usr/lib/postgresql/${{PG_MAJOR_VERSION}}/bin
 PG_BIN_PATH="${PG_BIN_PATH}"
+
 # > For postgres 1c: /opt/pgpro/1c-${{PG_MAJOR_VERSION}}/share
-# > For vanilla postgres: /usr/share/postgresql/${{PG_MAJOR_VERSION}}
+# > For postgres: /usr/share/postgresql/${{PG_MAJOR_VERSION}}
 PG_SHARE_PATH="${PG_SHARE_PATH}"
+
+# > For postgres 1c: 1
+# > For postgres: 0
+PG_RU=1
 
 PG_TAG="1c/postgres:${{PG_VERSION}}"

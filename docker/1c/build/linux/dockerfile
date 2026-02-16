@@ -22,12 +22,6 @@ LABEL maintainer="Agibalov Sergei <agibse@rarus.ru>" \
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
-RUN set -eux; \
-    groupadd -r grp1cv8 --gid="${OC_GID:-999}"; \
-    useradd -r -g grp1cv8 --uid="${OC_UID:-999}" --home-dir=/home/usr1cv8 --shell=/bin/bash usr1cv8; \
-    mkdir -p /var/1C/licenses /var/log/1C /home/usr1cv8/.1cv8/1C/1cv8/conf /home/usr1cv8/crserver /opt/1cv8/conf; \
-    chown -R usr1cv8:grp1cv8 /var/1C/licenses /var/log/1C /home/usr1cv8 /opt/1cv8/conf;
-
 # hadolint ignore=DL3044
 ENV OC_VERSION=${OC_VERSION} \
     OC_PATH="/opt/1cv8/x86_64/${OC_VERSION}"
@@ -37,14 +31,17 @@ RUN --mount=from=context,source=pre_install_mode,target=/pre_install_mode \
     --mount=from=context_arg,target=/context_arg \
     set -eux; \
     . /pre_install_mode; \
+    set_users; \
     install_packs
 
 # hadolint ignore=SC1091
 RUN --mount=from=context,source=distr,target=/distr \
+    --mount=from=context,source=install,target=/install \
     --mount=from=common_context,target=/common_context \
     --mount=from=context_arg,target=/context_arg \
     set -eux; \
     . /common_context/install; \
+    . /install; \
     install_packs
 
 # hadolint ignore=SC1091

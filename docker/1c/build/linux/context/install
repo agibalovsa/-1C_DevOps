@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+
+install_from_url () {
+
+    savePath="/tmp/install_deb"
+    
+    get_deb_from_url "${OC_URL_LOGIN}" "${OC_URL_PASSWORD}" "${OC_VERSION}" "${savePath}"
+
+    for installFile in ${INSTALL_FILES}; do
+        dpkg -i "${savePath}/${installFile}"
+    done;
+
+}
+
+get_deb_from_url () {
+
+    local Login="$1"
+    local Password="$2"
+    local Version="$3"
+    local savePath="${4:-/tmp/install_deb}"
+    
+    freeSpace=$(df -k / | awk 'NR==2 {print $4}')
+    if [ "${freeSpace}" -lt 3145728 ]; then
+        echo "Error: Not enough space on drive" >&2
+        return 1
+    fi
+
+    mkdir -p "${savePath}"
+    cookieFile=$(mktemp)
+    headers="User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36"
+
+    echo "1. Authorization on login.1c.ru..."
+
+    # Getting cookies and tokens
+
+    loginPage=$(curl -sL -c "${cookieFile}" -H "${headers}" "https://login.1c.ru/login")
+    execution=$(echo "${loginPage}" | grep -oP 'name="execution" value="\K[^"]+')
+
+    # Logging on login.1c.ru
+
+    authCheck=$(curl -sL -b "${cookieFile}" -c "${cookieFile}" -H "${headers}" \
+        -d "username=$Login" \
+        -d "password=$Password" \
+        -d "execution=$execution" \
+        -d "_eventId=submit" \
+        -d "rememberMe=false" \
+        "https://login.1c.ru/login")
+
+    if [[ ! "${authCheck}" =~ "user/profile" ]]; then
+        echo "Error: Failed to log in. Check credentials" >&2
+        rm "${cookieFile}"
+        return 1
+    fi
+
+    echo "2. Searching for a link to version ${Version}..."
+
+    versionsPage=$(curl -sL -b "${cookieFile}" -H "${headers}" "https://releases.1c.ru/project/Platform83?allUpdates=true")
+    versionPath=$(echo "${versionsPage}" | grep -oP "/version_files\?nick=Platform83&ver=${Version}" | head -n 1)
+
+    if [ -z "${versionPath}" ]; then
+        echo "Error: Version ${Version} not found" >&2
+        return 1
+    fi
+
+    fileName="deb64_${Version//./_}.zip"
+    filePageUrl="https://releases.1c.ru/version_file?nick=Platform83&ver=${Version}&path=Platform%5c${Version//./_}%5c${fileName}"
+    
+    downloadUrl=$(curl -sL -b "${cookieFile}" -H "${headers}" "${filePageUrl}" | grep -oP 'https://dl03.1c.ru/public/file/get/[^"]+')
+
+    if [ -z "${downloadUrl}" ]; then
+        echo "Error: Linux deb 64-bit link not found" >&2
+        return 1
+    fi
+
+    echo "3. Downloading file..."
+
+    curl -L -b "${cookieFile}" -H "${headers}" "${downloadUrl}" -o "${savePath}/${fileName}"
+
+    echo "4. Extracting..."
+    if command -v unzip >/dev/null; then
+        unzip "${savePath}/${fileName}" -d "${savePath}"
+    else
+        echo "Warning: unzip not found. Please install unzip"
+    fi
+
+    rm "${cookieFile}"
+    echo "Done. File saved to ${savePath}"
+
+}

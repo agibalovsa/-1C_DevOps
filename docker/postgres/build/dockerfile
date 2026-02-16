@@ -6,47 +6,54 @@ FROM "${REGISTRY}${OS_TAG}"
 
 ARG PG_MAJOR_VERSION \
     PG_VERSION \
+    PG_MANUFACTURER \
     PG_PATH \
     PG_BIN_PATH \
-    PG_SHARE_PATH
+    PG_SHARE_PATH \
+    PG_RU
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 LABEL maintainer="Agibalov Sergei <agibse@rarus.ru>" \
       version="${PG_VERSION}" \
-      manufacturer="Postgres pro" \
+      manufacturer="${PG_MANUFACTURER}" \
       libs="https://github.com/docker-library/postgres/blob/master/Dockerfile-debian.template"
 
 # hadolint ignore=SC1091
-RUN --mount=from=common_context,target=/common_context \
-    --mount=from=context,target=/context \
+RUN --mount=from=context,source=pre_install,target=/pre_install \
+    --mount=from=common_context,source=gosu,target=/gosu \
     --mount=from=context_arg,target=/context_arg \
     set -eux; \
-    . context/pre_install; \
+    . /pre_install; \
     install_packs; \
     set_users; \
     set_locals; \
-    . common_context/gosu; \
+    . /gosu; \
     install_gosu
 
 ENV LANG="en_US.utf8" \
-    PGMAJOR="${PG_MAJOR_VERSION}" \
+    PG_MAJOR="${PG_MAJOR_VERSION}" \
     PATH="${PATH}:${PG_BIN_PATH}" \
     PGDATA="${PG_PATH}/data" \
-    PGSHARE="${PG_SHARE_PATH}/data"
+    PGSHARE="${PG_SHARE_PATH}/data" \
+    PGRU="${PG_RU}"
 
 # hadolint ignore=SC1091
-RUN --mount=from=context,target=/context \
+RUN --mount=from=context,source=install,target=/install \
     --mount=from=context_arg,target=/context_arg \
     set -eux; \
-    . context/install; \
-    install_packs
+    . /install; \
+    if [ "${PG_MANUFACTURER}" = "Postgres pro" ]; then \
+        install_packs_pg_pro; \
+    elif [ "${PG_MANUFACTURER}" = "Postgres" ]; then \
+        install_packs_pg; \
+    fi
 
 # hadolint ignore=SC1091
-RUN --mount=from=context,target=/context \
+RUN --mount=from=context,source=post_install,target=/post_install \
     --mount=from=context_arg,target=/context_arg \
     set -eux; \
-    . context/post_install; \
+    . /post_install; \
     set_startup
 
 COPY --chmod=777 [ "docker-entrypoint.sh", "docker-ensure-initdb.sh", "/usr/local/bin/" ]
