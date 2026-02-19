@@ -62,7 +62,7 @@ setup_defaults() {
 
     # MSSQLServer|PostrgeSQL|IBMDB2|OracleDatabase
     OC_IBSRV_DBMS_KIND=${OC_IBSRV_DBMS_KIND:-""}
-    OC_IBSRV_DBMS_ADRESS=${OC_IBSRV_DBMS_ADRESS:-"localhost"}
+    OC_IBSRV_DBMS_ADDRESS=${OC_IBSRV_DBMS_ADDRESS:-"localhost"}
     OC_IBSRV_DBMS_NAME=${OC_IBSRV_DBMS_NAME:-"ibsrv"}
     OC_IBSRV_DBMS_LOGIN=${OC_IBSRV_DBMS_LOGIN:-"ibsrv"}
     OC_IBSRV_DBMS_PASSWORD=${OC_IBSRV_DBMS_PASSWORD:-"ibsrv"}
@@ -99,7 +99,7 @@ setup_ragent_exec() {
 
 run_ragent_exec() {
 
-    echo "Begining Ragent"
+    echo "Beginning Ragent"
     echo "${RAGENT_EXEC[@]}"
     exec ${RAGENT_EXEC[@]} 2>&1
 
@@ -115,7 +115,7 @@ setup_ras_exec() {
 
 run_ras_exec_background() {
 
-    echo "Begining Ras in background"
+    echo "Beginning Ras in background"
     echo "${RAS_EXEC[@]}"
     ${RAS_EXEC[@]} 2>&1 &
 
@@ -177,7 +177,7 @@ setup_ibsrv_init_exec() {
     IBSRV_INIT_EXEC+=( --disable-local-speech-to-text=false )
     if [ -n "${OC_IBSRV_DBMS_KIND}" ]; then
         IBSRV_INIT_EXEC+=( --dbms=${OC_IBSRV_DBMS_KIND} )
-        IBSRV_INIT_EXEC+=( --database-server=${OC_IBSRV_DBMS_ADRESS} )
+        IBSRV_INIT_EXEC+=( --database-server=${OC_IBSRV_DBMS_ADDRESS} )
         IBSRV_INIT_EXEC+=( --database-name=${OC_IBSRV_DBMS_NAME} )
         IBSRV_INIT_EXEC+=( --database-user=${OC_IBSRV_DBMS_LOGIN} )
         IBSRV_INIT_EXEC+=( --database-password=${OC_IBSRV_DBMS_PASSWORD} )
@@ -218,7 +218,7 @@ init_ibsrv_config() {
 
 run_ibsrv_exec() {
 
-    echo "Begining ibsrv"
+    echo "Beginning ibsrv"
     echo "${IBSRV_EXEC[@]}"
 
     exec ${IBSRV_EXEC[@]} 2>&1
@@ -300,14 +300,14 @@ setup_apache_exec() {
 
 run_apache_service() {
 
-    echo "Begining Apache service"
+    echo "Beginning Apache service"
     ${APACHE_EXEC[@]} 2>&1
 
 }
 
 run_crserver_exec() {
 
-    echo "Begining CRServer"
+    echo "Beginning CRServer"
     echo "${OC_CRSERVER_EXEC[@]}"
     exec ${OC_CRSERVER_EXEC[@]} 2>&1
 
@@ -352,14 +352,14 @@ setup_client_exec() {
 
 run_xvfb_exec_background() {
 
-    echo "Begining Xvfb in background"
+    echo "Beginning Xvfb in background"
     ${XVFB_EXEC} 2>&1 &
 
 }
 
 run_client_exec() {
 
-    echo "Begining client"
+    echo "Beginning client"
     echo "${CLIENT_EXEC}"
     exec ${CLIENT_EXEC} 2>&1
 

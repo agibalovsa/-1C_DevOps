@@ -8,7 +8,7 @@ SHELL [ "powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPre
 COPY [ "LogMonitorConfig.json", "/LogMonitor/LogMonitorConfig.json" ]
 COPY [ "build_context", "/build_context" ]
 
-RUN . "/build_context/pre_install.ps1" ; \
+RUN . /build_context/pre_install.ps1 ; \
     Install-Packs ; \
     Remove-Item "/build_context" -Recurse ;
 

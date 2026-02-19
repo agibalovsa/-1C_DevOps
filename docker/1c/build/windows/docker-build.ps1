@@ -7,12 +7,15 @@ Copy-Item ".arg" "build_context/.arg"
 . ./build_context/tools.ps1
 
 Set-Vars-From-File "./build_context/.arg"
+Set-Vars-From-File "./.secret"
 
 docker build `
   --build-arg "REGISTRY=${REGISTRY}" `
   --build-arg "OS_TAG=${OS_TAG}" `
   --build-arg "OC_VERSION=${OC_VERSION}" `
   --build-arg "OC_MODE=${OC_MODE}" `
+  --build-arg "ITS_LOGIN=${ITS_LOGIN}" `
+  --build-arg "ITS_PASSWORD=${ITS_PASSWORD}" `
   -t "${REGISTRY}${OC_TAG}" `
   .
 

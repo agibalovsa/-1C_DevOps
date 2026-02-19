@@ -4,7 +4,7 @@ function Set-Envs
 {
     begin
     {
-        New-Variable-With-Test -Name "IIS_DEF_PATH"    -Value "C:\inetpub\wwwroot"                  -Scope "Script"
+        New-Variable-With-Test -Name "IIS_DEF_PATH"    -Value "C:\inetpub\wwwroot"              -Scope "Script"
         New-Variable-With-Test -Name "OC_DEF_USER"     -Value "USER1CV8"                        -Scope "Script"
         New-Variable-With-Test -Name "OC_DEF_PASSWORD" -Value "_USER_1C_V8"                     -Scope "Script"
         New-Variable-With-Test -Name "OC_DEF_SRVINFO"  -Value "C:\Program Files\1cv8\srvinfo"   -Scope "Script"
@@ -39,7 +39,7 @@ function Set-Envs
 
         # MSSQLServer|PostrgeSQL|IBMDB2|OracleDatabase
         New-Variable-With-Test -Name "OC_IBSRV_DBMS_KIND"      -Value ""                                    -Scope "Script"
-        New-Variable-With-Test -Name "OC_IBSRV_DBMS_ADRESS"    -Value "localhost"                           -Scope "Script"
+        New-Variable-With-Test -Name "OC_IBSRV_DBMS_ADDRESS"   -Value "localhost"                           -Scope "Script"
         New-Variable-With-Test -Name "OC_IBSRV_DBMS_NAME"      -Value "ibsrv"                               -Scope "Script"
         New-Variable-With-Test -Name "OC_IBSRV_DBMS_LOGIN"     -Value "ibsrv"                               -Scope "Script"
         New-Variable-With-Test -Name "OC_IBSRV_DBMS_PASSWORD"  -Value "ibsrv"                               -Scope "Script"
@@ -207,10 +207,146 @@ function New-OCUsers
     }
 }
 
+function Get-OC-MSI-RAR
+{
+    param(
+        [Parameter(Mandatory)][string]$SavePath,
+        [Parameter(Mandatory)][string]$Version,
+        [Parameter(Mandatory)][string]$User,
+        [Parameter(Mandatory)][string]$Password
+    )
+    process
+    {
+        $Disk = Get-PSDrive $((Split-Path -Path "${SavePath}" -Qualifier).Substring(0, 1))
+        if ( $Disk.Free -lt 3GB )
+        {
+            Write-Error "Not enough space on the C drive:"
+            return
+        }
+        echo $Disk
+        if ( ! ( Test-Path "${SavePath}" ) )
+        {
+            New-Item -ItemType Directory -Path "${SavePath}"
+        }
+
+        Write-Host "1. Authorization on login.1c.ru..." -ForegroundColor Cyan
+
+        # Getting cookies and tokens
+
+        $Headers = @{ "User-Agent" = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" }
+        $LoginUrl = "https://login.1c.ru/login"
+        $LoginPage = Invoke-WebRequest -Uri ${LoginUrl} -SessionVariable Session1C -Headers ${Headers} -TimeoutSec 30
+
+        # Logging on login.1c.ru
+
+        $Body = @{
+            "inviteCode"      = ""
+            "inviteType"      = ""
+            "username"        = ${User}
+            "password"        = ${Password}
+            "anotherComputer" = $false
+            "rememberMe"      = $false
+            "execution"       = $LoginPage.InputFields[6].value
+            "_eventId"        = "submit"
+        }
+        $AuthResponse = Invoke-WebRequest -Uri ${LoginUrl} -Method Post -Body ${Body} -WebSession $Session1C -Headers ${Headers} -TimeoutSec 30
+
+        if ( $AuthResponse.BaseResponse.RequestMessage.RequestUri -notmatch "https://login.1c.ru/user/profile" )
+        {
+            Write-Error "Failed to log in. Check your username and password"
+            return
+        }
+
+        Write-Host "2. Searching for a link to the version ${Version}..." -ForegroundColor Cyan
+
+        # Searching links
+
+        $VersionsUrl = "https://releases.1c.ru/project/Platform83?allUpdates=true#updates"
+        $VersionsPage = Invoke-WebRequest -Uri ${VersionsUrl} -WebSession ${Session1C} -Headers ${Headers} -TimeoutSec 30
+        $VersionUrl = $VersionsPage.Links | Where-Object { $_.href -match "/version_files\?nick=Platform83&ver=${Version}" } | Select-Object -First 1 -ExpandProperty href
+
+        if ( $VersionUrl -match '[?&]ver=(?<version>[^&]+)' )
+        {
+            $Version = $matches['version']
+            Write-Host "Version $Version found" -ForegroundColor Green
+        } 
+        else 
+        {
+            Write-Error "Version ${Version} not found"
+            return
+        }
+
+        $FileName = "windows64full_$($Version.Replace(".","_")).rar"
+        $FileUrl  = "https://releases.1c.ru/version_file?nick=Platform83&ver=${Version}&path=Platform%5c$($Version.Replace(".","_"))%5c${FileName}"
+        $FilePage = Invoke-WebRequest -Uri ${FileUrl} -WebSession ${Session1C} -Headers ${Headers} -TimeoutSec 30
+        $DownloadUrl = $FilePage.Links | Where-Object { $_.href -match "https://dl0..1c.ru/public/file/get/" } | Select-Object -First 1 -ExpandProperty href
+        if ( ! $DownloadUrl )
+        {
+            Write-Error "Windows 64-bit link not found"
+            return
+        }
+
+        Write-Host "3. Downloading a file..." -ForegroundColor Yellow
+
+        # Downloading
+
+        try
+        {
+            Invoke-WebRequest -Uri ${DownloadUrl} -OutFile "${SavePath}\${FileName}" -WebSession ${Session1C} -Headers ${Headers}
+            Write-Host "The file ${SavePath}\${FileName} is saved" -ForegroundColor Green
+        } 
+        catch
+        {
+            Write-Error ("Error when downloading: {0}`nDetails: {1}" -f $_.Exception.Message, $_.Exception.InnerException)
+        }
+
+    }
+}
+
+function Get-Install-Arg-OC-Msi
+{
+    param(
+        [string]$OCPath="${OC_PATH}\${OC_VERSION}",
+        [int]$Server=0,
+        [int]$WS=0,
+        [int]$CRS=0,
+        [int]$Client=0,
+        [string]$User="${OC_DEF_USER}",
+        [string]$Password="${OC_DEF_PASSWORD}"
+    )
+
+    process
+    {
+            $ArgumentList = @(
+            'TRANSFORMS="adminstallrelogon.mst;1049.mst"'
+            "DESIGNERALLCLIENTS=1"                                           # Конфигуратор и все виды клиентов
+            "THICKCLIENT=$( ${Client} -gt 0 ? 1 : 0 )"                       # Толстый клиент
+            "THINCLIENTFILE=$( ${Client} -gt 0 ? 1 : 0 )"                    # Тонкий клиент, файловый вариант
+            "THINCLIENT=$( ${Client} -gt 0 ? 1 : 0 )"                        # Тонкий клиент
+            "SERVER=$( ${Server} -gt 0 ? 1 : 0 )"                            # Сервер 1С:Предприятие
+            "WEBSERVEREXT=$( ${WS} -gt 0 ? 1 : 0 )"                          # Модули расширения веб-сервера
+            "SERVERCLIENT=$( ${Server} -gt 0 ? 1 : 0 )"                      # Администрирование сервера 1С:Предприятие
+            "LANGUAGES=RU"                                                   # Интерфейсы на различных языках
+            "CONFREPOSSERVER=$( ${CRS} -gt 0 ? 1 : 0 )"                      # Сервер хранилища конфигураций 1С:Предприятие
+            "ADMINISTRATIONFUNC=$( ${Server} -gt 0 ? 1 : 0 )"                # Дополнительные функции администрирования
+            "CONVERTER77=0"                                                  # Конвертор ИБ 1С:Предприятия 7.7
+            "INSTALLSRVRASSRVC=$( ${Server} -gt 1 ? 1 : 0 )"                 # Установить сервер 1С:Предприятие как службу Windows
+            "SRVCUSERSELECTMODE=$( ${Server} -gt 1 ? ( "${User}" -eq "${OC_DEF_USER}" ? "new" : "existing") : '`"`"' )" # new(Создать пользователя USER1CV8)|existing(Существующий пользователь)
+            "USER1CV82SERVER=$( ${Server} -gt 1 ? "${User}" : '`"`"' )"          # Имя пользователя
+            "PASSWORD1CV82SERVER=$( ${Server} -gt 1 ? "${Password}" : '`"`"' )"  # Пароль пользователя
+            "INSTALLDIR=`"${OCPath}`""                                       # Папка
+        )
+
+        return $ArgumentList
+
+    }
+
+}
+
 function Install-OC-Msi
 {
     param(
-        [Parameter(Mandatory)][string]$DistrPath,
+        [Parameter(Mandatory)][string]$ArchivePath,
         [string]$OCPath="${OC_PATH}",
         [int]$Server=0,
         [int]$WS=0,
@@ -229,49 +365,31 @@ function Install-OC-Msi
             New-OCUsers "${User}" ${PasswordSec}
         }
 
-        Write-Host "Install 1C begining"
+        Write-Host "Install 1C beginning"
 
-        $InstallPath="C:\temp\install"
-        $InatallMsiPath="${InstallPath}\1CEnterprise 8 (x86-64).msi"
-        New-Catalog-With-Rules "${InstallPath}"
-        New-Item -ItemType "Directory" -Path "${InstallPath}" -Force
+        $DistrPath="C:\temp\install"
+        New-Catalog-With-Rules "${DistrPath}"
 
-        Expand-Archive "${DistrPath}" -DestinationPath "${InstallPath}" -Force
-
-        $SetupContent    = Get-Ini-Content "${InstallPath}\Setup.ini"
+        7z x "${ArchivePath}" -o"${DistrPath}"
+ 
+        $SetupContent    = Get-Ini-Content "${DistrPath}\Setup.ini"
         $PackageName     = $SetupContent["Startup"]["PackageName"]
-        $Version         = $SetupContent["Startup"]["ProductVersion"]
+        $ProductVersion  = $SetupContent["Startup"]["ProductVersion"]
 
-        $InatallMsiPath  = "${InstallPath}\${PackageName}"
-        if ( !(Test-Path "${InatallMsiPath}") )
+        $DistrMsiPath  = "${DistrPath}\${PackageName}"
+        if ( !(Test-Path "${DistrMsiPath}") )
         {
-            Write-Error -Message "File not found: ${InatallMsiPath}" -ErrorAction 'Stop'
+            Write-Error -Message "File not found: ${DistrMsiPath}" -ErrorAction 'Stop'
         }
 
         $ArgumentList = @(
             "/l*"
-            '"' + "${InstallPath}" + '\Msi_Install.log"'
+            '"' + "${DistrPath}" + '\Msi_Install.log"'
             "/i"
-            '"' + "${InatallMsiPath}" + '"'
+            '"' + "${DistrMsiPath}" + '"'
             "/qn"
-            'TRANSFORMS="adminstallrelogon.mst;1049.mst"'
-            "DESIGNERALLCLIENTS=1"                                           # Конфигуратор и все виды клиентов
-            "THICKCLIENT=$( ${Client} -gt 0 ? 1 : 0 )"                       # Толстый клиент
-            "THINCLIENTFILE=$( ${Client} -gt 0 ? 1 : 0 )"                    # Тонкий клиент, файловый вариант
-            "THINCLIENT=$( ${Client} -gt 0 ? 1 : 0 )"                        # Тонкий клиент
-            "SERVER=$( ${Server} -gt 0 ? 1 : 0 )"                            # Сервер 1С:Предприятие
-            "WEBSERVEREXT=$( ${WS} -gt 0 ? 1 : 0 )"                          # Модули расширения веб-сервера
-            "SERVERCLIENT=$( ${Server} -gt 0 ? 1 : 0 )"                      # Администрирование сервера 1С:Предприятие
-            "LANGUAGES=RU"                                                   # Интерфейсы на различных языках
-            "CONFREPOSSERVER=$( ${CRS} -gt 0 ? 1 : 0 )"                      # Сервер хранилища конфигураций 1С:Предприятие
-            "ADMINISTRATIONFUNC=$( ${Server} -gt 0 ? 1 : 0 )"                # Дополнительные функции администрирования
-            "CONVERTER77=0"                                                  # Конвертор ИБ 1С:Предприятия 7.7
-            "INSTALLSRVRASSRVC=$( ${Server} -gt 1 ? 1 : 0 )"                 # Установить сервер 1С:Предприятие как службу Windows
-            "SRVCUSERSELECTMODE=$( ${Server} -gt 1 ? ( "${User}" -eq "${OC_DEF_USER}" ? "new" : "existing") : '`"`"' )" # new(Создать пользователя USER1CV8)|existing(Существующий пользователь)
-            "USER1CV82SERVER=$( ${Server} -gt 1 ? "${User}" : '`"`"' )"          # Имя пользователя
-            "PASSWORD1CV82SERVER=$( ${Server} -gt 1 ? "${Password}" : '`"`"' )"  # Пароль пользователя
-            'INSTALLDIR="' + "${InstallDir}" + '"'                           # Папка
         )
+        $ArgumentList += Get-Install-Arg-OC-Msi "${OCPath}\${ProductVersion}" ${Server} ${WS} ${CRS} ${Client} ${User} ${Password}
 
         Start-Process -FilePath "msiexec.exe" -ArgumentList ${ArgumentList} -Wait -NoNewWindow
 
@@ -281,22 +399,22 @@ function Install-OC-Msi
         }
         New-Catalog-With-Rules "${OC_LOG_PATH}" "${User}"
 
-        if ( Test-Path "${InstallPath}\Msi_Install.log")
+        if ( Test-Path "${DistrPath}\Msi_Install.log")
         {
-            Get-Content "${InstallPath}\Msi_Install.log" | ForEach-Object {Write-Host $_}
+            Get-Content "${DistrPath}\Msi_Install.log" | ForEach-Object {Write-Host $_}
         }
 
-        Remove-Item -r "${InstallPath}"
+        Remove-Item -r "${DistrPath}"
 
         # Редактирование переменной среды PATH
-        $Include = "${OCPath}\${Version}\bin\"
+        $Include = "${OCPath}\${ProductVersion}\bin\"
         $OldPath = [System.Environment]::GetEnvironmentVariable('PATH','machine')
         $NewPath = "${OldPath};${Include}"
         [Environment]::SetEnvironmentVariable("PATH", "${NewPath}", "Machine")  
 
         Write-Host "Install 1C finished"
 
-        New-Variable-With-Test -Name "OC_VERSION" -Value "${Version}" -Scope "Script"
+        New-Variable-With-Test -Name "OC_VERSION" -Value "${ProductVersion}" -Scope "Script"
     }
 }
 
@@ -324,7 +442,7 @@ function Get-Ras-Exec
     {
         $RasExec="""${OCPath}\${Version}\bin\ras.exe""", "cluster", "--service", "--port $RasPort", "localhost:$RagentPort"
         
-        return "$RasExec"
+        return "${RasExec}"
     }
 }
 
@@ -386,7 +504,7 @@ function Get-Ragent-Exec
         [string]$PingTimeout="${OC_PING_TIMEOUT}",
         [ValidateSet("", "-tcp","-http")][string]$DebugType="${OC_DEBUG_TYPE}",
         [string]$DebugServerPort="${OC_DEBUG_PORT}",
-        [string]$DebugServerAddres="",
+        [string]$DebugServerAddress="",
         [string]$DebugServerUsers,
         [string]$DebugServerPwd=""
     )
@@ -398,7 +516,7 @@ function Get-Ragent-Exec
         $RagentExec+=@( "-port ${RagentPort}", "-regport ${RmngrPort}", "-range ${RphostPorts}", "-d ""${SrvInfoPath}""" )
         $RagentExec+=@( "-seclev ${SecLevel}", "-pingPeriod ${PingPeriod}", "-pingTimeout ${PingTimeout}" )
         if( $DebugType ) { $RagentExec+=@( "-debug ${DebugType}", "-debugServerPort ${DebugServerPort}" ) }
-        if( ($DebugType) -and ($DebugServerAddres) ) { $RagentExec+="-debugServerAddr ${DebugServerAddres}" }
+        if( ($DebugType) -and ($DebugServerAddress) ) { $RagentExec+="-debugServerAddr ${DebugServerAddress}" }
         if( ($DebugType) -and ($DebugServerUsers) )  { $RagentExec+="-debugServerUsers ${DebugServerUsers}" }
         if( ($DebugType) -and ($DebugServerPwd) )    { $RagentExec+="-debugServerPwd ${DebugServerPwd}" }
 
@@ -415,7 +533,7 @@ function Start-Ragent-Exec
 
     begin
     {
-        Write-Host "Begining Ragent"
+        Write-Host "Beginning Ragent"
         Start-Exec ${RagentExec} 
     }
 }
@@ -435,7 +553,7 @@ function Set-Ragent-Service
         [string]$PingTimeout="${OC_PING_TIMEOUT}",
         [ValidateSet("", "-tcp","-http")][string]$DebugType="${OC_DEBUG_TYPE}",
         [string]$DebugPort="${OC_DEBUG_PORT}",
-        [string]$DebugServerAddres="",
+        [string]$DebugServerAddress="",
         [string]$DebugServerPwd="",
         [System.Management.Automation.PSCredential]$Credential
     )
@@ -458,7 +576,7 @@ function Set-Ragent-Service
             "${PingTimeout}" `
             "${DebugType}" `
             "${DebugPort}" `
-            "${DebugServerAddres}" `
+            "${DebugServerAddress}" `
             "${DebugServerPwd}"
 
         Set-OC-Service "${ServiceName}" "${RagentExec}" $Credential
@@ -544,7 +662,7 @@ function Get-Ibsrv-Init-Exec
         [string]$IbsrvBaseName="${OC_IBSRV_BASE_NAME}",
         [string]$IbsrvBasePath="${OC_IBSRV_FILE_BASE_PATH}",
         [ValidateSet("","MSSQLServer","PostrgeSQL","IBMDB2","OracleDatabase")][string]$IbsrvDbmsKind="${OC_IBSRV_DBMS_KIND}",
-        [string]$IbsrvDbmsAddr="${OC_IBSRV_DBMS_ADRESS}",
+        [string]$IbsrvDbmsAddr="${OC_IBSRV_DBMS_ADDRESS}",
         [string]$IbsrvDbmsName="${OC_IBSRV_DBMS_NAME}",
         [string]$IbsrvDbmsLogin="${OC_IBSRV_DBMS_LOGIN}",
         [string]$IbsrvDbmsPass="${OC_IBSRV_DBMS_PASSWORD}"
@@ -588,7 +706,7 @@ function Start-Ibsrv-Exec
 
     begin
     {
-        Write-Host "Begining Ibsrv"
+        Write-Host "Beginning Ibsrv"
         Start-Exec ${IbsrvExec}
     }
 }
@@ -716,7 +834,7 @@ function Start-CRS-Exec
 
     begin
     {
-        Write-Host "Begining CRServer"
+        Write-Host "Beginning CRServer"
         Start-Exec ${CRSExec}
     }
 }

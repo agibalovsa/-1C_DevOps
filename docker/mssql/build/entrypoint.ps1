@@ -16,14 +16,14 @@ function Set-Passwd-MSSQL
     {
         Write-Verbose "Changing SA login credentials"
 
-        $Cred   = Get-Credential
-        $Passw  = $Cred.GetNetworkCredential().password
-        $User   = $Cred.Username
-        $sqlcmd = "ALTER LOGIN $User with password='${Passw}'; ALTER LOGIN ${User} ENABLE;"
+        $Cred      = Get-Credential
+        $Password  = $Cred.GetNetworkCredential().password
+        $User      = $Cred.Username
+        $sqlcmd    = "ALTER LOGIN $User with password='${Password}'; ALTER LOGIN ${User} ENABLE;"
         & sqlcmd -S localhost -Q ${sqlcmd}
-        $Passw  = ""
-        $sqlcmd = ""
-        $User   = ""
+        $Password  = ""
+        $sqlcmd    = ""
+        $User      = ""
     }
 }
 
@@ -108,7 +108,7 @@ elseif ( $args[0] -eq "init" )
 }
 else
 {
-    Write-Error "Wrong parametr: $($args[0])"
+    Write-Error "Wrong parameter: $($args[0])"
     exit 1
 }
 

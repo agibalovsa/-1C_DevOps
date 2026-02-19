@@ -203,7 +203,7 @@ function Start-CRS-Server
     }
 }
 
-. "/build_context/oc_lib.ps1"
+. "/tools/oc_lib.ps1"
 Set-Envs
 $PasswordSec = ConvertTo-SecureString ${OC_PASSWORD} -AsPlainText -Force
 $script:Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList ".\${OC_USER}", ${PasswordSec}
@@ -225,7 +225,7 @@ elseif ( $args[0] -eq "crserver" )
 }
 else
 {
-    Write-Error "Wrong parametr: $($args[0])"
+    Write-Error "Wrong parameter: $($args[0])"
     exit 1
 }
 

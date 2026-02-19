@@ -2,13 +2,13 @@ function Install-Packs
 {
     param
     (
-        [string]$DistrPath
+        [string]$ArchivePath
     )
 
-    . "${PSScriptRoot}/oc_lib.ps1"
+    . "/tools/oc_lib.ps1"
     
     Set-Envs
-    & $INSTALL_MODE ${DistrPath}
+    & $INSTALL_MODE ${ArchivePath}
 
 }
 
@@ -16,19 +16,19 @@ function Install-From-File
 {
     param
     (
-        [string]$DistrPath
+        [string]$ArchivePath
     )
 
     begin
     {
-        $SystemEvntCount = (Get-WinEvent -LogName "System").Count
-        $ApplicationEvntCount = (Get-WinEvent -LogName "Application").Count
+        $SystemEventCount = (Get-WinEvent -LogName "System").Count
+        $ApplicationEventCount = (Get-WinEvent -LogName "Application").Count
 
         # Получаем накопленные события
-        $NewSystemEvntCount = (Get-WinEvent -LogName "System").Count - $SystemEvntCount
-        if ( $NewSystemEvntCount -gt 0 )
+        $NewSystemEventCount = (Get-WinEvent -LogName "System").Count - $SystemEventCount
+        if ( $NewSystemEventCount -gt 0 )
         {
-            Get-WinEvent -LogName "System" -MaxEvents $NewSystemEvntCount -FilterXPath "*[System[Level=2 or Level=3]]"
+            Get-WinEvent -LogName "System" -MaxEvents $NewSystemEventCount -FilterXPath "*[System[Level=2 or Level=3]]"
         }
     }
 
@@ -36,7 +36,7 @@ function Install-From-File
     {
         $PasswordSec = ConvertTo-SecureString ${OC_PASSWORD} -AsPlainText -Force
 
-        Install-OC-Msi "${DistrPath}" "${OC_PATH}" ${OC_MODE_SERVER} ${OC_MODE_WS} ${OC_MODE_CRS} ${OC_MODE_CLIENT} "${OC_USER}" "${OC_PASSWORD}"
+        Install-OC-Msi "${ArchivePath}" "${OC_PATH}" ${OC_MODE_SERVER} ${OC_MODE_WS} ${OC_MODE_CRS} ${OC_MODE_CLIENT} "${OC_USER}" "${OC_PASSWORD}"
         $Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList ".\${OC_USER}", ${PasswordSec}
         if ( ${OC_MODE_SERVER} -gt 0 ){
             New-Catalog-With-Rules "${OC_SRVINFO}" "${OC_USER}"
@@ -55,10 +55,10 @@ function Install-From-File
 
     end
     {
-        $NewApplicationEvntCount = (Get-WinEvent -LogName "Application").Count - ${ApplicationEvntCount}
-        if ( ${NewApplicationEvntCount} -gt 0 )
+        $NewApplicationEventCount = (Get-WinEvent -LogName "Application").Count - ${ApplicationEventCount}
+        if ( ${NewApplicationEventCount} -gt 0 )
         {
-            Get-WinEvent -LogName "Application" -MaxEvents ${NewApplicationEvntCount} -FilterXPath "*[System[Level=2 or Level=3]]"
+            Get-WinEvent -LogName "Application" -MaxEvents ${NewApplicationEventCount} -FilterXPath "*[System[Level=2 or Level=3]]"
         }
     }
 

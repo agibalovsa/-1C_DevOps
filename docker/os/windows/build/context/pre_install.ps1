@@ -12,7 +12,9 @@ function Install-Packs
 
         choco install powershell-core -y
         choco install nano -y
+        choco install 7zip -y
         Install-PackageProvider -Name NuGet -Force
         Install-Module powershell-yaml -Force
+
     }
 }
