@@ -51,7 +51,8 @@ RUN --mount=from=context,source=post_install,target=/post_install \
     . /post_install; \
     set_startup
 
-COPY --chown=usr1cv8:grp1cv8 --chmod=766 [ "entrypoint.sh", "/" ]
+COPY --chown=usr1cv8:grp1cv8 --chmod=766 [ "entrypoint.sh", "/entrypoint.d/entrypoint_oc.sh" ]
+COPY --from=common_context --chown=usr1cv8:grp1cv8 --chmod=766 [ "entrypoint.sh", "/" ]
 
 HEALTHCHECK CMD /healthcheck.sh
 

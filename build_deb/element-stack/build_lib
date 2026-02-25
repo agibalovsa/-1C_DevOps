@@ -1,0 +1,35 @@
+#!/bin/bash
+
+set_deb_structure() {
+
+    local debName="${1}"
+    local elementService="${2}"
+    local elementServiceBin="${3}"
+
+    pathUsr="debian/${debName}/usr/share/${debName}"
+    archiveName="${elementService//-/_}_${DEB_VERSION}_linux_x86_64.tar.gz"
+
+    mkdir -p "${pathUsr}/install"
+    tar -xzf "../distr/${archiveName}" -C "${pathUsr}/install"
+    cp "../ps" "${pathUsr}/ps"
+    cp "../systemctl" "${pathUsr}/systemctl"
+    cp "../postinst" "debian/${debName}.postinst"
+    cp "../postrm" "debian/${debName}.postrm"
+    cp "../prerm" "debian/${debName}.prerm"
+    sed -i -e "s/VERSION/${DEB_VERSION}/g" "${pathUsr}/systemctl"
+    sed -i -e "s/ELEMENT_SERVICE/$(elementService)/g" "${pathUsr}/systemctl"
+    sed -i -e "s/ELEMENT_SERVICE_BIN/${elementServiceBin}/g" "${pathUsr}/systemctl"
+    sed -i -e "s/DEB_NAME/$(debName)/g" "${pathUsr}/systemctl"
+    sed -i -e "s/ELEMENT_SERVICE/${elementService}/g" "debian/${debName}.postinst"
+    sed -i -e "s/ELEMENT_SERVICE/${elementService}/g" "debian/${debName}.prerm"
+
+}
+
+start_debuild() {
+
+    debuild --no-lintian -uc -us
+    debuild -- clean
+
+    rm -f ../*.build ../*.buildinfo ../*.changes ../*.dsc ../*.tar.gz ../*.tar.bz2
+
+}

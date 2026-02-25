@@ -4,21 +4,50 @@ set -Eeo pipefail
 
 # common
 
+# Installing nethasp.ini for searching net license IPs
+#  $1 - Comma-separated IPs
+#
+setup_nethasp_ini_config() {
+
+    if [ -f "/opt/1cv8/conf/nethasp.ini" ]; then
+        return
+    fi;
+
+    printf "%s\n" \
+    "[NH_COMMON]" \
+    "NH_IPX = Disabled" \
+    "NH_NETBIOS = Disabled" \
+    "NH_TCPIP = Enabled" \
+    "" \
+    "[NH_TCPIP]" \
+    "NH_SERVER_ADDR    = ${1}" \
+    "NH_TCPIP_METHOD   = UDP" \
+    "NH_USE_BROADCAST  = Disabled" \
+    "NH_SESSION        = 30" \
+    "NH_SEND_RCV       = 30" \
+    | tee "/opt/1cv8/conf/nethasp.ini";
+
+}
+
 setup_init() {
 
     if [ -f logcfg.xml ]; then
         mv logcfg.xml /opt/1cv8/conf/logcfg.xml;
     fi;
 
-    if [ -f /config_ibsrv.yml ]; then
+    if [ -f config_ibsrv.yml ]; then
         mkdir -p "$(dirname "${OC_IBSRV_CONFIG_PATH}")";
-        mv /config_ibsrv.yml "${OC_IBSRV_CONFIG_PATH}";
+        mv config_ibsrv.yml "${OC_IBSRV_CONFIG_PATH}";
     fi;
 
     if [ -f init.sh ]; then
-        chmod 766 ./init.sh;
+        chmod 766 init.sh;
         ./init.sh;
-        rm ./init.sh;
+        rm init.sh;
+    fi;
+
+    if [ -n "${NETHASP_IP}" ]; then
+        setup_nethasp_ini_config "${NETHASP_IP}"
     fi;
 
 }
@@ -37,11 +66,12 @@ setup_ragent_healthcheck() {
 setup_defaults() {
 
     WWW_PATH=${WWW_PATH:-"/var/www"}
-    OC_SRVINFO=${OC_SRVINFO:-"/home/usr1cv8/srvinfo"}
+    OC_SRVINFO=${OC_SRVINFO:-"/home/usr1cv8/.1cv8/1C/1cv8"}
 
     OC_RAGENT_PORT=${OC_RAGENT_PORT:-"1540"}
     OC_RMNGR_PORT=${OC_RMNGR_PORT:-"1541"}
     OC_RPHOST_PORT=${OC_RPHOST_PORT:-"1560:1591"}
+    OC_RPHOST_PORT=${OC_RPHOST_PORT/-/:}
     OC_RAS_PORT=${OC_RAS_PORT:-"1545"}
 
     OC_DEBUG_TYPE=${OC_DEBUG_TYPE:-"-tcp"}
@@ -52,6 +82,7 @@ setup_defaults() {
 
     OC_IBSRV_PORT=${OC_IBSRV_PORT:-"1541"}
     OC_IBSRV_RANGE_PORT=${OC_IBSRV_RANGE_PORT:-"1560:1591"}
+    OC_IBSRV_RANGE_PORT=${OC_IBSRV_RANGE_PORT/-/:}
     OC_IBSRV_SECLEVEL=${OC_IBSRV_SECLEVEL:-"0"}
     OC_IBSRV_HTTP_ADDRESS=${OC_IBSRV_HTTP_ADDRESS:-"any"}
     OC_IBSRV_HTTP_PORT=${OC_IBSRV_HTTP_PORT:-"8314"}
@@ -188,7 +219,7 @@ setup_ibsrv_init_exec() {
 
 }
 
-init_ibsrv_config() {
+setup_ibsrv_config() {
 
     OC_IBSRV_CONFIG_DIR="$(dirname "${OC_IBSRV_CONFIG_PATH}")"
     if [ ! -d "${OC_IBSRV_CONFIG_DIR}" ]; then
@@ -227,13 +258,14 @@ run_ibsrv_exec() {
 
 ibsrv() {
 
+    setup_ibsrv_healthcheck
+    
     setup_ibsrv_exec
     setup_ibsrv_init_exec
 
     setup_init
-    setup_ibsrv_healthcheck
 
-    init_ibsrv_config
+    setup_ibsrv_config
     run_ibsrv_exec
 
 }
@@ -255,7 +287,7 @@ setup_crserver_exec() {
 
 }
 
-setup_crserver_conf() {
+setup_crserver_config() {
 
     IFS='/' read -r -a OC_CRSERVER_PARTS <<< "${OC_CRSERVER_LOCATION}"
     OC_CRSERVER_WWW_PATH="${WWW_PATH}/${OC_CRSERVER_LOCATION}"
@@ -315,13 +347,14 @@ run_crserver_exec() {
 
 crserver() {
 
-    setup_crserver_conf
+    setup_crserver_healthcheck
+    
     setup_crserver_exec
     setup_apache_exec
 
     setup_init
-    setup_crserver_healthcheck
 
+    setup_crserver_config
     run_apache_service
     run_crserver_exec
 
@@ -368,8 +401,11 @@ run_client_exec() {
 client() {
 
     setup_client_healthcheck
+    
     setup_xvfb_exec
+    
     setup_init
+    
     run_xvfb_exec_background
 
     if [ -n "${1}" ]; then
@@ -379,24 +415,20 @@ client() {
 
 }
 
-if [ "$1" == "sh" ]; then
-    exec sh
-elif [ "$1" == "bash" ]; then
-    exec /bin/bash
+setup_defaults
+if [ "$1" = "init" ]; then
+    setup_init
+elif [ "$1" = "server" ]; then
+    server
+elif [ "$1" = "ibsrv" ]; then
+    ibsrv
+elif [ "$1" = "crserver" ]; then
+    crserver
+elif [ "$1" = "client" ]; then
+    client "$2"
 else
-    setup_defaults
-    if [ "$1" = "server" ]; then
-        server
-    elif [ "$1" = "ibsrv" ]; then
-        ibsrv
-    elif [ "$1" = "crserver" ]; then
-        crserver
-    elif [ "$1" = "client" ]; then
-        client "$2"
-    else
-        setup_init
-        exec /bin/bash
-    fi;
+    echo "Wrong parameter: $1" >&2
+    exit 1
 fi
 
 exit 0

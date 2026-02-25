@@ -1,0 +1,26 @@
+# ## OS options
+
+OS_TAG="${OS_TAG}"
+
+# ## One Script options
+# > https://oscript.io/downloads/archive/
+
+OSCRIPT_VERSION="${OSCRIPT_VERSION}"
+OSCRIPT_TAG="oscript:${{OSCRIPT_VERSION}}"
+
+# ## Install options
+
+INSTALL_MODE="${INSTALL_MODE:-install_from_url}"
+
+# ### install_from_file
+
+INSTALL_FILES="onescript-engine_${{OSCRIPT_VERSION}}_all.deb"
+
+# ### install_from_repo
+
+APTLY_REPO_COMPONENTS="oscript main"
+INSTALL_PACKS="onescript=${{OSCRIPT_VERSION}}"
+
+# ### install_from_url
+
+INSTALL_URLS="https://oscript.io/downloads/${{OSCRIPT_VERSION//./_}}/x64/onescript-engine_${{OSCRIPT_VERSION}}_all.deb"

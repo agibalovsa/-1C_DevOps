@@ -3,21 +3,31 @@
 install_from_url () {
 
     savePath="/tmp/install_deb"
+    getClient="0"
+
+    if [[ "${INSTALL_FILES}" == *"-client"* ]]; then
+        getClient="1"
+    fi
     
-    get_deb_from_url "${OC_URL_LOGIN}" "${OC_URL_PASSWORD}" "${OC_VERSION}" "${savePath}"
+    get_deb_from_url "${savePath}" "${OC_VERSION}" "${getClient}" "${OC_URL_LOGIN}" "${OC_URL_PASSWORD}"  
+
+    unzip "${savePath}/*.zip" -d "${savePath}"
 
     for installFile in ${INSTALL_FILES}; do
         dpkg -i "${savePath}/${installFile}"
     done;
 
+    rm -r "${savePath}"
+
 }
 
 get_deb_from_url () {
 
-    local Login="$1"
-    local Password="$2"
-    local Version="$3"
-    local savePath="${4:-/tmp/install_deb}"
+    local savePath="${1:-/tmp/install_deb}"
+    local Version="$2"
+    local getClient="$3"
+    local Login="$4"
+    local Password="$5"
     
     freeSpace=$(df -k / | awk 'NR==2 {print $4}')
     if [ "${freeSpace}" -lt 3145728 ]; then
@@ -62,26 +72,27 @@ get_deb_from_url () {
         return 1
     fi
 
-    fileName="deb64_${Version//./_}.zip"
-    filePageUrl="https://releases.1c.ru/version_file?nick=Platform83&ver=${Version}&path=Platform%5c${Version//./_}%5c${fileName}"
-    
-    downloadUrl=$(curl -sL -b "${cookieFile}" -H "${headers}" "${filePageUrl}" | grep -oP 'https://dl03.1c.ru/public/file/get/[^"]+')
-
-    if [ -z "${downloadUrl}" ]; then
-        echo "Error: Linux deb 64-bit link not found" >&2
-        return 1
+    files=("deb64_${Version//./_}.zip")
+    if [ "${getClient}" = "1" ]; then
+        files+=("client_${Version//./_}.deb64.zip")  
     fi
 
-    echo "3. Downloading file..."
+    for fileName in "${files[@]}"; do
 
-    curl -L -b "${cookieFile}" -H "${headers}" "${downloadUrl}" -o "${savePath}/${fileName}"
+        filePageUrl="https://releases.1c.ru/version_file?nick=Platform83&ver=${Version}&path=Platform%5c${Version//./_}%5c${fileName}"
+        
+        downloadUrl=$(curl -sL -b "${cookieFile}" -H "${headers}" "${filePageUrl}" | grep -oP 'https://dl03.1c.ru/public/file/get/[^"]+')
 
-    echo "4. Extracting..."
-    if command -v unzip >/dev/null; then
-        unzip "${savePath}/${fileName}" -d "${savePath}"
-    else
-        echo "Warning: unzip not found. Please install unzip"
-    fi
+        if [ -z "${downloadUrl}" ]; then
+            echo "Error: Linux deb 64-bit link not found" >&2
+            return 1
+        fi
+
+        echo "3. Downloading file ${fileName}"
+
+        curl -L -b "${cookieFile}" -H "${headers}" "${downloadUrl}" -o "${savePath}/${fileName}"
+
+    done
 
     rm "${cookieFile}"
     echo "Done. File saved to ${savePath}"

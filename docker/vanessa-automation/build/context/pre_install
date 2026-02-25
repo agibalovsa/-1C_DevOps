@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+install_packs() {
+
+    apt-get update;
+    apt-get install -y --no-install-recommends git zip
+
+    rm -rf /var/lib/apt/lists/*;
+
+}

@@ -1,4 +1,4 @@
-1cesblib (7.0.5+57) stable; urgency=medium
+1c-esb-lib (7.0.5+57) stable; urgency=medium
 
   * Сервер
     * Настроечные файлы сервера
@@ -8,7 +8,7 @@
 
  -- Rarus-Samara <sam-gr@rarus.ru>  Wed, 03 Jul 2025 15:00:00 +0400
 
-1cesblib (6.1.6+15) stable; urgency=medium
+1c-esb-lib (6.1.6+15) stable; urgency=medium
 
   * Системные требования
     * Изменены системные требования для «1С:Шины». Теперь для работы сервера требуется наличие Java Runtime Environment (JRE) версии 17.
@@ -26,7 +26,7 @@
 
  -- Rarus-Samara <sam-gr@rarus.ru>  Wed, 03 Jul 2025 15:00:00 +0400
 
-1cesblib (4.1.4+6) stable; urgency=medium
+1c-esb-lib (4.1.4+6) stable; urgency=medium
 
   * Встроенный язык
     * Стандартная библиотека
@@ -45,7 +45,7 @@
 
  -- Rarus-Samara <sam-gr@rarus.ru>  Mon, 25 Sep 2024 15:00:00 +0400
 
-1cesblib (4.0.6+49) stable; urgency=medium
+1c-esb-lib (4.0.6+49) stable; urgency=medium
 
   * Встроенный язык
   * Групповая разработка
@@ -60,7 +60,7 @@
 
  -- Rarus-Samara <sam-gr@rarus.ru>  Mon, 04 Dec 2023 15:00:00 +0400
 
-1cesblib (3.1.1) beta; urgency=medium
+1c-esb-lib (3.1.1) beta; urgency=medium
 
   * Fix errors
   * Project Element Enumeration
@@ -75,7 +75,7 @@
 
  -- Rarus-Samara <sam-gr@rarus.ru>  Sun, 05 May 2023 09:21:04 +0400
 
-1cesblib (2.0.3) stable; urgency=medium
+1c-esb-lib (2.0.3) stable; urgency=medium
 
   * Fixed identified errors
 

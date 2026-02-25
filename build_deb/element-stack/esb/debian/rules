@@ -1,0 +1,13 @@
+#!/usr/bin/make -f
+include /usr/share/dpkg/*.mk
+export DH_VERBOSE = 1
+
+override_dh_install:
+	. ../../build_lib && set_deb_structure "${1c-esb}" "${1c-enterprise-esb}" "esb"
+	. ../../build_lib && set_deb_structure "${1c-esb-ide}" "${1c-enterprise-esb-with-ide}" "esb"
+
+override_dh_strip_nondeterminism:
+	true
+
+%:
+	dh $@

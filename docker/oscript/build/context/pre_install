@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+install_packs() {
+
+    mkdir -p /usr/share/man/man1
+    
+    apt-get update;
+    apt-get install -yq --no-install-recommends mono-runtime libmono-system-core4.[0-9]-cil libmono-corlib4.[0-9]-cil libmono-i18n4.[0-9]-all;
+    apt-get clean \
+        && rm -rf /var/lib/apt/lists/*;
+
+}

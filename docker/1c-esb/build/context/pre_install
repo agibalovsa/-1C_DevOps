@@ -2,7 +2,7 @@
 
 install_packs() {
 
-    if ["${OC_ESB_TYPE}" == "esbide"]; then
+    if [ "${OC_ESB_TYPE}" == "esbide" ]; then
         apt-get update;
         apt-get install -yq --no-install-recommends libsecret-1-0 git;
         apt-get clean \

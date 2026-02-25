@@ -25,7 +25,7 @@ install_packs() {
 
     # install client 1c
     if [ "${OC_MODE_CLIENT}" -eq "1" ]; then
-        apt-get install -yq --no-install-recommends libglu1-mesa libcups2 libgtk-3-0 libxxf86vm1 libsm6 libwebkit2gtk-4.0-37 xvfb;
+        apt-get install -yq --no-install-recommends libglu1-mesa libcups2 libgtk-3-0 libxxf86vm1 libsm6 libwebkit2gtk-4.[0-9]-[0-9]* evince x11-utils xfonts-utils xvfb;
     fi;
 
     apt-get clean && \

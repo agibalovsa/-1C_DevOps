@@ -3,10 +3,10 @@
 # shellcheck disable=SC2034
 BUILD_ARGS=(
 "--build-arg" "OS_TAG=${OS_TAG}"
-"--build-arg" "OC_EXECUTOR_VERSION=${OC_EXECUTOR_VERSION}"
+"--build-arg" "OSCRIPT_VERSION=${OSCRIPT_VERSION}"
 )
 
-TAG="${OC_EXECUTOR_TAG}"
+TAG="${OSCRIPT_TAG}"
 REL_PATH="../../"
 
 # shellcheck disable=SC1091

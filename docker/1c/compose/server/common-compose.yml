@@ -4,28 +4,35 @@ services:
 
     image: ${OC_SERVER_TAG}
     hostname: ${OC_SERVER_HOSTNAME}
-    command: server
+    command: ${OC_SERVER_COMMAND}
     environment:
-      TZ: ${TZ}
+      TZ:             ${TZ}
+      # 1С не любит проброс разноименных портов, используем проброс одноименных портов 
+      OC_RAGENT_PORT: ${OC_RAGENT_PORT:-1540}
+      OC_RMNGR_PORT:  ${OC_RMNGR_PORT:-1541}
+      OC_RAS_PORT:    ${OC_RAS_PORT:-1545}
+      OC_DEBUG_PORT:  ${OC_DEBUG_PORT:-1549}
+      OC_RPHOST_PORT: ${OC_RPHOST_PORT:-1560-1591}
     ports:
       - "${HTTP_PORT:-80}:80"
-      - "${OC_RAGENT_PORT:-1540}:1540"
-      - "${OC_RMNGR_PORT:-1541}:1541"
-      - "${OC_RAS_PORT:-1545}:1545"
-      - "${OC_DEBAGER_PORT:-1549}:1549"
-      - "${OC_RPHOST_PORT:-1560-1591}:1560-1591"
+      - "${OC_RAGENT_PORT:-1540}:${OC_RAGENT_PORT:-1540}"
+      - "${OC_RMNGR_PORT:-1541}:${OC_RMNGR_PORT:-1541}"
+      - "${OC_RAS_PORT:-1545}:${OC_RAS_PORT:-1545}"
+      - "${OC_DEBUG_PORT:-1549}:${OC_DEBUG_PORT:-1549}"
+      - "${OC_RPHOST_PORT:-1560-1591}:${OC_RPHOST_PORT:-1560-1591}"
     volumes:
-      - oc_srvinfo:/home/usr1cv8/.1cv8
-      - oc_lic:/var/1C/licenses
-      - oc_log:/var/log/1C
-      - oc_conf:/opt/1cv8/conf
+      - "oc_srvinfo:${OC_SRVINFO_PATH:-/home/usr1cv8/.1cv8/1C/1cv8}"
+      - "oc_lic:${OC_LIC_PATH:-/var/1C/licenses}"
+      - "oc_log:${OC_LOG_PATH:-/var/log/1C}"
+      - "oc_conf:${OC_CONF_PATH:-/opt/1cv8/conf}"
     cap_add:
       - SYS_NICE
+    tty: true
 
 volumes:
   oc_srvinfo:
     external: true
-    name: ${OC_SRVIFO_VOL:-oc_srvinfo}
+    name: ${OC_SRVINFO_VOL:-oc_srvinfo}
   oc_lic:
     external: true
     name: ${OC_LIC_VOL:-oc_lic}

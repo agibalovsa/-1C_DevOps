@@ -9,7 +9,7 @@ if [ "${systemd}" == "systemd" ]; then
     printf "%s\n" \
         "[Manager]" \
         "DefaultEnvironment=\"JAVA_HOME=${JAVA_HOME}\"" \
-    | tee "/etc/systemd/system.conf.d/1c-enterprise-esb.conf";
+    | tee "/etc/systemd/system.conf.d/ELEMENT_SERVICE.conf";
 fi
 
 if [ ! "${systemd}" == "systemd" ]; then
@@ -19,10 +19,10 @@ if [ ! "${systemd}" == "systemd" ]; then
     if [ -f /usr/bin/systemctl ]; then
         mv /usr/bin/systemctl /usr/bin/systemctle
     fi
-    cp /usr/share/1cesb/ps /usr/bin/ps
-    cp /usr/share/1cesb/systemctl /usr/bin/systemctl
-    chmod 777 /usr/bin/ps
-    chmod 777 /usr/bin/systemctl
+    cp "/usr/share/DEB_NAME/ps" "/usr/bin/ps"
+    cp "/usr/share/DEB_NAME/systemctl" "/usr/bin/systemctl"
+    chmod 777 "/usr/bin/ps"
+    chmod 777 "/usr/bin/systemctl"
 fi
 
 find_installer=(/opt/1C/1CE/components/1c-enterprise-installer*)
@@ -35,11 +35,11 @@ fi
 if [ ! "${components}" == 0 ]; 
 then
     if [ "${systemd}" == "systemd" ]; then
-        systemctl stop ESB_SERVICE
+        systemctl stop ELEMENT_SERVICE
     else
-        systemctl disable ESB_SERVICE
+        systemctl disable ELEMENT_SERVICE
     fi
-    "${installer}/1ce-installer-cli" uninstall ESB_SERVICE
+    "${installer}/1ce-installer-cli" uninstall ELEMENT_SERVICE
 fi
 
 ext_options="--ignore-hardware-checks"
@@ -47,18 +47,18 @@ if [ ! "${systemd}" == "systemd" ]; then
     ext_options="${ext_options} --disable-service-creation"
 fi
 
-eval "/usr/share/1cesb/install/1ce-installer-cli --verbose full install ESB_SERVICE --components 1c-enterprise-ring,ESB_SERVICE ${ext_options}"
-/usr/share/1cesb/install/1ce-installer-cli support clean
+eval "/usr/share/DEB_NAME/install/1ce-installer-cli --verbose full install ELEMENT_SERVICE --components 1c-enterprise-ring,ELEMENT_SERVICE ${ext_options}"
+eval "/usr/share/DEB_NAME/install/1ce-installer-cli support clean"
 
-rm -r /usr/share/1cesb/install
+rm -r "/usr/share/DEB_NAME/install"
 
 if [ ! "${systemd}" = "systemd" ]; then
-    rm /usr/bin/ps
-    rm /usr/bin/systemctl
-    if [ -f /usr/bin/pse ]; then
-        mv /usr/bin/pse /usr/bin/ps
+    rm "/usr/bin/ps"
+    rm "/usr/bin/systemctl"
+    if [ -f "/usr/bin/pse" ]; then
+        mv "/usr/bin/pse" "/usr/bin/ps"
     fi
-    if [ -f /usr/bin/systemctle ]; then
-        mv /usr/bin/systemctle /usr/bin/systemctl
+    if [ -f "/usr/bin/systemctle" ]; then
+        mv "/usr/bin/systemctle" "/usr/bin/systemctl"
     fi
 fi

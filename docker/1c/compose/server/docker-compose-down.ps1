@@ -1,0 +1,1 @@
+docker compose  -f common-compose.yml -f docker-compose.yml -f windows/docker-compose.yml -f mssql/docker-compose.yml down

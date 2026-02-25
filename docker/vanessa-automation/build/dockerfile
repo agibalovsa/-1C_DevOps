@@ -1,0 +1,34 @@
+ARG REGISTRY= \
+    OS_TAG=debian:bookworm-slim
+
+# hadolint ignore=DL3006
+FROM "${REGISTRY}${OS_TAG}" AS pre_build
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# hadolint ignore=SC1091
+RUN --mount=from=context,source=pre_install,target=/pre_install \
+    set -eux; \
+    . /pre_install; \
+    install_packs
+
+FROM pre_build AS compiler
+
+ARG VANESSA_VERSION
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# hadolint ignore=SC1091
+RUN --mount=from=context,source=compile,target=/compile \
+    --mount=from=context_arg,target=/context_arg \
+    set -eux; \
+    . /context_arg/.arg; \
+    . /compile; \
+    ./entrypoint.sh "oc=init"; \
+    mkdir -p /srv/vanessa-automation; \
+    compile_project "/srv/vanessa-automation"
+
+# hadolint ignore=DL3006
+FROM scratch AS project
+
+COPY --from=compiler [ "/srv/vanessa-automation", "/" ]

@@ -1,6 +1,6 @@
 files
 debhelper-build-stamp
-1cans/*
+1c-esb*/*
 .debhelper/*
 *.debhelper
 *.substvars

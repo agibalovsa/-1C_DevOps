@@ -5,6 +5,11 @@ set_startup() {
     # shellcheck source=/dev/null
     . /context_arg/.arg;
 
+    # install client 1c
+    if [ "${OC_MODE_CLIENT}" -eq "1" ]; then
+        ln -s "${OC_PATH}/1cv8" /usr/local/bin;
+    fi;
+
     # install server 1c
     if [ "${OC_MODE_SERVER}" -eq "1" ]; then
         ln -s "${OC_PATH}/ragent" /usr/local/bin;

@@ -16,7 +16,7 @@ init_stack () {
             --inputbox "" 8 40 \
     )
 
-    if [ -z ${ERASE_ON_EXIT} ]; then
+    if [ -z "${ERASE_ON_EXIT}" ]; then
         clear;
     fi
 
@@ -26,7 +26,7 @@ init_stack () {
             "compose" "compose" off
     )
 
-    if [ -z ${ERASE_ON_EXIT} ]; then
+    if [ -z "${ERASE_ON_EXIT}" ]; then
         clear;
     fi
 
@@ -62,14 +62,16 @@ init_stack () {
                 "nginx/build" "Nginx" off \
                 "openssl/build" "OpenSSL" off \
                 "os/linux_deb/build" "OS System" off \
+                "oscript/build" "One Script" off \
                 "postgres/build" "Postgres" off \
                 "slc/build" "Slc" off \
                 "sonarqube/build" "Sonarqube" off \
-                "step-ca-cli/build" "Step CA (cli)" off
+                "step-ca-cli/build" "Step CA (cli)" off \
+                "vanessa-automation/build" "Vanessa automation" off
         )"
     fi;
 
-    if [ -z ${ERASE_ON_EXIT} ]; then
+    if [ -z "${ERASE_ON_EXIT}" ]; then
         clear;
     fi
 
@@ -201,7 +203,7 @@ make_compose_stack () {
     paths=( "${!2}" )
     for path in "${paths[@]}"
     do
-        rel_path="${path#${script_dir}/}"
+        rel_path="${path#"${script_dir}"/}"
         proj_name=$(echo "${rel_path/\/compose/}" | tr '/' '-')
         for file in "${script_dir}/${rel_path}/"* "${script_dir}/${rel_path}/".*
         do

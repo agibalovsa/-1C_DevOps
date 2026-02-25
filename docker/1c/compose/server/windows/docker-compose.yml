@@ -1,0 +1,8 @@
+
+name: oc-server-windows
+
+services:
+
+  oc_server:
+
+    cap_add: []
