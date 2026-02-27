@@ -55,6 +55,7 @@ init_stack () {
                 "1c-ans/build" "1C Ans" off \
                 "1c-esb/build" "1C ESB" off \
                 "1c-element-script/build" "1C Element (Script)" off \
+                "deb-builder/build" "Deb builder" off \
                 "gitlab-ce/build/gitlab-auto-mr" "Gitlab MR" off \
                 "hasp/build" "Hasp" off \
                 "imagick/build" "Image Magick" off \

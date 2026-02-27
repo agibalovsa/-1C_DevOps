@@ -1,0 +1,23 @@
+#!/usr/bin/make -f
+include /usr/share/dpkg/*.mk
+export DH_VERBOSE = 1
+
+SHELL := /bin/bash
+
+override_dh_install:
+	. ../build_lib && set_deb_structure "1c-element-ide" "${DEB_VERSION}" "1c-enterprise-element-server-with-ide" "element-server"
+
+override_dh_strip_nondeterminism:
+	true
+
+override_dh_dwz:
+	true
+
+override_dh_strip:
+	true
+
+override_dh_shlibdeps:
+	dh_shlibdeps -- --ignore-missing-info
+
+%:
+	dh $@

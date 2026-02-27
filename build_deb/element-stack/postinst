@@ -9,7 +9,7 @@ if [ "${systemd}" == "systemd" ]; then
     printf "%s\n" \
         "[Manager]" \
         "DefaultEnvironment=\"JAVA_HOME=${JAVA_HOME}\"" \
-    | tee "/etc/systemd/system.conf.d/ELEMENT_SERVICE.conf";
+    | tee "/etc/systemd/system.conf.d/%ELEMENT_SERVICE%.conf";
 fi
 
 if [ ! "${systemd}" == "systemd" ]; then
@@ -19,8 +19,8 @@ if [ ! "${systemd}" == "systemd" ]; then
     if [ -f /usr/bin/systemctl ]; then
         mv /usr/bin/systemctl /usr/bin/systemctle
     fi
-    cp "/usr/share/DEB_NAME/ps" "/usr/bin/ps"
-    cp "/usr/share/DEB_NAME/systemctl" "/usr/bin/systemctl"
+    cp "/usr/share/%DEB_NAME%/ps" "/usr/bin/ps"
+    cp "/usr/share/%DEB_NAME%/systemctl" "/usr/bin/systemctl"
     chmod 777 "/usr/bin/ps"
     chmod 777 "/usr/bin/systemctl"
 fi
@@ -35,11 +35,11 @@ fi
 if [ ! "${components}" == 0 ]; 
 then
     if [ "${systemd}" == "systemd" ]; then
-        systemctl stop ELEMENT_SERVICE
+        systemctl stop %ELEMENT_SERVICE%
     else
-        systemctl disable ELEMENT_SERVICE
+        systemctl disable %ELEMENT_SERVICE%
     fi
-    "${installer}/1ce-installer-cli" uninstall ELEMENT_SERVICE
+    "${installer}/1ce-installer-cli" uninstall %ELEMENT_SERVICE%
 fi
 
 ext_options="--ignore-hardware-checks"
@@ -47,10 +47,10 @@ if [ ! "${systemd}" == "systemd" ]; then
     ext_options="${ext_options} --disable-service-creation"
 fi
 
-eval "/usr/share/DEB_NAME/install/1ce-installer-cli --verbose full install ELEMENT_SERVICE --components 1c-enterprise-ring,ELEMENT_SERVICE ${ext_options}"
-eval "/usr/share/DEB_NAME/install/1ce-installer-cli support clean"
+eval "/usr/lib/%DEB_NAME%/install/1ce-installer-cli --verbose full install %ELEMENT_SERVICE% --components 1c-enterprise-ring,%ELEMENT_SERVICE% ${ext_options} --javahome ${JAVA_HOME}"
+eval "/usr/lib/%DEB_NAME%/install/1ce-installer-cli support clean"
 
-rm -r "/usr/share/DEB_NAME/install"
+rm -r "/usr/lib/%DEB_NAME%/install"
 
 if [ ! "${systemd}" = "systemd" ]; then
     rm "/usr/bin/ps"

@@ -3,33 +3,52 @@
 set_deb_structure() {
 
     local debName="${1}"
-    local elementService="${2}"
-    local elementServiceBin="${3}"
+    local debVersion="${2}"
+    local elementService="${3}"
+    local elementServiceBin="${4}"
 
-    pathUsr="debian/${debName}/usr/share/${debName}"
-    archiveName="${elementService//-/_}_${DEB_VERSION}_linux_x86_64.tar.gz"
+    pathUsrLib="debian/${debName}/usr/lib/${debName}"
+    pathUsrShare="debian/${debName}/usr/share/${debName}"
+    archiveName="${elementService//-/_}_${debVersion}_linux_x86_64.tar.gz"
 
-    mkdir -p "${pathUsr}/install"
-    tar -xzf "../distr/${archiveName}" -C "${pathUsr}/install"
-    cp "../ps" "${pathUsr}/ps"
-    cp "../systemctl" "${pathUsr}/systemctl"
+    mkdir -p "${pathUsrLib}/install"
+    mkdir -p "${pathUsrShare}"
+    tar -xzf "../distr/${archiveName}" -C "${pathUsrLib}/install"
+    rm -rf "${pathUsrLib}/install"/axiom-*/data
+    rm -rf "${pathUsrLib}/install"/axiom-*/META-INF
+    cp "../ps" "${pathUsrShare}/ps"
+    chmod +x "${pathUsrShare}/ps"
+    cp "../systemctl" "${pathUsrShare}/systemctl"
+    chmod +x "${pathUsrShare}/systemctl"
     cp "../postinst" "debian/${debName}.postinst"
     cp "../postrm" "debian/${debName}.postrm"
     cp "../prerm" "debian/${debName}.prerm"
-    sed -i -e "s/VERSION/${DEB_VERSION}/g" "${pathUsr}/systemctl"
-    sed -i -e "s/ELEMENT_SERVICE/$(elementService)/g" "${pathUsr}/systemctl"
-    sed -i -e "s/ELEMENT_SERVICE_BIN/${elementServiceBin}/g" "${pathUsr}/systemctl"
-    sed -i -e "s/DEB_NAME/$(debName)/g" "${pathUsr}/systemctl"
-    sed -i -e "s/ELEMENT_SERVICE/${elementService}/g" "debian/${debName}.postinst"
-    sed -i -e "s/ELEMENT_SERVICE/${elementService}/g" "debian/${debName}.prerm"
+    sed -i -e "s/%VERSION%/${debVersion}/g" "${pathUsrShare}/systemctl"
+    sed -i -e "s/%DEB_NAME%/${debName}/g" "${pathUsrShare}/systemctl"
+    sed -i -e "s/%ELEMENT_SERVICE_BIN%/${elementServiceBin}/g" "${pathUsrShare}/systemctl"
+    sed -i -e "s/%ELEMENT_SERVICE%/${elementService}/g" "${pathUsrShare}/systemctl"
+    sed -i -e "s/%DEB_NAME%/${debName}/g" "debian/${debName}.postinst"
+    sed -i -e "s/%ELEMENT_SERVICE%/${elementService}/g" "debian/${debName}.postinst"
+    sed -i -e "s/%DEB_NAME%/${debName}/g" "debian/${debName}.prerm"
+    sed -i -e "s/%ELEMENT_SERVICE%/${elementService}/g" "debian/${debName}.prerm"
 
 }
 
 start_debuild() {
 
-    debuild --no-lintian -uc -us
+    apt-get update
+    apt-get build-dep . -y
+    debuild -us -uc -ui
+
+    for file in ../*.deb; do
+        dpkg -I "${file}" | grep Depends
+        dpkg -i "${file}"
+        packageName=$(dpkg-deb -f "${file}" Package)
+        dpkg -P "${packageName}"
+    done
+
     debuild -- clean
 
-    rm -f ../*.build ../*.buildinfo ../*.changes ../*.dsc ../*.tar.gz ../*.tar.bz2
+    rm -f ../*.build ../*.buildinfo ../*.changes ../*.dsc ../*.tar.gz ../*.tar.bz2 ../*.tar.xz
 
 }

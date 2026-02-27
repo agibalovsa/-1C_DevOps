@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+install_packs() {
+
+    apt-get update;
+    apt-get install -y --no-install-recommends \
+        build-essential \
+        debhelper \
+        devscripts \
+        dh-make \
+        quilt \
+        fakeroot \
+        equivs;
+
+    rm -rf /var/lib/apt/lists/*;
+
+}

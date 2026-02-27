@@ -3,7 +3,7 @@
 set -e
 
 if [ "${1}" = "purge" ]; then
-    rm -r /opt/1C
-    rm -r /etc/1C
-    rm -r /var/opt/1C
+    rm -rf /opt/1C
+    rm -rf /etc/1C
+    rm -rf /var/opt/1C
 fi

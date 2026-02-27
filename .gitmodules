@@ -1,0 +1,3 @@
+[submodule "docker/aptly"]
+	path = docker/aptly
+	url = https://github.com/agibalovsa/aptly.git

@@ -1,0 +1,15 @@
+Source: 1c-element-lib
+Section: devel
+Priority: optional
+Build-Depends: debhelper-compat (= 13), libgtk-3-0, libgdk-pixbuf-2.0-0, libglib2.0-0, libcairo2, libpango-1.0-0, libatk1.0-0
+Maintainer: 1C-Soft LLC <v8@1c.ru>
+Standards-Version: 4.6.2
+Homepage: https://releases.1c.ru/project/
+
+Package: 1c-element-ide
+Architecture: amd64
+Section: devel
+Depends: ${shlibs:Depends}, ${misc:Depends}, openjdk-17-jdk | java17-jdk
+Description: 1C:Enterprise.Element with IDE
+ 1C:Enterprise.Element is a development environment for the next generation 
+ of 1C applications. This package includes the IDE and the installer.

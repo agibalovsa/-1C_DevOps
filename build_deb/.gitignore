@@ -3,4 +3,12 @@
 *.changes
 *.dsc
 *.tar.gz
+*.tar.xz
 *.deb
+files
+debhelper-build-stamp
+.debhelper/*
+*.debhelper
+*.substvars
+element-stack/1c-esb-lib/*/1c-esb*
+element-stack/1c-element-lib/*/1c-element*

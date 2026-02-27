@@ -5,7 +5,7 @@ set -e
 systemd=$(ps --no-headers -o comm 1)
 
 if [ "${systemd}" == "systemd" ]; then
-    systemctl stop ELEMENT_SERVICE
+    systemctl stop %ELEMENT_SERVICE%
 else
     if [ -f "/usr/bin/ps" ]; then
         mv "/usr/bin/ps" "/usr/bin/pse"
@@ -13,17 +13,17 @@ else
     if [ -f "/usr/bin/systemctl" ]; then
         mv "/usr/bin/systemctl" "/usr/bin/systemctle"
     fi
-    cp "/usr/share/DEB_NAME/ps" "/usr/bin/ps"
-    cp "/usr/share/DEB_NAME/systemctl" "/usr/bin/systemctl"
+    cp "/usr/share/%DEB_NAME%/ps" "/usr/bin/ps"
+    cp "/usr/share/%DEB_NAME%/systemctl" "/usr/bin/systemctl"
     chmod 777 "/usr/bin/ps"
     chmod 777 "/usr/bin/systemctl"
-    systemctl disable ELEMENT_SERVICE
+    systemctl disable %ELEMENT_SERVICE%
 fi
 
 find_installer=(/opt/1C/1CE/components/1c-enterprise-installer*)
 installer="${find_installer[0]}"
 
-"${installer}/1ce-installer-cli" uninstall ELEMENT_SERVICE
+"${installer}/1ce-installer-cli" uninstall %ELEMENT_SERVICE%
 "${installer}/1ce-installer-cli" support clean
 
 if [ ! "${systemd}" = "systemd" ]; then

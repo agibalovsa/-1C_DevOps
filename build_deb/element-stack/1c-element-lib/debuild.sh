@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # shellcheck disable=SC1091
-. ../../build_lib
+. ../build_lib
 
 start_debuild
 
-rm debian/1c-esb.* debian/1c-esb-ide.*
+rm -r debian/1c-element-ide*

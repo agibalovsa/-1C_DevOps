@@ -1,0 +1,25 @@
+Source: 1c-esb-lib
+Section: devel
+Priority: standard
+Build-Depends: debhelper-compat (= 13), libgtk-3-0, libgdk-pixbuf-2.0-0, libglib2.0-0, libcairo2, libpango-1.0-0, libatk1.0-0
+Maintainer: 1C-Soft LLC <v8@1c.ru>
+Standards-Version: 4.6.2
+Homepage: https://releases.1c.ru/project/esb/
+
+Package: 1c-esb-ide
+Architecture: amd64
+Provides: 1c-esb-ide
+Section: devel
+Depends: ${shlibs:Depends}, ${misc:Depends}, openjdk-17-jdk | java17-jdk
+Description: 1C:Enterprise.ESB Development Tools (IDE)
+ 1C:Enterprise.ESB is a service bus that provides integration between 
+ heterogeneous information systems.
+
+Package: 1c-esb
+Architecture: amd64
+Provides: 1c-esb
+Section: devel
+Depends: ${shlibs:Depends}, ${misc:Depends}, openjdk-17-jre | java17-runtime
+Description: 1C:Enterprise.ESB
+ 1C:Enterprise.ESB is a service bus that provides integration between 
+ heterogeneous information systems.
