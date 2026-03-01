@@ -2,7 +2,8 @@
 
 # explicitly set user/group IDs
 #
-set_users() {
+set_users()
+{
 
     groupadd -r grp1cv8 --gid="${OC_GID:-1000}";
     useradd -r -g grp1cv8 --uid="${OC_UID:-999}" --home-dir=/home/usr1cv8 --shell=/bin/bash usr1cv8;
@@ -11,7 +12,8 @@ set_users() {
 
 }
 
-install_packs() {
+install_packs()
+{
 
     # shellcheck source=/dev/null
     . /context_arg/.arg;
@@ -25,6 +27,7 @@ install_packs() {
 
     # install client 1c
     if [ "${OC_MODE_CLIENT}" -eq "1" ]; then
+        # cspell:ignoreRegExp /lib.*( |\n)/
         apt-get install -yq --no-install-recommends libglu1-mesa libcups2 libgtk-3-0 libxxf86vm1 libsm6 libwebkit2gtk-4.[0-9]-[0-9]* evince x11-utils xfonts-utils xvfb;
     fi;
 

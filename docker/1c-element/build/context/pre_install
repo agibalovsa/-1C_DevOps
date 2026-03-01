@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+install_packs()
+{
+ 
+    # cspell:ignoreRegExp /lib.*( |\n)/
+
+    apt-get update;
+    apt-get install -yq --no-install-recommends \
+        libc6 \
+        libc-bin \
+        libgtk-3-0 \
+        libgdk-pixbuf-2.0-0 \
+        libglib2.0-0 \
+        libcairo2 \
+        libpango-1.0-0 \
+        libatk1.0-0
+
+    if [ "${OC_ELEMENT_TYPE: -3}" = "ide" ]; then
+        apt-get install -yq --no-install-recommends libsecret-1-0 git;
+    fi;
+    apt-get clean \
+        && rm -rf /var/lib/apt/lists/*;
+}

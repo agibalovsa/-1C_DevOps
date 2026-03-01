@@ -7,7 +7,8 @@ set -Eeo pipefail
 # Installing nethasp.ini for searching net license IPs
 #  $1 - Comma-separated IPs
 #
-setup_nethasp_ini_config() {
+setup_nethasp_ini_config()
+{
 
     if [ -f "/opt/1cv8/conf/nethasp.ini" ]; then
         return
@@ -29,7 +30,8 @@ setup_nethasp_ini_config() {
 
 }
 
-setup_init() {
+setup_init()
+{
 
     if [ -f logcfg.xml ]; then
         mv logcfg.xml /opt/1cv8/conf/logcfg.xml;
@@ -54,7 +56,8 @@ setup_init() {
 
 # server
 
-setup_ragent_healthcheck() {
+setup_ragent_healthcheck()
+{
 
     if [ ! -f "/healthcheck.sh" ]; then
         echo "gosu usr1cv8 rac cluster list localhost:${RAS_PORT:-1545}" > /healthcheck.sh
@@ -63,7 +66,8 @@ setup_ragent_healthcheck() {
 
 }
 
-setup_defaults() {
+setup_defaults()
+{
 
     WWW_PATH=${WWW_PATH:-"/var/www"}
     OC_SRVINFO=${OC_SRVINFO:-"/home/usr1cv8/.1cv8/1C/1cv8"}
@@ -112,47 +116,52 @@ setup_defaults() {
 
 }
 
-setup_ragent_exec() {
+setup_ragent_exec()
+{
 
     RAGENT_EXEC=( gosu usr1cv8 ragent )
-    RAGENT_EXEC+=( /port ${OC_RAGENT_PORT} )
-    RAGENT_EXEC+=( /regport ${OC_RMNGR_PORT} )
-    RAGENT_EXEC+=( /range ${OC_RPHOST_PORT} )
-    RAGENT_EXEC+=( /seclev ${OC_SECLEVEL} )
-    RAGENT_EXEC+=( /d ${OC_SRVINFO} )
-    RAGENT_EXEC+=( /pingPeriod ${OC_PING_PERIOD} )
-    RAGENT_EXEC+=( /pingTimeout ${OC_PING_TIMEOUT} )
-    if [ -n "$DEBUG" ]; then RAGENT_EXEC+=( /debug ${OC_DEBUG_TYPE} /debugServerPort ${OC_DEBUG_PORT} ); fi
-    if [ -n "$DEBUG_SERVER_ADDR" ]; then RAGENT_EXEC+=( /debugServerAddr ${DEBUG_SERVER_ADDR} ); fi
-    if [ -n "$DEBUG_SERVER_PWD" ]; then RAGENT_EXEC+=( /debugServerPwd ${DEBUG_SERVER_PWD} ); fi
+    RAGENT_EXEC+=( /port "${OC_RAGENT_PORT}" )
+    RAGENT_EXEC+=( /regport "${OC_RMNGR_PORT}" )
+    RAGENT_EXEC+=( /range "${OC_RPHOST_PORT}" )
+    RAGENT_EXEC+=( /seclev "${OC_SECLEVEL}" )
+    RAGENT_EXEC+=( /d "${OC_SRVINFO}" )
+    RAGENT_EXEC+=( /pingPeriod "${OC_PING_PERIOD}" )
+    RAGENT_EXEC+=( /pingTimeout "${OC_PING_TIMEOUT}" )
+    if [ -n "$DEBUG" ]; then RAGENT_EXEC+=( /debug "${OC_DEBUG_TYPE}" /debugServerPort "${OC_DEBUG_PORT}" ); fi
+    if [ -n "$DEBUG_SERVER_ADDR" ]; then RAGENT_EXEC+=( /debugServerAddr "${DEBUG_SERVER_ADDR}" ); fi
+    if [ -n "$DEBUG_SERVER_PWD" ]; then RAGENT_EXEC+=( /debugServerPwd "${DEBUG_SERVER_PWD}" ); fi
 
 }
 
-run_ragent_exec() {
+run_ragent_exec()
+{
 
     echo "Beginning Ragent"
     echo "${RAGENT_EXEC[@]}"
-    exec ${RAGENT_EXEC[@]} 2>&1
+    exec "${RAGENT_EXEC[@]}" 2>&1
 
 }
 
-setup_ras_exec() {
+setup_ras_exec()
+{
 
     RAS_EXEC=( gosu usr1cv8 ras cluster --daemon )
-    RAS_EXEC+=( --port ${OC_RAS_PORT} )
-    RAS_EXEC+=( localhost:${OC_RAGENT_PORT} )
+    RAS_EXEC+=( --port "${OC_RAS_PORT}" )
+    RAS_EXEC+=( "localhost:${OC_RAGENT_PORT}" )
 
 }
 
-run_ras_exec_background() {
+run_ras_exec_background()
+{
 
     echo "Beginning Ras in background"
     echo "${RAS_EXEC[@]}"
-    ${RAS_EXEC[@]} 2>&1 &
+    "${RAS_EXEC[@]}" 2>&1 &
 
 }
 
-server() {
+server()
+{
 
     setup_ragent_healthcheck
 
@@ -168,7 +177,8 @@ server() {
 
 # ibsrv
 
-setup_ibsrv_healthcheck() {
+setup_ibsrv_healthcheck()
+{
 
     if [ ! -f "/healthcheck.sh" ]; then
         echo "curl http://localhost:${OC_IBSRV_HTTP_PORT}${OC_IBSRV_HTTP_PATH}" > /healthcheck.sh
@@ -177,49 +187,52 @@ setup_ibsrv_healthcheck() {
 
 }
 
-setup_ibsrv_exec() {
+setup_ibsrv_exec()
+{
 
     IBSRV_EXEC=( gosu usr1cv8 ibsrv )
-    IBSRV_EXEC+=( --direct-regport=${OC_IBSRV_PORT} )
-    IBSRV_EXEC+=( --direct-range=${OC_IBSRV_RANGE_PORT} )
-    IBSRV_EXEC+=( --direct-seclevel=${OC_IBSRV_SECLEVEL} )
+    IBSRV_EXEC+=( --direct-regport="${OC_IBSRV_PORT}" )
+    IBSRV_EXEC+=( --direct-range="${OC_IBSRV_RANGE_PORT}" )
+    IBSRV_EXEC+=( --direct-seclevel="${OC_IBSRV_SECLEVEL}" )
     if [ -n "${OC_IBSRV_DEBUG_TYPE}" ] && [[ "tcp|http|server" =~ .*"${OC_IBSRV_DEBUG_TYPE}".* ]]; then
-        IBSRV_EXEC+=( --debug=${OC_IBSRV_DEBUG_TYPE} )
-        IBSRV_EXEC+=( --debug-address=${OC_IBSRV_DEBUG_ADDRESS} )
-        IBSRV_EXEC+=( --debug-port=${OC_IBSRV_DEBUG_PORT} )
-        if [ -n "${OC_IBSRV_DEBUG_PASSWORD}" ]; then IBSRV_EXEC+=( --debug-password=${OC_IBSRV_DEBUG_PASSWORD} ); fi
-        if [ -n "${OC_IBSRV_DEBUG_URL}" ];      then IBSRV_EXEC+=( --debug-server-url=${OC_IBSRV_DEBUG_URL} ); fi
+        IBSRV_EXEC+=( --debug="${OC_IBSRV_DEBUG_TYPE}" )
+        IBSRV_EXEC+=( --debug-address="${OC_IBSRV_DEBUG_ADDRESS}" )
+        IBSRV_EXEC+=( --debug-port="${OC_IBSRV_DEBUG_PORT}" )
+        if [ -n "${OC_IBSRV_DEBUG_PASSWORD}" ]; then IBSRV_EXEC+=( --debug-password="${OC_IBSRV_DEBUG_PASSWORD}" ); fi
+        if [ -n "${OC_IBSRV_DEBUG_URL}" ];      then IBSRV_EXEC+=( --debug-server-url="${OC_IBSRV_DEBUG_URL}" ); fi
     else
         IBSRV_EXEC+=( --debug=none )
     fi
-    IBSRV_EXEC+=( --config=${OC_IBSRV_CONFIG_PATH} )
+    IBSRV_EXEC+=( --config="${OC_IBSRV_CONFIG_PATH}" )
 
 }
 
-setup_ibsrv_init_exec() {
+setup_ibsrv_init_exec()
+{
 
     IBSRV_INIT_EXEC=( gosu usr1cv8 ibcmd server config init )
-    IBSRV_INIT_EXEC+=( --http-address=${OC_IBSRV_HTTP_ADDRESS} )
-    IBSRV_INIT_EXEC+=( --http-port=${OC_IBSRV_HTTP_PORT} )
-    IBSRV_INIT_EXEC+=( --http-base=${OC_IBSRV_HTTP_PATH} )
-    IBSRV_INIT_EXEC+=( --name=${OC_IBSRV_BASE_NAME} )
+    IBSRV_INIT_EXEC+=( --http-address="${OC_IBSRV_HTTP_ADDRESS}" )
+    IBSRV_INIT_EXEC+=( --http-port="${OC_IBSRV_HTTP_PORT}" )
+    IBSRV_INIT_EXEC+=( --http-base="${OC_IBSRV_HTTP_PATH}" )
+    IBSRV_INIT_EXEC+=( --name="${OC_IBSRV_BASE_NAME}" )
     IBSRV_INIT_EXEC+=( --distribute-licenses=no )
     IBSRV_INIT_EXEC+=( --schedule-jobs=allow )
     IBSRV_INIT_EXEC+=( --disable-local-speech-to-text=false )
     if [ -n "${OC_IBSRV_DBMS_KIND}" ]; then
-        IBSRV_INIT_EXEC+=( --dbms=${OC_IBSRV_DBMS_KIND} )
-        IBSRV_INIT_EXEC+=( --database-server=${OC_IBSRV_DBMS_ADDRESS} )
-        IBSRV_INIT_EXEC+=( --database-name=${OC_IBSRV_DBMS_NAME} )
-        IBSRV_INIT_EXEC+=( --database-user=${OC_IBSRV_DBMS_LOGIN} )
-        IBSRV_INIT_EXEC+=( --database-password=${OC_IBSRV_DBMS_PASSWORD} )
+        IBSRV_INIT_EXEC+=( --dbms="${OC_IBSRV_DBMS_KIND}" )
+        IBSRV_INIT_EXEC+=( --database-server="${OC_IBSRV_DBMS_ADDRESS}" )
+        IBSRV_INIT_EXEC+=( --database-name="${OC_IBSRV_DBMS_NAME}" )
+        IBSRV_INIT_EXEC+=( --database-user="${OC_IBSRV_DBMS_LOGIN}" )
+        IBSRV_INIT_EXEC+=( --database-password="${OC_IBSRV_DBMS_PASSWORD}" )
     else
-        IBSRV_INIT_EXEC+=( --database-path=${OC_IBSRV_FILE_BASE_PATH} )
+        IBSRV_INIT_EXEC+=( --database-path="${OC_IBSRV_FILE_BASE_PATH}" )
     fi
-    IBSRV_INIT_EXEC+=( --out=${OC_IBSRV_CONFIG_PATH} )
+    IBSRV_INIT_EXEC+=( --out="${OC_IBSRV_CONFIG_PATH}" )
 
 }
 
-setup_ibsrv_config() {
+setup_ibsrv_config()
+{
 
     OC_IBSRV_CONFIG_DIR="$(dirname "${OC_IBSRV_CONFIG_PATH}")"
     if [ ! -d "${OC_IBSRV_CONFIG_DIR}" ]; then
@@ -230,7 +243,7 @@ setup_ibsrv_config() {
     if [ ! -f "${OC_IBSRV_CONFIG_PATH}" ]; then
         echo "Init ibsrv";
         echo "${IBSRV_INIT_EXEC[@]}";
-        ${IBSRV_INIT_EXEC[@]} 2>&1;
+        "${IBSRV_INIT_EXEC[@]}" 2>&1;
     fi;
 
     cat "${OC_IBSRV_CONFIG_PATH}"
@@ -247,16 +260,18 @@ setup_ibsrv_config() {
 
 }
 
-run_ibsrv_exec() {
+run_ibsrv_exec()
+{
 
     echo "Beginning ibsrv"
     echo "${IBSRV_EXEC[@]}"
 
-    exec ${IBSRV_EXEC[@]} 2>&1
+    exec "${IBSRV_EXEC[@]}" 2>&1
 
 }
 
-ibsrv() {
+ibsrv()
+{
 
     setup_ibsrv_healthcheck
     
@@ -272,7 +287,8 @@ ibsrv() {
 
 # crserver
 
-setup_crserver_healthcheck() {
+setup_crserver_healthcheck()
+{
 
     if [ ! -f "/healthcheck.sh" ]; then
         echo "curl http://${OC_CRSERVER_HOSTNAME}/${OC_CRSERVER_LOCATION}" > /healthcheck.sh
@@ -281,13 +297,15 @@ setup_crserver_healthcheck() {
 
 }
 
-setup_crserver_exec() {
+setup_crserver_exec()
+{
 
-    OC_CRSERVER_EXEC=( gosu usr1cv8 crserver -port ${OC_CRSERVER_PORT} -d ${OC_CRSERVER_PATH} )
+    OC_CRSERVER_EXEC=( gosu usr1cv8 crserver -port "${OC_CRSERVER_PORT}" -d "${OC_CRSERVER_PATH}" )
 
 }
 
-setup_crserver_config() {
+setup_crserver_config()
+{
 
     IFS='/' read -r -a OC_CRSERVER_PARTS <<< "${OC_CRSERVER_LOCATION}"
     OC_CRSERVER_WWW_PATH="${WWW_PATH}/${OC_CRSERVER_LOCATION}"
@@ -324,28 +342,32 @@ setup_crserver_config() {
 
 }
 
-setup_apache_exec() {
+setup_apache_exec()
+{
 
     APACHE_EXEC=( service apache2 start )
 
 }
 
-run_apache_service() {
+run_apache_service()
+{
 
     echo "Beginning Apache service"
-    ${APACHE_EXEC[@]} 2>&1
+    "${APACHE_EXEC[@]}" 2>&1
 
 }
 
-run_crserver_exec() {
+run_crserver_exec()
+{
 
     echo "Beginning CRServer"
     echo "${OC_CRSERVER_EXEC[@]}"
-    exec ${OC_CRSERVER_EXEC[@]} 2>&1
+    exec "${OC_CRSERVER_EXEC[@]}" 2>&1
 
 }
 
-crserver() {
+crserver()
+{
 
     setup_crserver_healthcheck
     
@@ -362,7 +384,8 @@ crserver() {
 
 # client
 
-setup_client_healthcheck() {
+setup_client_healthcheck()
+{
 
     if [ ! -f "/healthcheck.sh" ]; then
         echo "ps -ef | grep Xvfb | grep -v grep" > /healthcheck.sh
@@ -371,26 +394,30 @@ setup_client_healthcheck() {
 
 }
 
-setup_xvfb_exec() {
+setup_xvfb_exec()
+{
 
     XVFB_EXEC="/usr/bin/Xvfb :99 -screen 0 1024x768x24"
 
 }
 
-setup_client_exec() {
+setup_client_exec()
+{
 
     CLIENT_EXEC="DISPLAY=:99.0 ${1}"
 
 }
 
-run_xvfb_exec_background() {
+run_xvfb_exec_background()
+{
 
     echo "Beginning Xvfb in background"
     ${XVFB_EXEC} 2>&1 &
 
 }
 
-run_client_exec() {
+run_client_exec()
+{
 
     echo "Beginning client"
     echo "${CLIENT_EXEC}"
@@ -398,7 +425,8 @@ run_client_exec() {
 
 }
 
-client() {
+client()
+{
 
     setup_client_healthcheck
     

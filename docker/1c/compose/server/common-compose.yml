@@ -1,6 +1,6 @@
 services:
 
-  oc_server:
+  oc-server:
 
     image: ${OC_SERVER_TAG}
     hostname: ${OC_SERVER_HOSTNAME}

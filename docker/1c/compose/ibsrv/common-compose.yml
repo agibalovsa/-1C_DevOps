@@ -1,6 +1,6 @@
 services:
 
-  oc_ibsrv:
+  oc-ibsrv:
 
     image: ${OC_IBSRV_TAG}
     hostname: ${OC_IBSRV_HOSTNAME}

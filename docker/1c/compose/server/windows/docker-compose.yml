@@ -3,6 +3,6 @@ name: oc-server-windows
 
 services:
 
-  oc_server:
+  oc-server:
 
     cap_add: []

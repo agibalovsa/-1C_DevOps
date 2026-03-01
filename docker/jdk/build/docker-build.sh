@@ -15,4 +15,4 @@ REL_PATH="../../"
 # shellcheck disable=SC1091
 source "${REL_PATH}/common_context/build/docker"
 
-docker-build "${1}" "${2}"
+docker_build "${1}" "${2}"

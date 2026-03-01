@@ -4,6 +4,8 @@ ARG REGISTRY= \
 # hadolint ignore=DL3006
 FROM "${REGISTRY}${OS_TAG}"
 
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
 # hadolint ignore=SC1091
 RUN --mount=from=context,source=pre_install,target=/pre_install \
     set -eux; \
@@ -19,8 +21,6 @@ ARG DEBIAN_FRONTEND=noninteractive \
 LABEL maintainer="Agibalov Sergei <agibse@rarus.ru>" \
       version="${OC_MODE}:${OC_VERSION}" \
       manufacturer="1C"
-
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 # hadolint ignore=DL3044
 ENV OC_VERSION=${OC_VERSION} \
@@ -52,7 +52,7 @@ RUN --mount=from=context,source=post_install,target=/post_install \
     set_startup
 
 COPY --chown=usr1cv8:grp1cv8 --chmod=766 [ "entrypoint.sh", "/entrypoint.d/entrypoint_oc.sh" ]
-COPY --from=common_context --chown=usr1cv8:grp1cv8 --chmod=766 [ "entrypoint.sh", "/" ]
+COPY --from=entrypoint_context --chown=usr1cv8:grp1cv8 --chmod=766 [ "entrypoint.sh", "/" ]
 
 HEALTHCHECK CMD /healthcheck.sh
 

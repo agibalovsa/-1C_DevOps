@@ -37,7 +37,7 @@ init_stack () {
                 "1c/compose/ibsrv" "1C Platform (ibsrv)" off \
                 "1c/compose/server" "1C Platform (server)" off \
                 "1c-ans/compose" "1C Ans" off \
-                "1c-esb/compose" "1C ESB" off \
+                "1c-element/compose" "1C Element" off \
                 "gitlab-ce/compose" "Gitlab" off \
                 "hasp/compose" "Hasp" off \
                 "fluent-bit/compose" "Fluent Bit" off \
@@ -53,7 +53,7 @@ init_stack () {
             dialog --ascii-lines --no-shadow --no-tags ${ERASE_ON_EXIT} --output-fd 1 --radiolist "Please select applications" 0 0 0 \
                 "1c/build/linux" "1C Platform" off \
                 "1c-ans/build" "1C Ans" off \
-                "1c-esb/build" "1C ESB" off \
+                "1c-element/build" "1C Element" off \
                 "1c-element-script/build" "1C Element (Script)" off \
                 "deb-builder/build" "Deb builder" off \
                 "gitlab-ce/build/gitlab-auto-mr" "Gitlab MR" off \

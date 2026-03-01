@@ -2,7 +2,7 @@ name: oc-server-windows-mssql
 
 services:
 
-  oc_server:
+  oc-server:
 
     environment:
       - MSSQL_AGENT_ENABLED=true

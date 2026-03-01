@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-set_startup() {
+set_startup()
+{
 
     # shellcheck source=/dev/null
     . /context_arg/.arg;
@@ -32,8 +33,9 @@ set_startup() {
         ln -s "${OC_PATH}/crserver" /usr/local/bin;
     fi;
 
+    # cspell:ignoreRegExp /lib.*( |\n)/
     if [ -f "${OC_PATH}/libstdc++.so.6" ] && [ -f "/usr/lib/x86_64-linux-gnu/libstdc++.so.6" ]; then
-        mv "${OC_PATH}/libstdc++.so.6" "${OC_PATH}/libstdc++.so.6.old";
+        mv "${OC_PATH}/libstdc++.so.6" "${OC_PATH}/libstdc++.so.6.old"
     fi;
 
 }

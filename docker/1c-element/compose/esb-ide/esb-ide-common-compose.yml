@@ -1,0 +1,24 @@
+services:
+
+  oc-esb-ide:
+
+    image: "${OC_ESB_IDE_TAG}"
+    hostname: "${OC_ESB_IDE_HOSTNAME:-oc-esb-ide}"
+    command: element=esb
+    environment:
+      TZ: ${TZ}
+    ports:
+      - "${OC_ESB_IDE_SERVER_PORT:-9090}:9090"
+      - "${OC_ESB_IDE_DEBUG_PORT:-8080}:8080"
+      - "${OC_ESB_IDE_BUS_PORT:-6698}:6698"
+    volumes:
+      - oc_esb_ide_data:/var/opt/1C/1CE/instances/1c-enterprise-esb-with-ide
+      - oc_esb_ide_usr1ce:/home/usr1ce
+
+volumes:
+  oc_esb_ide_data:
+    external: true
+    name: "${OC_ESB_IDE_DATA_VOL:-oc_esb_ide_data}"
+  oc_esb_ide_usr1ce:
+    external: true
+    name: "${OC_ESB_IDE_USR_VOL:-oc_esb_ide_usr1ce}"

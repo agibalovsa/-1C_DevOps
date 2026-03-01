@@ -10,7 +10,8 @@ elif [[ "$1" == *"="* ]]; then
     for param in "$@"; do
         key="${param%%=*}"
         value="${param#*=}"
-        "entrypoint.d/entrypoint_${key}.sh" "$value"
+        SH_EXEC=( "entrypoint.d/entrypoint_${key}.sh" "$value" )
+        exec "${SH_EXEC[@]}" 
     done
 else
     echo "Wrong parameter: $1" >&2

@@ -1,0 +1,23 @@
+# ## OS options
+
+OS_TAG="${OS_TAG}"
+
+# ## 1C:Enterprise.Element options
+
+OC_ELEMENT_VERSION="${OC_ELEMENT_VERSION}"
+# > element-ide, esb, esb-ide
+OC_ELEMENT_TYPE="${OC_ELEMENT_TYPE}"
+OC_ELEMENT_TAG="1c/${{OC_ELEMENT_TYPE}}:${{OC_ELEMENT_VERSION/+/.}}"
+
+# ## Install options
+
+INSTALL_MODE="${INSTALL_MODE:-install_from_file}"
+
+# ### install_from_file
+
+INSTALL_FILES="1c-${{OC_ELEMENT_TYPE}}-${{OC_ELEMENT_VERSION}}_amd64.deb"
+
+# ### install_from_repo
+
+APTLY_REPO_COMPONENTS="1c main"
+INSTALL_PACKS="1c-${{OC_ELEMENT_TYPE}}=${{OC_ELEMENT_VERSION}}"

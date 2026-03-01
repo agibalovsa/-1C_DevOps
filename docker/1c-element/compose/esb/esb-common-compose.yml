@@ -4,7 +4,7 @@ services:
 
     image: "${OC_ESB_TAG}"
     hostname: "${OC_ESB_HOSTNAME:-oc-esb}"
-    command: esb
+    command: element=esb
     environment:
       TZ: ${TZ}
     ports:

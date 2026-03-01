@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 
-install_packs() {
+install_packs()
+{
 
     apt-get update;
+    # cspell:disable-next-line
     apt-get install -yq --no-install-recommends ttf-mscorefonts-installer fontconfig iproute2 libkrb5-dev libgsf-1-114;
     fc-cache –fv;
     apt-get clean \

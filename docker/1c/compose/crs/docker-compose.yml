@@ -1,6 +1,6 @@
 services:
 
-  oc_crserver:
+  oc-crserver:
 
-    container_name: ${OC_CRSERVER_NAME:-oc_crserver}
+    container_name: ${OC_CRSERVER_NAME:-oc-crserver}
     restart: always

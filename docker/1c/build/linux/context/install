@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-install_from_url () {
+install_from_url ()
+{
 
     savePath="/tmp/install_deb"
     getClient="0"
@@ -21,7 +22,8 @@ install_from_url () {
 
 }
 
-get_deb_from_url () {
+get_deb_from_url ()
+{
 
     local savePath="${1:-/tmp/install_deb}"
     local Version="$2"

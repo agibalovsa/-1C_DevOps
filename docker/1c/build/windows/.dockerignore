@@ -1,0 +1,5 @@
+.arg.tmpl
+.secret.tmpl
+docker-build.ps1
+.arg
+.secret

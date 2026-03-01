@@ -1,0 +1,24 @@
+services:
+
+  oc-element-ide:
+
+    image: "${OC_ELEMENT_IDE_TAG}"
+    hostname: "${OC_ELEMENT_IDE_HOSTNAME:-oc-element-ide}"
+    command: element=element
+    environment:
+      TZ: ${TZ}
+    ports:
+      - "${OC_ELEMENT_IDE_SERVER_PORT:-9090}:9090"
+      - "${OC_ELEMENT_IDE_DEBUG_PORT:-8080}:8080"
+      - "${OC_ELEMENT_IDE_BUS_PORT:-6698}:6698"
+    volumes:
+      - oc_esb_element_data:/var/opt/1C/1CE/instances/1c-enterprise-element-server-with-ide
+      - oc_esb_element_usr1ce:/home/usr1ce
+
+volumes:
+  oc_esb_element_data:
+    external: true
+    name: "${OC_ELEMENT_IDE_DATA_VOL:-oc_esb_element_data}"
+  oc_esb_element_usr1ce:
+    external: true
+    name: "${OC_ELEMENT_IDE_USR_VOL:-oc_esb_element_usr1ce}"
