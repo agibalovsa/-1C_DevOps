@@ -4,6 +4,24 @@ ARG REGISTRY= \
 # hadolint ignore=DL3006
 FROM "${REGISTRY}${OS_TAG}"
 
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+# hadolint ignore=SC1091
+RUN --mount=from=context,source=pre_install,target=/pre_install \
+    set -eux; \
+    . /pre_install; \
+    install_packs
+
+ARG OC_ELEMENT_IDE="false"
+
+# hadolint ignore=SC1091
+RUN --mount=from=context,source=pre_install,target=/pre_install \
+    set -eux; \
+    . /pre_install; \
+    install_packs_ide
+
 ARG OC_ELEMENT_VERSION \
     OC_ELEMENT_TYPE
 
@@ -11,17 +29,8 @@ LABEL maintainer="Agibalov Sergei <agibse@rarus.ru>" \
     version="${OC_ELEMENT_TYPE}:${OC_ELEMENT_VERSION}" \
     manufacturer="1C"
 
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
-
 ENV OC_ELEMENT_TYPE=${OC_ELEMENT_TYPE} \
     OC_ELEMENT_VERSION=${OC_ELEMENT_VERSION}
-
-# hadolint ignore=SC1091
-RUN --mount=from=context,source=pre_install,target=/pre_install \
-    --mount=from=context_arg,target=/context_arg \
-    set -eux; \
-    . /pre_install; \
-    install_packs
 
 # hadolint ignore=SC1091
 RUN --mount=from=common_context,target=/common_context \

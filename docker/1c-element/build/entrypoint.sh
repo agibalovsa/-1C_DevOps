@@ -17,10 +17,10 @@ setup_element_healthcheck()
 setup_element_config()
 {
 
-    if [ "$OC_ELEMENT_TYPE" == "element-ide" ]; then
+    if [ "${OC_ELEMENT_TYPE}" == "element-ide" ]; then
         export OC_ELEMENT_SERVICE=1c-enterprise-element-server-with-ide
         export OC_ELEMENT_SERVICE_BIN=element-server
-    elif [ "$OC_ELEMENT_TYPE" == "esb-ide" ]; then
+    elif [ "${OC_ELEMENT_TYPE}" == "esb-ide" ]; then
         export OC_ELEMENT_SERVICE=1c-enterprise-esb-with-ide
         export OC_ELEMENT_SERVICE_BIN=esb
     else
@@ -28,15 +28,18 @@ setup_element_config()
         export OC_ELEMENT_SERVICE_BIN=esb
     fi
 
+    # Для подключения к 1С:Элементу с IDE как к внешнему сервису подходит такая комбинация настроек
     ideManagerPath="/var/opt/1C/1CE/instances/${OC_ELEMENT_SERVICE}/config/ide-manager.yml"
-    if grep -q "0.0.0.0" "${ideManagerPath}" 2>/dev/null; then
-        sed -i -e "s/0.0.0.0/127.0.0.1/g" "${ideManagerPath}"
-        echo "Set ide-manager.yml to 127.0.0.1"
-    fi
     serverPath="/var/opt/1C/1CE/instances/${OC_ELEMENT_SERVICE}/config/server.yml"
-    if grep -q "127.0.0.1" "${serverPath}" 2>/dev/null; then
-        sed -i -e "s/127.0.0.1/0.0.0.0/g" "${serverPath}"
-        echo "Set server.yml to 0.0.0.0"
+    address0="address: 0.0.0.0"
+    address127="address: 127.0.0.1"
+    if grep -q "${address0}" "${ideManagerPath}" 2>/dev/null; then
+        sed -i -e "s/${address0}/${address127}/g" "${ideManagerPath}"
+        echo "Set ide-manager.yml to ${address127}"
+    fi
+    if grep -q "${address127}" "${serverPath}" 2>/dev/null; then
+        sed -i -e "s/${address127}/${address0}/g" "${serverPath}"
+        echo "Set server.yml to ${address0}"
     fi
 
 }
@@ -56,7 +59,7 @@ run_element_exec()
         rm /var/opt/1C/1CE/instances/${OC_ELEMENT_SERVICE}/daemon.pid
     fi
 
-    echo "Beginning 1c-element";
+    echo "Beginning ${OC_ELEMENT_TYPE} service";
     exec "${OC_ELEMENT_EXEC[@]}" 2>&1;
 
 }

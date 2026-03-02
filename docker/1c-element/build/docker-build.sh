@@ -5,6 +5,7 @@ BUILD_ARGS=(
 "--build-arg" "OS_TAG=${OS_TAG}"
 "--build-arg" "OC_ELEMENT_VERSION=${OC_ELEMENT_VERSION}" \
 "--build-arg" "OC_ELEMENT_TYPE=${OC_ELEMENT_TYPE}" \
+"--build-arg" "OC_ELEMENT_IDE=$([[ "${OC_ELEMENT_TYPE: -3}" = "ide" ]] && echo "true" || echo "false")" \
 )
 
 TAG="${OC_ELEMENT_TAG}"
