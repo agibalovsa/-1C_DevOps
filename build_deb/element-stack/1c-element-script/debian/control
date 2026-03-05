@@ -1,0 +1,15 @@
+Source: 1c-element-script-lib
+Section: devel
+Priority: optional
+Build-Depends: debhelper-compat (= 13)
+Maintainer: 1C-Soft LLC <v8@1c.ru>
+Standards-Version: 4.6.2
+Homepage: https://lang.1c.ru/
+
+Package: 1c-element-script
+Architecture: amd64
+Section: devel
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: 1C:Enterprise Script language runtime
+ This package provides the runtime environment for executing 
+ scripts written in the 1C:Element language.

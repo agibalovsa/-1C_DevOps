@@ -1,0 +1,34 @@
+#!/usr/bin/make -f
+include /usr/share/dpkg/*.mk
+export DH_VERBOSE = 1
+
+SHELL := /bin/bash
+
+archivePath=script_x_linux_${DEB_VERSION}.zip
+pathPack=debian/1c-element-script
+pathTmp=/tmp/
+pathOpt=/var/opt/script/
+
+override_dh_install:
+	mkdir -p ${pathPack}${pathTmp}
+	unzip -o ../distr/${archivePath} -d ${pathPack}${pathTmp}
+	mkdir -p ${pathPack}${pathOpt}
+	mv ${pathPack}${pathTmp}* ${pathPack}${pathOpt}
+	rm -r ${pathPack}${pathTmp}
+	chmod 755 ${pathPack}${pathOpt}executor
+	chmod 755 ${pathPack}${pathOpt}/bin/executor-x
+
+override_dh_strip_nondeterminism:
+	true
+
+override_dh_dwz:
+	true
+
+override_dh_strip:
+	true
+
+override_dh_shlibdeps:
+	dh_shlibdeps -- --ignore-missing-info
+
+%:
+	dh $@

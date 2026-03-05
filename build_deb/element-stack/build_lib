@@ -38,7 +38,7 @@ start_debuild() {
 
     apt-get update
     apt-get build-dep . -y
-    debuild -us -uc -ui
+    debuild -us -uc -ui --build=binary
 
     for file in ../*.deb; do
         dpkg -I "${file}" | grep Depends
@@ -47,7 +47,7 @@ start_debuild() {
         dpkg -P "${packageName}"
     done
 
-    debuild -- clean
+    debuild -b -- clean
 
     rm -f ../*.build ../*.buildinfo ../*.changes ../*.dsc ../*.tar.gz ../*.tar.bz2 ../*.tar.xz
 

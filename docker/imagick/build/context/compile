@@ -6,7 +6,8 @@
 compile_deb() {
 
     apt-get update \
-        && apt-get install -y --no-install-recommends git make cmake checkinstall build-essential yasm nasm \
+        && apt-get install -y --no-install-recommends git make cmake checkinstall build-essential yasm nasm;
+    apt-get clean \
         && rm -rf /var/lib/apt/lists/*;
 
     # shellcheck disable=SC2153
