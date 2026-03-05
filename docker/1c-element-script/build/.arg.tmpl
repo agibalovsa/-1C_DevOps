@@ -4,8 +4,8 @@ OS_TAG="${OS_TAG}"
 
 # ## 1C:Enterprise.Element Script options
 
-OC_EXECUTOR_VERSION="${OC_EXECUTOR_VERSION}"
-OC_EXECUTOR_TAG="1c/executor:${{OC_EXECUTOR_VERSION}}"
+OC_SCRIPT_VERSION="${OC_SCRIPT_VERSION}"
+OC_SCRIPT_TAG="1c/script:${{OC_SCRIPT_VERSION}}"
 
 # ## Install options
 
@@ -13,9 +13,9 @@ INSTALL_MODE="${INSTALL_MODE:-install_from_file}"
 
 # ### install_from_file
 
-INSTALL_FILES="1cext-${{OC_EXECUTOR_VERSION}}_all.deb"
+INSTALL_FILES="1c-element-script_${{OC_SCRIPT_VERSION}}_amd64.deb"
 
 # ### install_from_repo
 
 APTLY_REPO_COMPONENTS="1c main"
-INSTALL_PACKS="1cext=${{OC_EXECUTOR_VERSION}}"
+INSTALL_PACKS="1c-element-script=${{OC_SCRIPT_VERSION}}"

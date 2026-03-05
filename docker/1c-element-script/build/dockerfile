@@ -5,15 +5,15 @@ ARG REGISTRY= \
 FROM "${REGISTRY}${OS_TAG}"
 
 ARG DEBIAN_FRONTEND=noninteractive \
-    OC_EXECUTOR_VERSION
+    OC_SCRIPT_VERSION
 
 LABEL maintainer="Agibalov Sergei <agibse@rarus.ru>" \
-    version="${OC_EXECUTOR_VERSION}" \
+    version="${OC_SCRIPT_VERSION}" \
     manufacturer="1C"
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
-ENV OC_EXECUTOR_VERSION=${OC_EXECUTOR_VERSION}
+ENV OC_SCRIPT_VERSION=${OC_SCRIPT_VERSION}
 
 # hadolint ignore=SC1091
 RUN --mount=from=common_context,target=/common_context \

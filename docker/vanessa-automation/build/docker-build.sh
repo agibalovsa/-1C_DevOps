@@ -2,10 +2,9 @@
 
 # shellcheck disable=SC2034
 BUILD_ARGS=(
+"--build-arg" "OS_BUILD_TAG=${OS_BUILD_TAG}"
 "--build-arg" "OS_TAG=${OS_TAG}"
 "--build-arg" "VANESSA_VERSION=${VANESSA_VERSION}"
-"--target" "project"
-"--output" "project"
 )
 
 TAG="${VANESSA_TAG}"
