@@ -141,7 +141,7 @@ function Start-OC-Server
             "${OC_VERSION}" `
             "${OC_RAGENT_PORT}" `
             "${OC_RMNGR_PORT}" `
-            "${OC_RPHOST_PORTS}" `
+            "$([string]$OC_RPHOST_PORTS.Replace("-", ":"))" `
             "${OC_SRVINFO}" `
             "${OC_SECLEVEL}" `
             "${OC_PING_PERIOD}" `
@@ -204,9 +204,9 @@ function Start-CRS-Server
 }
 
 . "/tools/oc_lib.ps1"
+. "/tools/tools.ps1"
 Set-Envs
-$PasswordSec = ConvertTo-SecureString ${OC_PASSWORD} -AsPlainText -Force
-$script:Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList ".\${OC_USER}", ${PasswordSec}
+$script:Credential = Get-Credential "${OC_USER}" "${OC_PASSWORD}"
 Set-Init
 Set-IIS-Catalog
 Set-OC-Catalog

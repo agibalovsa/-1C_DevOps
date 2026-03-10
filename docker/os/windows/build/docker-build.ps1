@@ -1,6 +1,6 @@
 mkdir "build_context" -Force
 
-Copy-Item "../../common_context/build/tools.ps1" "build_context/tools.ps1" -Force
+Copy-Item "../../../common_context/build/tools.ps1" "build_context/tools.ps1" -Force
 Copy-Item context/* "build_context/"
 Copy-Item ".arg" "build_context/.arg"
 

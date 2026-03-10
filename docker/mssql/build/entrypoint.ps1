@@ -86,6 +86,7 @@ function Set-MSSQL
         Set-First-Start-MSSQL
         Start-MSSQL
         Set-Passwd-MSSQL
+        exit 2
     }
 }
 

@@ -11,6 +11,7 @@ services:
     volumes:
       - mssql_data:C:\Program Files\Microsoft SQL Server\MSSQL16.MSSQLSERVER\MSSQL
       - mssql_temp:C:\TempDB
+    cap_add: !override []
 
 volumes:
   mssql_data:

@@ -1,8 +1,7 @@
-
 name: oc-server-windows
 
 services:
 
   oc-server:
 
-    cap_add: []
+    cap_add: !override []

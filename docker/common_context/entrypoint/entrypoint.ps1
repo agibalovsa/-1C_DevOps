@@ -17,7 +17,7 @@ if ( $args[0] -eq "cmd" )
 {
     cmd
 }
-elseif ( ( $args[0] -eq "pwsh" ) -or ( $args[0] -eq "") )
+elseif ( ($args.Count -eq 0) -or ( $args[0] -eq "pwsh" ) -or ( $args[0] -eq "") )
 {
     pwsh
 }
@@ -29,6 +29,11 @@ elseif ( ( $args[0] -match ".*=.*" ))
         foreach ($Command in $Commands.GetEnumerator()) {
             & "entrypoint.d/entrypoint_$($Command.Key).ps1" $Command.Value
         }
+    }
+
+    if ( $LASTEXITCODE -eq 2)
+    {
+        exit 0
     }
 
     Get-Log

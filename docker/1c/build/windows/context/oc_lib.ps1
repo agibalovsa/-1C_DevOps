@@ -10,8 +10,8 @@ function Set-Envs
         New-Variable-With-Test -Name "OC_DEF_SRVINFO"  -Value "C:\Program Files\1cv8\srvinfo"   -Scope "Script"
 
         New-Variable-With-Test -Name "OC_VERSION"      -Value ""                                -Scope "Script"
-        New-Variable-With-Test -Name "OC_USER"         -Value "${OC_DEF_USER}"                  -Scope "Script"
-        New-Variable-With-Test -Name "OC_PASSWORD"     -Value "${OC_DEF_PASSWORD}"              -Scope "Script"
+        New-Variable-With-Test -Name "OC_USER"         -Value ""                                -Scope "Script"
+        New-Variable-With-Test -Name "OC_PASSWORD"     -Value ""                                -Scope "Script"
         New-Variable-With-Test -Name "OC_RAGENT_PORT"  -Value "1540"                            -Scope "Script"
         New-Variable-With-Test -Name "OC_RMNGR_PORT"   -Value "1541"                            -Scope "Script"
         New-Variable-With-Test -Name "OC_RPHOST_PORTS" -Value "1560:1591"                       -Scope "Script"
@@ -109,7 +109,10 @@ function New-Catalog-With-Rules
             New-Item -ItemType "Directory" -Path "${CatalogPath}" -Force
         }
 
-        Set-Icacls-Rules "${CatalogPath}" "${User}"
+        if ( ${User} )
+        {
+            Set-Icacls-Rules "${CatalogPath}" "${User}"
+        }
     }
 }
 
@@ -147,7 +150,8 @@ function Set-OC-Service
             New-Service -Name "${ServiceName}" `
                 -BinaryPathName "${OCExec}" `
                 -DisplayName "${ServiceName}" `
-                -Description "${ServiceName}"
+                -Description "${ServiceName}" `
+                | Format-List
         }
         else
         {
@@ -155,8 +159,8 @@ function Set-OC-Service
         }
 
         Set-Service   -Name "${ServiceName}" -Credential $Credential -StartupType "Manual"
-        Start-Service -Name "${ServiceName}"
-        Stop-Service  -Name "${ServiceName}"
+        Start-Service -Name "${ServiceName}" -ErrorAction Stop
+        Stop-Service  -Name "${ServiceName}" -ErrorAction Stop
     }
 }
 
@@ -180,7 +184,7 @@ function New-OCUsers
     param
     (
         [string]$User,
-        [System.Security.SecureString]$PasswordSec
+        [string]$Password
     )
 
     process
@@ -189,6 +193,7 @@ function New-OCUsers
         if ( ${UserStatus}.count -eq 0 )
         {
             # Создание локального пользователя 1С
+            $PasswordSec = ConvertTo-SecureString "${Password}" -AsPlainText -Force
             New-LocalUser -Name "${User}" -Password $PasswordSec -Description "Account for 1C:Enterprise 8 Server" -AccountNeverExpires -PasswordNeverExpires -UserMayNotChangePassword
 
             # Добавление пользователя в локальную политику безопасности "Вход в качестве службы" и выдача прав на доступ к папкам
@@ -317,7 +322,7 @@ function Get-Install-Arg-OC-Msi
 
     process
     {
-            $ArgumentList = @(
+        $ArgumentList = @(
             'TRANSFORMS="adminstallrelogon.mst;1049.mst"'
             "DESIGNERALLCLIENTS=1"                                           # Конфигуратор и все виды клиентов
             "THICKCLIENT=$( ${Client} -gt 0 ? 1 : 0 )"                       # Толстый клиент
@@ -336,9 +341,7 @@ function Get-Install-Arg-OC-Msi
             "PASSWORD1CV82SERVER=$( ${Server} -gt 1 ? "${Password}" : '`"`"' )"  # Пароль пользователя
             "INSTALLDIR=`"${OCPath}`""                                       # Папка
         )
-
         return $ArgumentList
-
     }
 
 }
@@ -358,11 +361,9 @@ function Install-OC-Msi
 
     process
     {
-        $PasswordSec = ConvertTo-SecureString "${Password}" -AsPlainText -Force
-        
-        if ( ! ( "${User}" -eq "${OC_DEF_USER}") -or ! ( $Server -gt 1 ) )
+        if ( ( ${User} ) -and ( ! ( "${User}" -eq "${OC_DEF_USER}") -or ! ( $Server -gt 1 ) ) )
         {
-            New-OCUsers "${User}" ${PasswordSec}
+            New-OCUsers "${User}" "${Password}"
         }
 
         Write-Host "Install 1C beginning"
@@ -393,7 +394,7 @@ function Install-OC-Msi
 
         Start-Process -FilePath "msiexec.exe" -ArgumentList ${ArgumentList} -Wait -NoNewWindow
 
-        if ( ! ( "${User}" -eq "${OC_DEF_USER}" ) )
+        if ( ( ${User} ) -and ! ( "${User}" -eq "${OC_DEF_USER}" ) )
         {
             Set-Icacls-Rules "${OC_LICENSE_PATH}" "${User}"
         }
@@ -579,10 +580,21 @@ function Set-Ragent-Service
             "${DebugServerAddress}" `
             "${DebugServerPwd}"
 
-        Set-OC-Service "${ServiceName}" "${RagentExec}" $Credential
-
+        $StartError=$false
+        try {
+            Set-OC-Service "${ServiceName}" "${RagentExec}" $Credential
+        }
+        catch {
+            Write-Host "$_" -ForegroundColor Red
+            $StartError=$true
+        }
         # Установка параметров службы "Действие при первом сбое"(перезапуск службы через 3 мин.)
         sc failure "${ServiceName}" reset= 0 actions= restart/180000/noaction/noaction
+        if ( $StartError -eq $true )
+        {
+            Start-Service $ServiceName -ErrorAction Stop
+            Stop-Service $ServiceName -ErrorAction Stop
+        }
     }
 }
 
