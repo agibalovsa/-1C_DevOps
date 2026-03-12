@@ -88,8 +88,7 @@ function  New-Variable-With-Test
     {
         if ( ( ! (Test-Path Variable:$Name) ) -or  ( ! ( Get-Variable -Name $Name -ValueOnly ) ) )
         {
-            
-            New-Variable -Name "${Name}" -Value ( ((${Name}) -and (Test-Path Env:${Name})) ? (Get-Item -Path env:\${Name}).Value : "${Value}" ) -Scope "${Scope}"
+            New-Variable -Name "${Name}" -Value $( if ( ( ${Name} ) -and ( Test-Path Env:${Name} ) ) { (Get-Item -Path env:\${Name}).Value } else { "${Value}" } ) -Scope "${Scope}"
         }
     }
 
@@ -225,10 +224,9 @@ function Get-OC-MSI-RAR
         $Disk = Get-PSDrive $((Split-Path -Path "${SavePath}" -Qualifier).Substring(0, 1))
         if ( $Disk.Free -lt 3GB )
         {
-            Write-Error "Not enough space on the C drive:"
+            Write-Error "Not enough space on the ${Disk} drive"
             return
         }
-        echo $Disk
         if ( ! ( Test-Path "${SavePath}" ) )
         {
             New-Item -ItemType Directory -Path "${SavePath}"
@@ -240,9 +238,22 @@ function Get-OC-MSI-RAR
 
         $Headers = @{ "User-Agent" = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" }
         $LoginUrl = "https://login.1c.ru/login"
-        $LoginPage = Invoke-WebRequest -Uri ${LoginUrl} -SessionVariable Session1C -Headers ${Headers} -TimeoutSec 30
+        $LoginPage = Invoke-WebRequest -Uri ${LoginUrl} -SessionVariable "Session1C" -Headers ${Headers} -TimeoutSec 30 -UseBasicParsing
 
         # Logging on login.1c.ru
+        if ( ( ! $PW7 ) -and ($LoginPage.Content -match 'name="execution" value="([^"]+)"') )
+        {
+            $ExecutionId = $Matches[1]
+        }
+        elseif ( $PW7 )
+        {
+            $ExecutionId = $LoginPage.InputFields[6].value
+        }
+        else
+        {
+            Write-Error "Could not find execution token"
+            return
+        }
 
         $Body = @{
             "inviteCode"      = ""
@@ -251,12 +262,12 @@ function Get-OC-MSI-RAR
             "password"        = ${Password}
             "anotherComputer" = $false
             "rememberMe"      = $false
-            "execution"       = $LoginPage.InputFields[6].value
+            "execution"       = $ExecutionId
             "_eventId"        = "submit"
         }
-        $AuthResponse = Invoke-WebRequest -Uri ${LoginUrl} -Method Post -Body ${Body} -WebSession $Session1C -Headers ${Headers} -TimeoutSec 30
+        $AuthResponse = Invoke-WebRequest -Uri ${LoginUrl} -Method Post -Body ${Body} -WebSession $Session1C -Headers ${Headers} -TimeoutSec 30 -UseBasicParsing -ContentType "application/x-www-form-urlencoded"
 
-        if ( $AuthResponse.BaseResponse.RequestMessage.RequestUri -notmatch "https://login.1c.ru/user/profile" )
+        if ( ( ( $PW7 ) -and ( $AuthResponse.BaseResponse.RequestMessage.RequestUri -notmatch "https://login.1c.ru/user/profile" ) ) -or ( ( ! $PW7 ) -and ( $AuthResponse.BaseResponse.ResponseUri -notmatch "https://login.1c.ru/user/profile" ) ) )
         {
             Write-Error "Failed to log in. Check your username and password"
             return
@@ -267,7 +278,7 @@ function Get-OC-MSI-RAR
         # Searching links
 
         $VersionsUrl = "https://releases.1c.ru/project/Platform83?allUpdates=true#updates"
-        $VersionsPage = Invoke-WebRequest -Uri ${VersionsUrl} -WebSession ${Session1C} -Headers ${Headers} -TimeoutSec 30
+        $VersionsPage = Invoke-WebRequest -Uri ${VersionsUrl} -WebSession ${Session1C} -Headers ${Headers} -TimeoutSec 30 -UseBasicParsing
         $VersionUrl = $VersionsPage.Links | Where-Object { $_.href -match "/version_files\?nick=Platform83&ver=${Version}" } | Select-Object -First 1 -ExpandProperty href
 
         if ( $VersionUrl -match '[?&]ver=(?<version>[^&]+)' )
@@ -283,21 +294,21 @@ function Get-OC-MSI-RAR
 
         $FileName = "windows64full_$($Version.Replace(".","_")).rar"
         $FileUrl  = "https://releases.1c.ru/version_file?nick=Platform83&ver=${Version}&path=Platform%5c$($Version.Replace(".","_"))%5c${FileName}"
-        $FilePage = Invoke-WebRequest -Uri ${FileUrl} -WebSession ${Session1C} -Headers ${Headers} -TimeoutSec 30
-        $DownloadUrl = $FilePage.Links | Where-Object { $_.href -match "https://dl0..1c.ru/public/file/get/" } | Select-Object -First 1 -ExpandProperty href
+        $FilePage = Invoke-WebRequest -Uri ${FileUrl} -WebSession ${Session1C} -Headers ${Headers} -TimeoutSec 30 -UseBasicParsing
+        $DownloadUrl = $FilePage.Links | Where-Object { $_.href -match "https://dl0.\.1c\.ru/public/file/get/" } | Select-Object -First 1 -ExpandProperty href
         if ( ! $DownloadUrl )
         {
             Write-Error "Windows 64-bit link not found"
             return
         }
 
-        Write-Host "3. Downloading a file..." -ForegroundColor Yellow
+        Write-Host "3. Downloading a file ${FileName}..." -ForegroundColor Yellow
 
         # Downloading
 
         try
         {
-            Invoke-WebRequest -Uri ${DownloadUrl} -OutFile "${SavePath}\${FileName}" -WebSession ${Session1C} -Headers ${Headers}
+            Invoke-WebRequest -Uri ${DownloadUrl} -OutFile "${SavePath}\${FileName}" -WebSession ${Session1C} -Headers ${Headers} -UseBasicParsing
             Write-Host "The file ${SavePath}\${FileName} is saved" -ForegroundColor Green
         } 
         catch
@@ -311,7 +322,7 @@ function Get-OC-MSI-RAR
 function Get-Install-Arg-OC-Msi
 {
     param(
-        [string]$OCPath="${OC_PATH}\${OC_VERSION}",
+        [string]$InstallPath="${OC_PATH}\${OC_VERSION}",
         [int]$Server=0,
         [int]$WS=0,
         [int]$CRS=0,
@@ -322,26 +333,61 @@ function Get-Install-Arg-OC-Msi
 
     process
     {
+        if ( $(Get-UICulture).TwoLetterISOLanguageName.ToUpper() -eq "RU" )
+        {
+            $LANGUAGES = "RU,EN"
+        }
+        else
+        {
+            $LANGUAGES = "EN,RU"
+        }
         $ArgumentList = @(
             'TRANSFORMS="adminstallrelogon.mst;1049.mst"'
-            "DESIGNERALLCLIENTS=1"                                           # Конфигуратор и все виды клиентов
-            "THICKCLIENT=$( ${Client} -gt 0 ? 1 : 0 )"                       # Толстый клиент
-            "THINCLIENTFILE=$( ${Client} -gt 0 ? 1 : 0 )"                    # Тонкий клиент, файловый вариант
-            "THINCLIENT=$( ${Client} -gt 0 ? 1 : 0 )"                        # Тонкий клиент
-            "SERVER=$( ${Server} -gt 0 ? 1 : 0 )"                            # Сервер 1С:Предприятие
-            "WEBSERVEREXT=$( ${WS} -gt 0 ? 1 : 0 )"                          # Модули расширения веб-сервера
-            "SERVERCLIENT=$( ${Server} -gt 0 ? 1 : 0 )"                      # Администрирование сервера 1С:Предприятие
-            "LANGUAGES=RU"                                                   # Интерфейсы на различных языках
-            "CONFREPOSSERVER=$( ${CRS} -gt 0 ? 1 : 0 )"                      # Сервер хранилища конфигураций 1С:Предприятие
-            "ADMINISTRATIONFUNC=$( ${Server} -gt 0 ? 1 : 0 )"                # Дополнительные функции администрирования
-            "CONVERTER77=0"                                                  # Конвертор ИБ 1С:Предприятия 7.7
-            "INSTALLSRVRASSRVC=$( ${Server} -gt 1 ? 1 : 0 )"                 # Установить сервер 1С:Предприятие как службу Windows
-            "SRVCUSERSELECTMODE=$( ${Server} -gt 1 ? ( "${User}" -eq "${OC_DEF_USER}" ? "new" : "existing") : '`"`"' )" # new(Создать пользователя USER1CV8)|existing(Существующий пользователь)
-            "USER1CV82SERVER=$( ${Server} -gt 1 ? "${User}" : '`"`"' )"          # Имя пользователя
-            "PASSWORD1CV82SERVER=$( ${Server} -gt 1 ? "${Password}" : '`"`"' )"  # Пароль пользователя
-            "INSTALLDIR=`"${OCPath}`""                                       # Папка
+            "DESIGNERALLCLIENTS=1"                                                           # Конфигуратор и все виды клиентов
+            "THICKCLIENT=$( if ( ${Client} -gt 0 ) { 1 } else { 0 } )"                       # Толстый клиент
+            "THINCLIENTFILE=$( if ( ${Client} -gt 0 ) { 1 } else { 0 } )"                    # Тонкий клиент, файловый вариант
+            "THINCLIENT=$( if ( ${Client} -gt 0 ) { 1 } else { 0 } )"                        # Тонкий клиент
+            "SERVER=$( if ( ${Server} -gt 0 ) { 1 } else { 0 } )"                            # Сервер 1С:Предприятие
+            "WEBSERVEREXT=$( if ( ${WS} -gt 0 ) { 1 } else { 0 } )"                          # Модули расширения веб-сервера
+            "SERVERCLIENT=$( if ( ${Server} -gt 0 ) { 1 } else { 0 } )"                      # Администрирование сервера 1С:Предприятие
+            "LANGUAGES=${LANGUAGES}"                                                                   # Интерфейсы на различных языках
+            "CONFREPOSSERVER=$( if ( ${CRS} -gt 0 ) { 1 } else { 0 } )"                      # Сервер хранилища конфигураций 1С:Предприятие
+            "ADMINISTRATIONFUNC=$( if ( ${Server} -gt 0 ) { 1 } else { 0 } )"                # Дополнительные функции администрирования
+            "CONVERTER77=0"                                                                  # Конвертор ИБ 1С:Предприятия 7.7
+            "INSTALLSRVRASSRVC=$( if ( ${Server} -gt 1 ) { 1 } else { 0 } )"                 # Установить сервер 1С:Предприятие как службу Windows
+            "SRVCUSERSELECTMODE=$( if ( ${Server} -gt 1 ) { if ( "${User}" -eq "${OC_DEF_USER}" ) { "new" } else { "existing" } } else { '`"`"'  } )" # new(Создать пользователя USER1CV8)|existing(Существующий пользователь)
+            "USER1CV82SERVER=$( if ( ${Server} -gt 1 ) { "${User}" } else { '`"`"' } )"          # Имя пользователя
+            "PASSWORD1CV82SERVER=$( if ( ${Server} -gt 1 ) { "${Password}" } else { '`"`"' } )"  # Пароль пользователя
+            "INSTALLDIR=`"${InstallPath}`""                                                  # Папка
         )
         return $ArgumentList
+    }
+
+}
+
+function Unpack-OC-Msi-Rar
+{
+    param(
+        [Parameter(Mandatory)][string]$ArchivePath,
+        [Parameter(Mandatory)][string]$DistrPath
+    )
+    process
+    {
+        New-Catalog-With-Rules "${DistrPath}" | Out-Null
+        7z x "${ArchivePath}" -o"${DistrPath}" -y | Out-Null
+        $SetupContent    = Get-Ini-Content "${DistrPath}\Setup.ini"
+        $PackageName     = $SetupContent["Startup"]["PackageName"]
+        $ProductVersion  = $SetupContent["Startup"]["ProductVersion"]
+
+        $DistrMsiPath  = Join-Path "${DistrPath}" "${PackageName}"
+        if ( !(Test-Path "${DistrMsiPath}") )
+        {
+            Write-Error -Message "File not found: ${DistrMsiPath}" -ErrorAction 'Stop'
+        }
+        return @{
+            ProductVersion = "${ProductVersion}"
+            PackageName    = "${PackageName}"
+        }
     }
 
 }
@@ -368,20 +414,9 @@ function Install-OC-Msi
 
         Write-Host "Install 1C beginning"
 
-        $DistrPath="C:\temp\install"
-        New-Catalog-With-Rules "${DistrPath}"
-
-        7z x "${ArchivePath}" -o"${DistrPath}"
- 
-        $SetupContent    = Get-Ini-Content "${DistrPath}\Setup.ini"
-        $PackageName     = $SetupContent["Startup"]["PackageName"]
-        $ProductVersion  = $SetupContent["Startup"]["ProductVersion"]
-
-        $DistrMsiPath  = "${DistrPath}\${PackageName}"
-        if ( !(Test-Path "${DistrMsiPath}") )
-        {
-            Write-Error -Message "File not found: ${DistrMsiPath}" -ErrorAction 'Stop'
-        }
+        $DistrPath = "C:\temp\install"
+        $DistrParam = Unpack-OC-Msi-Rar "${ArchivePath}" "${DistrPath}"
+        $DistrMsiPath = ( Join-Path "${DistrPath}" $DistrParam["PackageName"] )
 
         $ArgumentList = @(
             "/l*"
@@ -390,7 +425,7 @@ function Install-OC-Msi
             '"' + "${DistrMsiPath}" + '"'
             "/qn"
         )
-        $ArgumentList += Get-Install-Arg-OC-Msi "${OCPath}\${ProductVersion}" ${Server} ${WS} ${CRS} ${Client} ${User} ${Password}
+        $ArgumentList += Get-Install-Arg-OC-Msi ( Join-Path "${OCPath}" $DistrParam["ProductVersion"] ) ${Server} ${WS} ${CRS} ${Client} ${User} ${Password}
 
         Start-Process -FilePath "msiexec.exe" -ArgumentList ${ArgumentList} -Wait -NoNewWindow
 
@@ -408,14 +443,14 @@ function Install-OC-Msi
         Remove-Item -r "${DistrPath}"
 
         # Редактирование переменной среды PATH
-        $Include = "${OCPath}\${ProductVersion}\bin\"
+        $Include = Join-Path ( Join-Path "${OCPath}" $DistrParam["ProductVersion"] ) "bin"
         $OldPath = [System.Environment]::GetEnvironmentVariable('PATH','machine')
         $NewPath = "${OldPath};${Include}"
         [Environment]::SetEnvironmentVariable("PATH", "${NewPath}", "Machine")  
 
         Write-Host "Install 1C finished"
 
-        New-Variable-With-Test -Name "OC_VERSION" -Value "${ProductVersion}" -Scope "Script"
+        New-Variable-With-Test -Name "OC_VERSION" -Value $DistrParam["ProductVersion"] -Scope "Script"
     }
 }
 

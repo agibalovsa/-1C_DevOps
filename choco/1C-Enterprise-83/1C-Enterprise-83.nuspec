@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>1C-Enterprise-83</id>
+    <version>8.3.27.1989</version>
+    <packageSourceUrl>https://github.com/agibalovsa/-1C_DevOps/master/choco/oc</packageSourceUrl>
+    <owners>Agibalov Sergei</owners>
+    <title>1C:Enterprise:8.3</title>
+    <authors>1C-Soft</authors>
+    <projectUrl>https://releases.1c.ru</projectUrl>
+    <iconUrl>https://static.1c.ru/images/logo.png</iconUrl>
+    <copyright>"1C Soft", 1996-2026</copyright>
+    <licenseUrl>https://github.com/agibalovsa/-1C_DevOps/master/choco/oc/1CEnterprise_en.htm</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <docsUrl>https://its.1c.ru</docsUrl>
+    <mailingListUrl>mailto:v8@1c.ru</mailingListUrl>
+    <bugTrackerUrl>https://bugboard.1c.ru</bugTrackerUrl>
+    <tags>1c enterprise 8.3</tags>
+    <summary>1C:Enterprise:8.3</summary>
+    <description><![CDATA[
+# [EN] 1C:Enterprise 8.3 Platform Installer / [RU] Установщик платформы 1С:Предприятие 8.3
+
+[EN] 1C:Enterprise platform is a low-code framework for developing business applications.
+[RU] Платформа 1С:Предприятие — это low-code-фреймворк для создания бизнес-приложений.
+
+[EN] This package allows installing different versions of the 1C platform side-by-side.
+[RU] Данный пакет позволяет устанавливать различные версии платформы 1С одновременно.
+
+## [EN] Package Parameters / [RU] Параметры пакета
+
+- `/DistrPath:` — [EN] Path to the distribution files. If specified, the installer searches the chosen path; if not found, the distribution will be downloaded from the releases.1c.ru website. / [RU] Путь к дистрибутиву. Если указан, то дистрибутив будет искаться по выбранному пути, если он найден не будет, то данный дистрибутив будет скачан с сайта releases.1c.ru.
+- `/OCPath:` — [EN] (Default: "C:\Program Files\1cv8") Installation base path. Version will be appended automatically. / [RU] (По умолчанию: "C:\Program Files\1cv8") Базовый путь установки. Версия будет добавлена автоматически.
+- `/Server:` — (2/1/0) [EN] Install 1C Server. Mode "2" is used to install the 1C Cluster Service. / [RU] Установка сервера 1С. Режим "2" используется для установки службы кластера 1С.
+- `/WS:` — (1/0) [EN] Install Web-server extension. / [RU] Установка расширения веб-сервера.
+- `/CRS:` — (1/0) [EN] Install Configuration Repository Server. / [RU] Установка хранилища конфигураций.
+- `/Client:` — (1/0) [EN] Install Thick/Thin client. / [RU] Установка толстого/тонкого клиента.
+- `/User:` — [EN] (Default: "USER1CV8") Service user name. Used only for service installation (/Server=2). / [RU] (По умолчанию: "USER1CV8") Имя пользователя для службы. Используется только при установке службы (/Server=2).
+- `/Password:` — [EN] (Default: "_USER_1C_V8") Service user password. Used only for service installation (/Server=2). / [RU] (По умолчанию: "_USER_1C_V8") Пароль пользователя службы. Используется только при установке службы (/Server=2).
+
+## Usage Example / Пример использования
+
+`choco install 1C-Enterprise-83 --version 8.3.27.1989 --side-by-side --params="/OCPath:'D:\Program Files\1cv8' /Client:1 /Server:1"`
+
+---
+> [!Note]
+>
+> [EN] To install multiple versions, always use the `--side-by-side` flag.
+> [RU] Для установки нескольких версий всегда используйте флаг `--side-by-side`.
+]]></description>
+    <dependencies>
+      <dependency id="7zip" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="tools\**" target="tools" />
+    <file src="..\..\docker\common_context\build\oc_lib.ps1" target="tools" />
+    <file src="..\..\docker\common_context\build\tools.ps1" target="tools" />
+  </files>
+</package>

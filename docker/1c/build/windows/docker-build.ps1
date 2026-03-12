@@ -1,7 +1,7 @@
 mkdir build_context -Force
 
-Copy-Item "../../../common_context/build/*" "build_context/" -Force
-Copy-Item "../../../common_context/entrypoint/*" "build_context/" -Force
+Copy-Item "../../../common_context/build/*.ps1" "build_context/" -Force
+Copy-Item "../../../common_context/entrypoint/*.ps1" "build_context/" -Force
 Copy-Item "context/*" "build_context/"
 Copy-Item ".arg" "build_context/.arg"
 
