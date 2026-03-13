@@ -18,34 +18,61 @@
     <tags>1c enterprise 8.3</tags>
     <summary>1C:Enterprise:8.3</summary>
     <description><![CDATA[
-# [EN] 1C:Enterprise 8.3 Platform Installer / [RU] Установщик платформы 1С:Предприятие 8.3
+# 1C:Enterprise 8.3 Platform Installer / Установщик платформы 1С:Предприятие 8.3
 
-[EN] 1C:Enterprise platform is a low-code framework for developing business applications.
-[RU] Платформа 1С:Предприятие — это low-code-фреймворк для создания бизнес-приложений.
+1C:Enterprise platform is a low-code framework for developing business applications.
+This package allows installing different versions of the 1C platform side-by-side.
 
-[EN] This package allows installing different versions of the 1C platform side-by-side.
-[RU] Данный пакет позволяет устанавливать различные версии платформы 1С одновременно.
+Платформа 1С:Предприятие - это low-code-фреймворк для создания бизнес-приложений.
+Данный пакет позволяет устанавливать различные версии платформы 1С одновременно.
 
-## [EN] Package Parameters / [RU] Параметры пакета
-
-- `/DistrPath:` — [EN] Path to the distribution files. If specified, the installer searches the chosen path; if not found, the distribution will be downloaded from the releases.1c.ru website. / [RU] Путь к дистрибутиву. Если указан, то дистрибутив будет искаться по выбранному пути, если он найден не будет, то данный дистрибутив будет скачан с сайта releases.1c.ru.
-- `/OCPath:` — [EN] (Default: "C:\Program Files\1cv8") Installation base path. Version will be appended automatically. / [RU] (По умолчанию: "C:\Program Files\1cv8") Базовый путь установки. Версия будет добавлена автоматически.
-- `/Server:` — (2/1/0) [EN] Install 1C Server. Mode "2" is used to install the 1C Cluster Service. / [RU] Установка сервера 1С. Режим "2" используется для установки службы кластера 1С.
-- `/WS:` — (1/0) [EN] Install Web-server extension. / [RU] Установка расширения веб-сервера.
-- `/CRS:` — (1/0) [EN] Install Configuration Repository Server. / [RU] Установка хранилища конфигураций.
-- `/Client:` — (1/0) [EN] Install Thick/Thin client. / [RU] Установка толстого/тонкого клиента.
-- `/User:` — [EN] (Default: "USER1CV8") Service user name. Used only for service installation (/Server=2). / [RU] (По умолчанию: "USER1CV8") Имя пользователя для службы. Используется только при установке службы (/Server=2).
-- `/Password:` — [EN] (Default: "_USER_1C_V8") Service user password. Used only for service installation (/Server=2). / [RU] (По умолчанию: "_USER_1C_V8") Пароль пользователя службы. Используется только при установке службы (/Server=2).
-
-## Usage Example / Пример использования
-
-`choco install 1C-Enterprise-83 --version 8.3.27.1989 --side-by-side --params="/OCPath:'D:\Program Files\1cv8' /Client:1 /Server:1"`
-
----
-> [!Note]
+> [!IMPORTANT]
 >
-> [EN] To install multiple versions, always use the `--side-by-side` flag.
-> [RU] Для установки нескольких версий всегда используйте флаг `--side-by-side`.
+> During the 1C:Enterprise platform installation, the installer will search for a local distribution file at the path specified in `/DistrPath`. If the file is not found, the installer will prompt for a username and password to authenticate with the <releases.1c.ru> website and download the required distribution.
+>
+> Во время установки платформы 1С будет произведен поиск локального дистрибутива по пути `/DistrPath`. Если файл дистрибутива не будет найден, то установщик запросит логин и пароль для авторизации на сайте <releases.1c.ru>, откуда данный дистрибутив будет получен.
+
+## Package Parameters
+
+- `/DistrPath:` - Path to the local distribution files. If specified, the installer searches the chosen path. If the file is not found, the installer will attempt to download it from <releases.1c.ru>. Once downloaded, the distribution will be saved to this path and will NOT be deleted after installation.
+- `/ReleasesLogin` - Username for accessing the <releases.1c.ru> website.
+- `/ReleasesPassword` - Password for accessing the <releases.1c.ru> website.
+- `/OCPath:` - (Default: `C:\Program Files\1cv8`) Installation base path. The version number will be appended automatically.
+- `/Server:` - (`2`/`1`/`0`) Install 1C Server. Mode `2` is used to install the 1C Cluster Service.
+- `/WS:` - (`1`/`0`) Install Web-server extension.
+- `/CRS:` - (`1`/`0`) Install Configuration Repository Server.
+- `/Client:` - (`1`/`0`) Install Thick/Thin client.
+- `/User:` - (Default: `USER1CV8`) Windows Service user name. Used only for service installation (`/Server=2`).
+- `/Password:` - (Default: `_USER_1C_V8`) Windows Service user password. Used only for service installation (`/Server=2`).
+
+## Параметры пакета
+
+- `/DistrPath:` - Путь к локальному дистрибутиву. Если указан, дистрибутив будет искаться по выбранному пути. Если файл не найден, установщик попытается скачать его с сайта <releases.1c.ru>. При получении дистрибутива с сайта, он сохранится по указанному пути и не будет удален после установки.
+- `/ReleasesLogin` - Логин для доступа к сайту <releases.1c.ru>.
+- `/ReleasesPassword` - Пароль для доступа к сайту <releases.1c.ru>.
+- `/OCPath:` - (По умолчанию: `C:\Program Files\1cv8`) Базовый путь установки. Версия будет добавлена автоматически.
+- `/Server:` - (`2`/`1`/`0`) Установка сервера 1С. Режим `2` используется для установки службы кластера 1С.
+- `/WS:` - (`1`/`0`) Установка расширения веб-сервера.
+- `/CRS:` - (`1`/`0`) Установка хранилища конфигураций.
+- `/Client:` - (`1`/`0`) Установка толстого/тонкого клиента.
+- `/User:` - (По умолчанию: `USER1CV8`) Имя пользователя для службы Windows. Используется только при установке службы (`/Server=2`).
+- `/Password:` - (По умолчанию: `_USER_1C_V8`) Пароль пользователя службы Windows. Используется только при установке службы (`/Server=2`).
+
+## Usage Examples / Примеры использования
+
+> [!NOTE]
+>
+> To install multiple versions, always use the `--side-by-side` flag.
+>
+> Для установки нескольких версий всегда используйте флаг `--side-by-side`.
+
+```powershell
+choco install 1C-Enterprise-83 --version 8.3.27.1989 --side-by-side --params="/DistrPath:'C:\Distr' /OCPath:'D:\Program Files\1cv8' /Client:1 /Server:1"
+```
+
+```powershell
+choco install 1C-Enterprise-83 --version 8.3.27.1989 --side-by-side --params="/ReleasesLogin:'login' /ReleasesPassword:'password' /OCPath:'D:\Program Files\1cv8' /Client:1 /Server:1"
+```
 ]]></description>
     <dependencies>
       <dependency id="7zip" />

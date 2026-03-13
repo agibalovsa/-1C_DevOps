@@ -11,8 +11,8 @@ $CRS = if ($Param['CRS']) { $Param['CRS'] } else { 0 }
 $Client = if ($Param['Client']) { $Param['Client'] } else { 0 }
 $User = if ($Param['User']) { $Param['User'] } else { "" }
 $Password = if ($Param['Password']) { $Param['Password'] } else { "" }
-$RelisesLogin = if ($Param['RelisesLogin']) { $Param['RelisesLogin'] } else { "" }
-$RelisesPassword = if ($Param['RelisesPassword']) { $Param['RelisesPassword'] } else { "" }
+$ReleasesLogin = if ($Param['ReleasesLogin']) { $Param['ReleasesLogin'] } else { "" }
+$ReleasesPassword = if ($Param['ReleasesPassword']) { $Param['ReleasesPassword'] } else { "" }
 
 $DistrFileName = "windows64full_$($Env:chocolateyPackageVersion.Replace('.', '_')).rar"
 $LocalDistrFilePath = (Join-Path "${DistrPath}" "${DistrFileName}")
@@ -27,14 +27,14 @@ if ( Test-Path $LocalDistrFilePath )
 else
 {
     Write-Host "Local distribution ${LocalDistrFilePath} not found. Starting download..." -ForegroundColor Yellow
-    if ( ! $RelisesLogin )
+    if ( ! $ReleasesLogin )
     {
-        $RelisesLogin    = Read-Host -Prompt "Enter login for releases.1c.ru..."
+        $ReleasesLogin    = Read-Host -Prompt "Enter login for releases.1c.ru..."
         Write-Host "Enter password for releases.1c.ru..." -ForegroundColor Yellow
         $SecurePassword  = $Host.UI.ReadLineAsSecureString()
-        $RelisesPassword = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($SecurePassword))
+        $ReleasesPassword = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($SecurePassword))
     }
-    Get-OC-Msi-Rar "${DistrPath}" "${env:chocolateyPackageVersion}" "${RelisesLogin}" "${RelisesPassword}"
+    Get-OC-Msi-Rar "${DistrPath}" "${env:chocolateyPackageVersion}" "${ReleasesLogin}" "${ReleasesPassword}"
 }
 $InstallDistrPath = ( Join-Path "${toolsDir}" "install")
 $DistrParam = Unpack-OC-Msi-Rar "${LocalDistrFilePath}" "${InstallDistrPath}"
