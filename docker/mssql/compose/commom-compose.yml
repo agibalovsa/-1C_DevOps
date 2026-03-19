@@ -1,0 +1,24 @@
+name: mssql
+
+services:
+
+  mssql:
+
+    image: ${MSSQL_TAG}
+    hostname: ${MSSQL_HOSTNAME:-mssql}
+    command: "mssql=mssql"
+    environment:
+      - MSSQL_AGENT_ENABLED=true
+    ports:
+      - "${MSSQL_PORT:-1433}:1433"
+    volumes:
+      - mssql_data:C:\Program Files\Microsoft SQL Server\MSSQL16.MSSQLSERVER\MSSQL
+      - mssql_temp:C:\TempDB
+
+volumes:
+  mssql_data:
+    external: true
+    name: ${MSSQL_DATA_VOL:-mssql_data}
+  mssql_temp:
+    external: true
+    name: ${MSSQL_TEMP_VOL:-mssql_temp}

@@ -1,4 +1,6 @@
-.arg
-.env
+.arg*
+!*.arg.tmpl
+.env*
+!*.env.tmpl
 .secret
 distr

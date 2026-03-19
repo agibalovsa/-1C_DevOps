@@ -1,0 +1,6 @@
+services:
+
+  mssql:
+
+    container_name: ${MSSQL_NAME:-mssql}
+    restart: always

@@ -1,0 +1,1 @@
+docker compose  -f common-compose.yml -f docker-compose.yml down

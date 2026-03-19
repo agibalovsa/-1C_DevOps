@@ -23,8 +23,8 @@ services:
       - "${OC_IBSRV_DEBUG_PORT:-1550}:${OC_IBSRV_DEBUG_PORT:-1550}"
       - "${OC_IBSRV_RANGE_PORT:-1560-1591}:${OC_IBSRV_RANGE_PORT:-1560-1591}"
     volumes:
-      - oc_ibsrv_data:/srv/1c/ibsrv
-      - oc_conf:/opt/1cv8/conf
+      - "oc_ibsrv_data:${OC_IBSRV_DATA_PATH:-/srv/1c/ibsrv}"
+      - "oc_conf:${OC_IBSRV_CONF_PATH:-/opt/1cv8/conf}"
   
 volumes:
   oc_ibsrv_data:
