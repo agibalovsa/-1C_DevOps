@@ -17,6 +17,7 @@ function Install-Packs
         choco install powershell-core -y
         choco install nano -y
         choco install 7zip -y
+        choco install et dust -y
 
     }
 }

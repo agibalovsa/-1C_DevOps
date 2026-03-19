@@ -14,6 +14,7 @@ services:
     volumes:
       - mssql_data:C:\Program Files\Microsoft SQL Server\MSSQL16.MSSQLSERVER\MSSQL
       - mssql_temp:C:\TempDB
+      - mssql_backup:C:\Backup
 
 volumes:
   mssql_data:
@@ -22,3 +23,6 @@ volumes:
   mssql_temp:
     external: true
     name: ${MSSQL_TEMP_VOL:-mssql_temp}
+  mssql_backup:
+    external: true
+    name: ${MSSQL_BACKUP_VOL:-mssql_backup}
