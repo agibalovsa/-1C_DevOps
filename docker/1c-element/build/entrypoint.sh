@@ -8,7 +8,7 @@ setup_element_healthcheck()
 {
 
     if [ ! -f "/healthcheck.sh" ]; then
-        echo "curl -f http://localhost:9090/maintenance/server/v1/heartbeat || exit 1" > /healthcheck.sh;
+        echo "curl -f http://localhost:${OC_ELEMENT_IDE_SERVER_PORT}/maintenance/server/v1/heartbeat || exit 1" > /healthcheck.sh;
         chmod 766 /healthcheck.sh;
     fi;
 
