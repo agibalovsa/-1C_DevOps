@@ -29,18 +29,33 @@ setup_element_config()
     fi
 
     # Для подключения к 1С:Элементу с IDE как к внешнему сервису подходит такая комбинация настроек
-    ideManagerPath="/var/opt/1C/1CE/instances/${OC_ELEMENT_SERVICE}/config/ide-manager.yml"
-    serverPath="/var/opt/1C/1CE/instances/${OC_ELEMENT_SERVICE}/config/server.yml"
+    configPath="/var/opt/1C/1CE/instances/${OC_ELEMENT_SERVICE}/config"
+    ideManagerPath="${configPath}/ide-manager.yml"
+    serverPath="${configPath}/server.yml"
+    integrationBusPath="${configPath}/integrationBus.yml"
+    debugPath="${configPath}/debug.yml"
     address0="address: 0.0.0.0"
     address127="address: 127.0.0.1"
-    if grep -q "${address0}" "${ideManagerPath}" 2>/dev/null; then
-        sed -i -e "s/${address0}/${address127}/g" "${ideManagerPath}"
-        echo "Set ide-manager.yml to ${address127}"
-    fi
-    if grep -q "${address127}" "${serverPath}" 2>/dev/null; then
-        sed -i -e "s/${address127}/${address0}/g" "${serverPath}"
-        echo "Set server.yml to ${address0}"
-    fi
+    if grep -qwF "${address0}" "${ideManagerPath}" 2>/dev/null; then
+        sed -i -e "s|${address0}|${address127}|g" "${ideManagerPath}"
+        echo "Set ip ide-manager.yml to ${address127}"
+    fi;
+    if grep -qwF "${address127}" "${serverPath}" 2>/dev/null; then
+        sed -i -e "s|${address127}|${address0}|g" "${serverPath}"
+        echo "Set ip server.yml to ${address0}"
+    fi;
+    if ! grep -qwF "${address0}:${OC_ELEMENT_IDE_SERVER_PORT}" "${serverPath}" 2>/dev/null; then
+        sed -i -E "s|(${address0}:)[0-9]+|\1${OC_ELEMENT_IDE_SERVER_PORT}|" "${serverPath}"
+        echo "Set port server.yml to ${OC_ELEMENT_IDE_SERVER_PORT}"
+    fi;
+    if ! grep -qw "port: ${OC_ELEMENT_IDE_BUS_PORT}" "${integrationBusPath}" 2>/dev/null; then
+        sed -i -E "s/(port: )[0-9]+/\1${OC_ELEMENT_IDE_BUS_PORT}/" "${integrationBusPath}"
+        echo "Set port integrationBus.yml to ${OC_ELEMENT_IDE_BUS_PORT}"
+    fi;
+    if ! grep -qw "port: ${OC_ELEMENT_IDE_DEBUG_PORT}" "${debugPath}" 2>/dev/null; then
+        sed -i -E "s/(port: )[0-9]+/\1${OC_ELEMENT_IDE_DEBUG_PORT}/" "${debugPath}"
+        echo "Set port debug.yml to ${OC_ELEMENT_IDE_DEBUG_PORT}"
+    fi;
 
 }
 
