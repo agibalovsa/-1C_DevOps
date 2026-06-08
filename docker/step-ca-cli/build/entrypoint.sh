@@ -7,8 +7,12 @@ set -Eeo pipefail
 setup_step_ca_healthcheck() {
 
     if [ ! -f "/healthcheck.sh" ]; then
-        echo "step ca health" >> "/healthcheck.sh"
-        chmod 766 "/healthcheck.sh"
+        printf "%s\n" \
+        "#!/bin/bash" \
+        "step ca health" \
+        "step certificate inspect ${CERT_PATH}/${DOMAIN_NAME}.crt --bundle > /dev/null 2>&1 || { echo 'CRITICAL: Certificate validation failed!' >&2; exit 1; }" \
+        | tee "/healthcheck.sh";
+        chmod +x "/healthcheck.sh"
     fi;
 
 }
@@ -23,50 +27,71 @@ setup_step_ca_bootstrap() {
 
 }
 
+setup_defaults() {
+
+    CERT_PATH=${CERT_PATH:-"/root/.step/certs"}
+    mkdir -p "${CERT_PATH}"
+    WEB_ROOT=${WEB_ROOT:-"/usr/share/nginx/html"}
+    SEND_SIGHUP=${SEND_SIGHUP:-"0"}
+    BACKGROUND=${BACKGROUND:-"0"}
+
+}
+
 setup_step_ca_certificate() {
 
-    if [ ! -f "/root/.step/certs/${DOMAIN_NAME}.crt" ]; then
-        step ca certificate \
-        --force --standalone --provisioner acme "${DOMAIN_NAME}" \
-        "/root/.step/certs/${DOMAIN_NAME}.crt" "/root/.step/certs/${DOMAIN_NAME}.key";
+    if [ ! -f "${CERT_PATH}/${DOMAIN_NAME}.crt" ]; then
+        STEP_CA_CERT=( step ca certificate )
+        STEP_CA_CERT+=( --force --provisioner acme "${DOMAIN_NAME}" )
+        if ss -tulnp | grep ":80" ; then
+            STEP_CA_CERT+=( --webroot=${WEB_ROOT} )
+        else
+            STEP_CA_CERT+=( --standalone )
+        fi;
+        STEP_CA_CERT+=( "${CERT_PATH}/${DOMAIN_NAME}.crt" "${CERT_PATH}/${DOMAIN_NAME}.key" )
+
+        exec "${STEP_CA_CERT[@]}" 2>&1
+    fi
+
+}
+
+setup_step_ca_renew_exec() {
+
+    STEP_CA_EXEC=( step ca renew )
+    if [ "${SEND_SIGHUP}" != "0" ]; then STEP_CA_EXEC+=( --exec="/send_sighup.sh" ); fi
+    STEP_CA_EXEC+=( --daemon "${CERT_PATH}/${DOMAIN_NAME}.crt" "${CERT_PATH}/${DOMAIN_NAME}.key" )
+
+}
+
+run_setup_step_ca_renew() {
+
+    echo "Beginning step ca renew";
+    echo "${STEP_CA_EXEC[@]}"
+    if [ "${BACKGROUND}" = "0" ]; then
+        exec "${STEP_CA_EXEC[@]}" 2>&1;
+    else
+        "${STEP_CA_EXEC[@]}" 2>&1 &
     fi;
 
 }
 
-setup_step_ca_exec() {
-
-    STEP_CA_EXEC=( step ca renew --exec="/send_sighup.sh" --daemon "/root/.step/certs/${DOMAIN_NAME}.crt" "/root/.step/certs/${DOMAIN_NAME}.key" );
-
-}
-
-run_step_ca_exec() {
-
-    echo "Begining step ca";
-    echo "${STEP_CA_EXEC[@]}"
-    exec "${STEP_CA_EXEC[@]}" 2>&1;
-
-}
-
-step_ca() {
-
-    setup_step_ca_healthcheck
+step_ca_renew() {
 
     setup_step_ca_bootstrap
     setup_step_ca_certificate
-    setup_step_ca_exec
+    setup_step_ca_renew_exec
 
-    run_step_ca_exec
+    run_setup_step_ca_renew
 
 }
 
-if [ "$1" == "sh" ]; then
-    exec sh
-elif [ "$1" == "bash" ]; then
-    exec /bin/bash
-elif [ "$1" = "step_ca" ]; then
-    step_ca
+setup_defaults
+setup_step_ca_healthcheck
+
+if [ "$1" = "renew" ]; then
+    step_ca_renew
 else
-    exec /bin/bash
+    echo "Wrong parameter: $1" >&2
+    exit 1
 fi
 
 exit 0

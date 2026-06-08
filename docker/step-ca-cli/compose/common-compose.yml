@@ -4,7 +4,7 @@ services:
 
     image: ${STEP_TAG}
     hostname: ${STEP_CA_HOSTNAME:-step-ca-cli}
-    command: step_ca
+    command: step_ca=renew
     environment:
       DOMAIN_NAME:      "${DOMAIN_NAME}"
       STEP_URL:         "${STEP_URL}"
