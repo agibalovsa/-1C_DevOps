@@ -19,21 +19,31 @@ setup_step_ca_healthcheck() {
 
 setup_step_ca_bootstrap() {
 
-    if [ ! -f /root/.step/config/defaults.json ]; then
+    if [ ! -f "${CONF_PATH}/defaults.json" ]; then
         step ca bootstrap \
           --force --ca-url "${STEP_URL}" \
           --fingerprint "${STEP_FINGERPRINT}";
+    fi;
+
+    if [ "${SEND_SIGHUP}" != "0" ]; then
+        chown "${USER_DOMAIN_ID}:${GROUP_DOMAIN_ID}" "${CERT_PATH}/*"
     fi;
 
 }
 
 setup_defaults() {
 
-    CERT_PATH=${CERT_PATH:-"/root/.step/certs"}
-    mkdir -p "${CERT_PATH}"
+    USER_DOMAIN_ID=${USER_DOMAIN_ID:-"1001"}
+    GROUP_DOMAIN_ID=${GROUP_DOMAIN_ID:-"1001"}
+    STEP_CA_HOME="/root/.step"
+    CERT_PATH=${CERT_PATH:-"${STEP_CA_HOME}/certs"}
+    CONF_PATH=${CONF_PATH:-"${STEP_CA_HOME}/config"}
     WEB_ROOT=${WEB_ROOT:-"/usr/share/nginx/html"}
     SEND_SIGHUP=${SEND_SIGHUP:-"0"}
     BACKGROUND=${BACKGROUND:-"0"}
+
+    mkdir -p "${CERT_PATH}"
+    mkdir -p "${CONF_PATH}"
 
 }
 
@@ -51,6 +61,10 @@ setup_step_ca_certificate() {
         STEP_CA_CERT+=( "${CERT_PATH}/${DOMAIN_NAME}.crt" "${CERT_PATH}/${DOMAIN_NAME}.key" )
 
         exec "${STEP_CA_CERT[@]}" 2>&1
+
+        if [ "${SEND_SIGHUP}" != "0" ]; then
+            chown "${USER_DOMAIN_ID}:${GROUP_DOMAIN_ID}" "${CERT_PATH}/*"
+        fi;
     fi
 
 }

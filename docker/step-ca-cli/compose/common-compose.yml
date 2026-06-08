@@ -10,6 +10,9 @@ services:
       DOMAIN_NAME:      "${DOMAIN_NAME}"
       STEP_URL:         "${STEP_URL}"
       STEP_FINGERPRINT: "${STEP_FINGERPRINT}"
+      USER_DOMAIN_ID:   "${USER_DOMAIN_ID:-1001}"
+      GROUP_DOMAIN_ID:  "${GROUP_DOMAIN_ID:-1001}"
+      SEND_SIGHUP:      "${SEND_SIGHUP:-0}"
     ports:
       - "80:80"
     volumes:
