@@ -26,7 +26,7 @@ setup_step_ca_bootstrap() {
     fi;
 
     if [ "${SEND_SIGHUP}" != "0" ]; then
-        chown "${USER_DOMAIN_ID}:${GROUP_DOMAIN_ID}" "${CERT_PATH}/*"
+        chown "${USER_DOMAIN_ID}:${GROUP_DOMAIN_ID}" "${CERT_PATH}"/*
     fi;
 
 }
@@ -63,7 +63,7 @@ setup_step_ca_certificate() {
         exec "${STEP_CA_CERT[@]}" 2>&1
 
         if [ "${SEND_SIGHUP}" != "0" ]; then
-            chown "${USER_DOMAIN_ID}:${GROUP_DOMAIN_ID}" "${CERT_PATH}/*"
+            chown "${USER_DOMAIN_ID}:${GROUP_DOMAIN_ID}" "${CERT_PATH}"/*
         fi;
     fi
 
