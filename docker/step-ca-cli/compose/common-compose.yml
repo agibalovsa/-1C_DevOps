@@ -6,6 +6,7 @@ services:
     hostname: ${STEP_CA_HOSTNAME:-step-ca-cli}
     command: step_ca=renew
     environment:
+      TZ:               "${TZ}"
       DOMAIN_NAME:      "${DOMAIN_NAME}"
       STEP_URL:         "${STEP_URL}"
       STEP_FINGERPRINT: "${STEP_FINGERPRINT}"
