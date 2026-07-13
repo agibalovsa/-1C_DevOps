@@ -1,0 +1,20 @@
+Title: "Параметры установки"
+Fields:
+  - Name: "Version"
+    Type: "Radio"
+    Label: "1) Версия:"
+    Options:
+      - "Нет версии"
+
+  - Name: "Login"
+    Type: "Text"
+    Label: "2) Логин 1C releases:"
+
+  - Name: "Password"
+    Type: "Password"
+    Label: "3) Пароль 1C releases:"
+
+  - Name: "InstallPath"
+    Type: "Text"
+    Label: "4) Путь установки 1С:"
+    Default: "C:\\Program Files\\1cv8"

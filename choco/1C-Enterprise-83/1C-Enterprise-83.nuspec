@@ -1,8 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
   <metadata>
     <id>1C-Enterprise-83</id>
-    <version>8.3.27.1989</version>
+    <version>8.3.27.2214</version>
     <packageSourceUrl>https://github.com/agibalovsa/-1C_DevOps/master/choco/oc</packageSourceUrl>
     <owners>Agibalov Sergei</owners>
     <title>1C:Enterprise:8.3</title>
@@ -60,18 +60,12 @@ This package allows installing different versions of the 1C platform side-by-sid
 
 ## Usage Examples / Примеры использования
 
-> [!NOTE]
->
-> To install multiple versions, always use the `--side-by-side` flag.
->
-> Для установки нескольких версий всегда используйте флаг `--side-by-side`.
-
 ```powershell
-choco install 1C-Enterprise-83 --version 8.3.27.1989 --side-by-side --params="/DistrPath:'C:\Distr' /OCPath:'D:\Program Files\1cv8' /Client:1 /Server:1"
+choco install 1C-Enterprise-83 --version 8.3.27.1989 --params="/DistrPath:'C:\Distr' /OCPath:'D:\Program Files\1cv8' /Client:1 /Server:1"
 ```
 
 ```powershell
-choco install 1C-Enterprise-83 --version 8.3.27.1989 --side-by-side --params="/ReleasesLogin:'login' /ReleasesPassword:'password' /OCPath:'D:\Program Files\1cv8' /Client:1 /Server:1"
+choco install 1C-Enterprise-83 --version 8.3.27.1989 --params="/ReleasesLogin:'login' /ReleasesPassword:'password' /OCPath:'D:\Program Files\1cv8' /Client:1 /Server:1"
 ```
 ]]></description>
     <dependencies>
