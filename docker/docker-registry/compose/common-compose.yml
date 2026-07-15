@@ -6,6 +6,7 @@ services:
     hostname: ${DOCKER_REGISTRY_HOSTNAME:-docker-registry}
     environment:
       TZ:                            "${TZ}"
+      REGISTRY_HTTP_SECRET:          "${REGISTRY_HTTP_SECRET}"
       REGISTRY_HTTP_TLS_CERTIFICATE: "/etc/docker/registry/certs/docker-registry.crt"
       REGISTRY_HTTP_TLS_KEY:         "/etc/docker/registry/certs/docker-registry.key"
       REGISTRY_HTTP_ADDR:            "0.0.0.0:${DOCKER_REGISTRY_PORT:-5000}"

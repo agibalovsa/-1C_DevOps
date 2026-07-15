@@ -1,5 +1,7 @@
 version: 0.1
 log:
+  level: warn
+  formatter: text
   fields:
     service: registry
 storage:
@@ -16,5 +18,5 @@ http:
 health:
   storagedriver:
     enabled: true
-    interval: 10s
+    interval: 5m
     threshold: 3

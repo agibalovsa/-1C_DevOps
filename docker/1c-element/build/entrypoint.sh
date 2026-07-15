@@ -4,6 +4,14 @@ set -Eeo pipefail
 
 # element
 
+setup_defaults() {
+
+    OC_ELEMENT_IDE_SERVER_PORT=${OC_ELEMENT_IDE_SERVER_PORT:-"9090"}
+    OC_ELEMENT_IDE_BUS_PORT=${OC_ELEMENT_IDE_BUS_PORT:-"6698"}
+    OC_ELEMENT_IDE_DEBUG_PORT=${OC_ELEMENT_IDE_DEBUG_PORT:-"8080"}
+
+}
+
 setup_element_healthcheck()
 {
 
@@ -52,9 +60,17 @@ setup_element_config()
         sed -i -E "s/(port: )[0-9]+/\1${OC_ELEMENT_IDE_BUS_PORT}/" "${integrationBusPath}"
         echo "Set port integrationBus.yml to ${OC_ELEMENT_IDE_BUS_PORT}"
     fi;
+    if ! grep -qw "enabledTCP: true" "${integrationBusPath}" 2>/dev/null; then
+        sed -i -E "s/(enabledTCP: )false/\1true/" "${integrationBusPath}"
+        echo "Set enabledTCP integrationBus.yml to true"
+    fi;
     if ! grep -qw "port: ${OC_ELEMENT_IDE_DEBUG_PORT}" "${debugPath}" 2>/dev/null; then
         sed -i -E "s/(port: )[0-9]+/\1${OC_ELEMENT_IDE_DEBUG_PORT}/" "${debugPath}"
         echo "Set port debug.yml to ${OC_ELEMENT_IDE_DEBUG_PORT}"
+    fi;
+    if ! git config --global --get-all safe.directory | grep -q "^\*$"; then
+        git config --global --add safe.directory "*"
+        echo "Set safe.directory '*' for git"
     fi;
 
 }
@@ -82,13 +98,14 @@ run_element_exec()
 element()
 {
 
-    setup_element_healthcheck
-
     setup_element_config
     setup_element_exec
     run_element_exec
 
 }
+
+setup_defaults
+setup_element_healthcheck
 
 if [ "$1" = "element" ] || [ "$1" = "esb" ] ; then
     element
