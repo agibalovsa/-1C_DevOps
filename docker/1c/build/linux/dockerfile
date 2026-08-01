@@ -37,6 +37,7 @@ RUN --mount=from=context,source=pre_install_mode,target=/pre_install_mode \
 # hadolint ignore=SC1091
 RUN --mount=from=context,source=distr,target=/distr \
     --mount=from=context,source=install,target=/install \
+    --mount=from=scripts,target=/scripts \
     --mount=from=common_context,target=/common_context \
     --mount=from=context_arg,target=/context_arg \
     set -eux; \

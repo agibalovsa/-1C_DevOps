@@ -28,6 +28,7 @@ docker_build () {
     docker build ${PLAIN} \
         --build-arg "REGISTRY=${REGISTRY}" \
         "${BUILD_ARGS[@]}" \
+        "${BUILD_CNTXT[@]}" \
         --build-context common_context="${REL_PATH}/common_context/build" \
         --build-context entrypoint_context="${REL_PATH}/common_context/entrypoint" \
         --build-context context=context \

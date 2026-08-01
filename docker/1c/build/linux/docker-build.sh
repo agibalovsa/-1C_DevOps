@@ -7,6 +7,10 @@ BUILD_ARGS=(
 "--build-arg" "OC_MODE=${OC_MODE}" \
 )
 
+BUILD_CNTXT=(
+"--build-context" "../../../../scripts=scripts"
+)
+
 TAG="${OC_TAG}"
 REL_PATH="../../../"
 

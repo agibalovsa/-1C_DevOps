@@ -1,0 +1,38 @@
+Title: "Параметры получения пакета"
+Fields:
+  - Name: "Group1C"
+    Type: "Separator"
+    Label: "=1C"
+
+  - Name: "Version"
+    Type: "Text"
+    Label: "1) Версия:"
+
+  - Name: "Login"
+    Type: "Text"
+    Label: "2) Логин 1C releases:"
+
+  - Name: "Password"
+    Type: "Password"
+    Label: "3) Пароль 1C releases:"
+
+  - Name: "GroupAptly"
+    Type: "Separator"
+    Label: "=Aptly"
+
+  - Name: "AptlyURL"
+    Type: "Text"
+    Label: "5) URL сервиса aptly"
+    Default: "http://localhost:8080"
+
+  - Name: "RepoName"
+    Type: "Text"
+    Label: "6) Имя репозитория"
+
+  - Name: "DistributionName"
+    Type: "Text"
+    Label: "7) Имя публикации"
+
+  - Name: "PassPhrase"
+    Type: "Password"
+    Label: "8) Парольная фраза"
