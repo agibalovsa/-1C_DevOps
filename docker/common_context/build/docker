@@ -25,15 +25,29 @@ docker_build () {
         mkdir -p "context/distr"
     fi
 
-    docker build ${PLAIN} \
-        --build-arg "REGISTRY=${REGISTRY}" \
-        "${BUILD_ARGS[@]}" \
-        "${BUILD_CNTXT[@]}" \
-        --build-context common_context="${REL_PATH}/common_context/build" \
-        --build-context entrypoint_context="${REL_PATH}/common_context/entrypoint" \
-        --build-context context=context \
-        --build-context "context_arg=${CONTEXT_ARG}" \
-        -t "${REGISTRY}${TAG}" \
+    DOCKER_ARG=()
+
+    [ -n "${PLAIN}" ] && DOCKER_ARG+=("${PLAIN}")
+
+    DOCKER_ARG+=(
+        "--build-arg" "REGISTRY=${REGISTRY}"
+    )
+
+    [ ${#BUILD_ARGS[@]} -gt 0 ] && DOCKER_ARG+=("${BUILD_ARGS[@]}")
+    [ ${#BUILD_SCRTS[@]} -gt 0 ] && DOCKER_ARG+=("${BUILD_SCRTS[@]}")
+    [ ${#BUILD_CNTXT[@]} -gt 0 ] && DOCKER_ARG+=("${BUILD_CNTXT[@]}")
+    
+    DOCKER_ARG+=(
+        "--build-context" "common_context=${REL_PATH}/common_context/build" \
+        "--build-context" "entrypoint_context=${REL_PATH}/common_context/entrypoint" \
+        "--build-context" "context=context" \
+        "--build-context" "context_arg=${CONTEXT_ARG}" \
+    )
+
+    [ -n "${TAG}" ] && DOCKER_ARG+=("-t" "${REGISTRY}${TAG}")
+
+    docker build \
+        "${DOCKER_ARG[@]}" \
         .
 
     if [ -n "${PUSH}" ] && [ -n "${REGISTRY}" ]; then

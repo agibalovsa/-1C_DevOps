@@ -15,13 +15,13 @@ compile_deb() {
         && cd imei \
         && ([ -n "${IMEI_VERSION}" ] && git checkout "${IMEI_VERSION}") \
         && chmod +x imei.sh \
-        && ./imei.sh --build-only --checkinstall \
-            --imagemagick-version="${IM_VERSION}" \
-            --aom-version="${AOM_VERSION}" \
-            --heif-version="${HEIF_VERSION}" \
-            --jxl-version="${JXL_VERSION}"
+        && ./imei.sh --build-local --no-install \
+            --imagemagick-version "${IM_VERSION}" \
+            --aom-version "${AOM_VERSION}" \
+            --libheif-version "${HEIF_VERSION}" \
+            --jpeg-xl-version "${JXL_VERSION}"
 
     mkdir -p "${1}"
-    mv /usr/local/*.deb "${1}"
+    mv "/imei/dist/debian$(grep -oP '^VERSION_ID="\K[^"]+' /etc/os-release)/"*.deb "${1}"
 
 }

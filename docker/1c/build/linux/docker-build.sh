@@ -8,7 +8,11 @@ BUILD_ARGS=(
 )
 
 BUILD_CNTXT=(
-"--build-context" "../../../../scripts=scripts"
+"--build-context" "scripts=../../../../scripts"
+)
+
+BUILD_SCRTS=(
+"--secret" "id=its_secret,src=${CONTEXT_SECRET}"
 )
 
 TAG="${OC_TAG}"

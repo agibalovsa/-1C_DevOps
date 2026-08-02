@@ -79,11 +79,11 @@ init_stack () {
     if [ "${type}" = "compose" ]; then
 
         add_compose=()
-        script_dir=$(dirname "$(readlink -f "$0")")
+        current_dir=$(dirname "$(readlink -f "$0")")
         
         for path in "${paths[@]}"
         do
-            search_compose="${script_dir}/${path}/*/*compose.yml"
+            search_compose="${current_dir}/${path}/*/*compose.yml"
             for compose_file in ${search_compose};
             do
                 if [ ! "${compose_file}" == "${search_compose}" ] ; then
@@ -126,8 +126,8 @@ init_stack () {
 make_compose_stack () {
 
     stack_name="${1}"
-    script_dir=$(dirname "$(readlink -f "$0")")
-    stack_path="${script_dir}/users/compose/${stack_name}"
+    current_dir=$(dirname "$(readlink -f "$0")")
+    stack_path="${current_dir}/users/compose/${stack_name}"
 
     if [ ! -d "${stack_path:?}" ]; then
         mkdir -p "${stack_path:?}"
@@ -163,18 +163,18 @@ make_compose_stack () {
         "" \
         "set -Eeoa pipefail" \
         "" \
-        "script_dir=\$(dirname \"\$(readlink -f \"\$0\")\")" \
+        "current_dir=\$(dirname \"\$(readlink -f \"\$0\")\")" \
         "" \
-        "mkdir -p \"\${script_dir}/${stack_name}\"" \
+        "mkdir -p \"\${current_dir}/${stack_name}\"" \
         "# make context file" \
         "" \
-        "CONTEXT_ENV=\$(realpath \"\${script_dir}/${stack_name}\")" \
+        "CONTEXT_ENV=\$(realpath \"\${current_dir}/${stack_name}\")" \
         "{" \
             "echo \"CONTEXT_ENV=\${CONTEXT_ENV}\"" \
             "echo \"\"" \
-            "cat \"\${script_dir}/../common_context/.env\"" \
+            "cat \"\${current_dir}/../common_context/.env\"" \
             "echo \"\"" \
-            "cat \"\${script_dir}/.env\"" \
+            "cat \"\${current_dir}/.env\"" \
         "} > \"\${CONTEXT_ENV}/.env\"" \
         "" \
         | tee "${stack_path}/docker-compose-up.sh.tmp" > /dev/null;
@@ -184,8 +184,8 @@ make_compose_stack () {
         "" \
         "set -Eeoa pipefail" \
         "" \
-        "script_dir=\$(dirname \"\$(readlink -f \"\$0\")\")" \
-        "CONTEXT_ENV=\$(realpath \"\${script_dir}/${stack_name}\")" \
+        "current_dir=\$(dirname \"\$(readlink -f \"\$0\")\")" \
+        "CONTEXT_ENV=\$(realpath \"\${current_dir}/${stack_name}\")" \
         "" \
     | tee "${stack_path}/docker-compose-down.sh.tmp" > /dev/null;
 
@@ -194,8 +194,8 @@ make_compose_stack () {
         "" \
         "set -Eeoa pipefail" \
         "" \
-        "script_dir=\$(dirname \"\$(readlink -f \"\$0\")\")" \
-        "CONTEXT_ENV=\$(realpath \"\${script_dir}/${stack_name}\")" \
+        "current_dir=\$(dirname \"\$(readlink -f \"\$0\")\")" \
+        "CONTEXT_ENV=\$(realpath \"\${current_dir}/${stack_name}\")" \
         "" \
     | tee "${stack_path}/docker-compose-logs.sh.tmp" > /dev/null;
 
@@ -204,9 +204,9 @@ make_compose_stack () {
     paths=( "${!2}" )
     for path in "${paths[@]}"
     do
-        rel_path="${path#"${script_dir}"/}"
+        rel_path="${path#"${current_dir}"/}"
         proj_name=$(echo "${rel_path/\/compose/}" | tr '/' '-')
-        for file in "${script_dir}/${rel_path}/"* "${script_dir}/${rel_path}/".*
+        for file in "${current_dir}/${rel_path}/"* "${current_dir}/${rel_path}/".*
         do
             if [[ "${file}" == *"configs" ]]; then
                 {
@@ -234,7 +234,7 @@ make_compose_stack () {
                     echo "# # ${proj_name}"
                     echo ""
                     # https://github.com/a8m/envsubst (interpolating default values in file)
-                    envsubst < "${script_dir}/${rel_path}/.env.tmpl"
+                    envsubst < "${current_dir}/${rel_path}/.env.tmpl"
                     echo ""
                 } >> "${stack_path}/.env.tmp"
             else
@@ -304,8 +304,8 @@ make_compose_stack () {
 #
 make_build_stack () {
 
-    script_dir=$(dirname "$(readlink -f "$0")")
-    stack_path="${script_dir}/users/builds/${1}"
+    current_dir=$(dirname "$(readlink -f "$0")")
+    stack_path="${current_dir}/users/builds/${1}"
 
     if [ ! -d "${stack_path:?}" ]; then
         mkdir -p "${stack_path:?}"
@@ -329,17 +329,19 @@ make_build_stack () {
         "" \
         "set -Eeoa pipefail" \
         "" \
-        "script_dir=\$(dirname \"\$(readlink -f \"\$0\")\")" \
+        "current_dir=\$(dirname \"\$(readlink -f \"\$0\")\")" \
         "" \
         "# make context file" \
-        "mkdir -p \"\${script_dir}/context\"" \
-        "CONTEXT_ARG=\$(realpath \"\${script_dir}/context\")" \
+        "mkdir -p \"\${current_dir}/context\"" \
+        "CONTEXT_ARG=\$(realpath \"\${current_dir}/context\")" \
+        "CONTEXT_SECRET=\$(realpath \"\${current_dir}/.secret\")" \
         "{" \
             "echo \"CONTEXT_ARG=\${CONTEXT_ARG}\"" \
+            "echo \"CONTEXT_SECRET=\${CONTEXT_SECRET}\"" \
             "echo \"\"" \
-            "cat \"\${script_dir}/../common_context/.arg\"" \
+            "cat \"\${current_dir}/../common_context/.arg\"" \
             "echo \"\"" \
-            "cat \"\${script_dir}/.arg\"" \
+            "cat \"\${current_dir}/.arg\"" \
         "} > \"\${CONTEXT_ARG}/.arg\"" \
         "" \
         "# shellcheck source=/dev/null" \
@@ -352,14 +354,13 @@ make_build_stack () {
     paths=( "${!2}" )
     for path in "${paths[@]}"
     do
-        if [ -f "${script_dir}/${path}/docker-build.sh" ]; then
+        if [ -f "${current_dir}/${path}/docker-build.sh" ]; then
             {
-                echo ""
-                echo "if [ -d \"${stack_path}/distr\" ]; then"
-                echo "    cp -r \"${stack_path}/distr\" \"${script_dir}/${path}/context\""
+                echo "if [ -d \"\${current_dir}/distr\" ]; then"
+                echo "    cp -r \"\${current_dir}/distr\" \"${current_dir}/${path}/context\""
                 echo "fi"
-                echo "cd \"${script_dir}/${path}\""
-                echo "${script_dir}/${path}/docker-build.sh \"\$1\" \"\$2\""
+                echo "cd \"${current_dir}/${path}\""
+                echo "${current_dir}/${path}/docker-build.sh \"\$1\" \"\$2\""
                 echo ""
             } >> "${stack_path}/docker-build.sh.tmp"
             make_docker_build=1
@@ -368,23 +369,37 @@ make_build_stack () {
             echo "# # ${path}"
             echo ""
             # https://github.com/a8m/envsubst (interpolating default values in file)
-            envsubst < "${script_dir}/${path}/.arg.tmpl"
+            envsubst < "${current_dir}/${path}/.arg.tmpl"
             echo ""
         } >> "${stack_path}/.arg.tmp"
+        if [ -f "${current_dir}/${path}/.secret.tmpl" ]; then
+            {
+                echo "# # ${path}"
+                echo ""
+                # https://github.com/a8m/envsubst (interpolating default values in file)
+                envsubst < "${current_dir}/${path}/.secret.tmpl"
+                echo ""
+            } >> "${stack_path}/.secret.tmp"
+        fi
     done
 
     set +a
 
     sed -i 's/{{/{/g' "${stack_path}/.arg.tmp"
     sed -i 's/}}/}/g' "${stack_path}/.arg.tmp"
-
     mv "${stack_path}/.arg.tmp" "${stack_path}/.arg"
+
+    if [ -f "${stack_path}/.secret.tmp" ]; then
+        sed -i 's/{{/{/g' "${stack_path}/.secret.tmp"
+        sed -i 's/}}/}/g' "${stack_path}/.secret.tmp"
+        mv "${stack_path}/.secret.tmp" "${stack_path}/.secret"
+    fi
 
     if [ ${make_docker_build} = 1 ]; then
         {
             echo "rm -r \"\${CONTEXT_ARG}\""
-            echo "if [ -d \"${script_dir}/${path}/context/distr\" ]; then"
-            echo "    rm -r \"${script_dir}/${path}/context/distr\""
+            echo "if [ -d \"${current_dir}/${path}/context/distr\" ]; then"
+            echo "    rm -r \"${current_dir}/${path}/context/distr\""
             echo "fi"
         } >> "${stack_path}/docker-build.sh.tmp"
         mv "${stack_path}/docker-build.sh.tmp" "${stack_path}/docker-build.sh"

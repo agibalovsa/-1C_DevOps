@@ -2,12 +2,8 @@
 
 set_startup() {
 
-    ldconfig /usr/local/lib
-
-    /usr/local/bin/identify -version;
-    /usr/local/bin/convert -version;
-
-    ln -s /usr/local/bin/magick /usr/bin/magick;
+    identify -version;
+    convert -version;
     magick -version;
 
 }

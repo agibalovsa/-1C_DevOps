@@ -54,7 +54,7 @@ LABEL maintainer="Agibalov Sergei <agibse@rarus.ru>" \
 # hadolint ignore=SC1091
 RUN --mount=from=common_context,target=/common_context \
     --mount=from=context_arg,target=/context_arg \
-    --mount=from=compiler,source=/srv/imagick,target=/context \
+    --mount=from=compiler,source=/srv/imagick/distr,target=/distr \
     set -eux; \
     . common_context/install; \
     install_packs

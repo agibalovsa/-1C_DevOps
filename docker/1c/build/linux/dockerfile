@@ -40,6 +40,8 @@ RUN --mount=from=context,source=distr,target=/distr \
     --mount=from=scripts,target=/scripts \
     --mount=from=common_context,target=/common_context \
     --mount=from=context_arg,target=/context_arg \
+    --mount=type=secret,id=its_secret \
+    . /run/secrets/its_secret; \
     set -eux; \
     . /common_context/install; \
     . /install; \
