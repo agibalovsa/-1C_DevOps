@@ -23,7 +23,7 @@ services:
       discovery.type: "${OPENSEARCH_TYPE}"
       discovery.seed_hosts: "${OPENSEARCH_SEED_HOSTS}"
       plugins.ml_commons.sync_up_job_interval_in_seconds: 0 # turn off sync up ML job
-      bootstrap.memory_lock: true # Disable JVM heap memory swapping
+      bootstrap.memory_lock: "true" # Disable JVM heap memory swapping
       OPENSEARCH_JAVA_OPTS: -Xms512m -Xmx512m # Set min and max JVM heap sizes to at least 50% of system RAM
       OPENSEARCH_INITIAL_ADMIN_PASSWORD: ${OPENSEARCH_INITIAL_ADMIN_PASSWORD}
     volumes:
