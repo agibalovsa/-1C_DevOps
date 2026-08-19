@@ -1,0 +1,16 @@
+services:
+
+  opensearch:
+  
+    networks:
+      - opensearch_network
+
+  opensearch-dashboards:
+
+    networks:
+      - opensearch_network
+
+networks:
+  opensearch_network:
+    name: "${OPENSEARCH_NETWORK:-opensearch_network}"
+    external: true

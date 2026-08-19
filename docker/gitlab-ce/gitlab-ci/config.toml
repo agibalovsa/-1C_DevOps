@@ -12,7 +12,7 @@ shutdown_timeout = 0
   token = "runner_token"
   token_obtained_at = 2025-04-08T22:05:37Z
   token_expires_at = 0001-01-01T00:00:00Z
-  tls-ca-file = "/etc/gitlab-runner/certs/gitlab-chaine.crt"
+  tls-ca-file = "/etc/gitlab-runner/certs/gitlab-chain.crt"
   executor = "docker"
   [runners.cache]
     MaxUploadedArchiveSize = 0

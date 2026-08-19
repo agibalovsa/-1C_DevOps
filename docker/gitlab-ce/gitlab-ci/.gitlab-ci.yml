@@ -13,7 +13,7 @@ create-mr:
   rules:
     - if: $CI_COMMIT_BRANCH =~ '/^CodeReview.*$/'
   before_script:
-    - cp /etc/gitlab-runner/certs/gitlab-chaine.crt /usr/local/share/ca-certificates/gitlab-chaine.crt
+    - cp /etc/gitlab-runner/certs/gitlab-chain.crt /usr/local/share/ca-certificates/gitlab-chain.crt
     - update-ca-certificates
   script:
     - /entrypoint.sh create_mr

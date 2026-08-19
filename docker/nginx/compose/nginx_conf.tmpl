@@ -43,6 +43,15 @@ server {
 
   }
 
+  location /opensearch/ {
+
+    proxy_ssl_verify off;
+    client_max_body_size 10M;
+
+    proxy_pass https://{{ env "OPENSEARCH_EXTERNAL_URL" }}:{{ env "OPENSEARCH_HTTP_PORT" }};
+
+  }
+
   location /portainer/ {
 
     client_max_body_size 0;
