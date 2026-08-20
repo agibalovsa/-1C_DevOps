@@ -24,8 +24,8 @@ services:
       discovery.seed_hosts: "${OPENSEARCH_SEED_HOSTS}"
       plugins.ml_commons.sync_up_job_interval_in_seconds: 0 # turn off sync up ML job
       bootstrap.memory_lock: "true" # Disable JVM heap memory swapping
-      OPENSEARCH_JAVA_OPTS: -Xms512m -Xmx512m # Set min and max JVM heap sizes to at least 50% of system RAM
-      OPENSEARCH_INITIAL_ADMIN_PASSWORD: ${OPENSEARCH_INITIAL_ADMIN_PASSWORD}
+      OPENSEARCH_JAVA_OPTS: "${OPENSEARCH_JAVA_OPTS:--Xms512m -Xmx512m}"
+      OPENSEARCH_INITIAL_ADMIN_PASSWORD: "${OPENSEARCH_INITIAL_ADMIN_PASSWORD}"
     volumes:
       - opensearch-data:/usr/share/opensearch/data
       - opensearch-config:/usr/share/opensearch/config
@@ -46,6 +46,9 @@ services:
       OPENSEARCH_HOSTS: "${OPENSEARCH_DASHBOARD_HOSTS:-[ \"https://opensearch:9200\" ]}"
       SERVER_REWRITEBASEPATH: "${SERVER_REWRITEBASEPATH:-false}"
       SERVER_BASEPATH: "${SERVER_BASEPATH}"
+      DATA_SOURCE_ENABLED: "true"
+      WORKSPACE_ENABLED: "true"
+      EXPLORE_ENABLED: "true"
     ports:
       - "${OPENSEARCH_DASHBOARD_PORT:-5601}:5601"
 
