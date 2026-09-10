@@ -24,12 +24,16 @@ services:
       - "${OC_IBSRV_RANGE_PORT:-1560-1591}:${OC_IBSRV_RANGE_PORT:-1560-1591}"
     volumes:
       - "oc_ibsrv_data:${OC_IBSRV_DATA_PATH:-/srv/1c/ibsrv}"
+      - "oc_log:${OC_IBSRV_LOG_PATH:-/var/log/1C}"
       - "oc_conf:${OC_IBSRV_CONF_PATH:-/opt/1cv8/conf}"
   
 volumes:
   oc_ibsrv_data:
     external: true
     name: ${OC_IBSRV_DATA_VOL:-oc_ibsrv_data}
+  oc_log:
+    external: true
+    name: ${OC_LOG_VOL:-oc_log}
   oc_conf:
     external: true
     name: ${OC_CONF_VOL:-oc_conf}
