@@ -4,8 +4,6 @@ services:
 
     environment:
       GITLAB_OMNIBUS_CONFIG: "from_file('/omnibus_config.rb')"
-    networks:
-      - gitlab_network
     configs:
       - source: gitlab_conf
         target: /omnibus_config.rb
@@ -18,16 +16,9 @@ services:
 
   gitlab-runner:
 
-    networks:
-      - gitlab_network
     deploy:
       mode: replicated
       replicas: 1
-
-networks:
-  gitlab_network:
-    name: "${GITLAB_NETWORK:-gitlab_network}"
-    external: true
 
 configs:
   gitlab_conf:

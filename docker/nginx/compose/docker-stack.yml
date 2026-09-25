@@ -2,8 +2,6 @@ services:
 
   nginx:
 
-    networks:
-      - nginx_network
     configs:
       - source: nginx_conf
         target: /etc/nginx/conf.d/nginx.conf
@@ -14,11 +12,6 @@ services:
         target: /etc/nginx/ssl/nginx.key
       - source: nginx_crt
         target: /etc/nginx/ssl/nginx.crt
-
-networks:
-  nginx_network:
-    name: "${NGINX_NETWORK:-nginx_network}"
-    external: true
 
 configs:
   nginx_conf:

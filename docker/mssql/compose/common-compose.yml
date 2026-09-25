@@ -9,12 +9,19 @@ services:
     command: "mssql=mssql"
     environment:
       - MSSQL_AGENT_ENABLED=true
+    networks:
+      - mssql_network
     ports:
       - "${MSSQL_PORT:-1433}:1433"
     volumes:
       - mssql_data:C:\Program Files\Microsoft SQL Server\MSSQL16.MSSQLSERVER\MSSQL
       - mssql_temp:C:\TempDB
       - mssql_backup:C:\Backup
+
+networks:
+  mssql_network:
+    name: "${MSSQL_NETWORK:-mssql_network}"
+    external: true
 
 volumes:
   mssql_data:

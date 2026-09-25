@@ -16,6 +16,8 @@ services:
       SONAR_CE_JAVAOPTS: -Xms1024m -Xmx6g -XX:+HeapDumpOnOutOfMemoryError
       SONAR_SEARCH_JAVAOPTS: -Xms2g -Xmx2g -XX:+HeapDumpOnOutOfMemoryError
       SONAR_WEB_CONTEXT: "${SONAR_WEB_CONTEXT}"
+    networks:
+      - sonarqube_network
     volumes:
       - sonarqube_conf:/opt/sonarqube/conf
       - sonarqube_data:/opt/sonarqube/data
@@ -24,6 +26,11 @@ services:
       - sonarqube_temp:/opt/sonarqube/temp
     ports:
       - "${SONAR_HTTP_PORT:-9000}:9000"
+
+networks:
+  sonarqube_network:
+    name: "${SONAR_NETWORK:-sonarqube_network}"
+    external: true
 
 volumes:
   sonarqube_conf:

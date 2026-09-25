@@ -17,7 +17,14 @@ services:
       SONAR_HTTP_PORT:        "${SONAR_HTTP_PORT}"
       PORTAINER_EXTERNAL_URL: "${PORTAINER_EXTERNAL_URL}"
       PORTAINER_HTTPS_PORT:   "${PORTAINER_HTTPS_PORT}"
+    networks:
+      - nginx_network
     ports:
       - "80:80"
       - "443:443"
       - "${GITLAB_SSH_PORT:-22}:${GITLAB_SSH_PORT:-22}"
+
+networks:
+  nginx_network:
+    name: "${NGINX_NETWORK:-nginx_network}"
+    external: true

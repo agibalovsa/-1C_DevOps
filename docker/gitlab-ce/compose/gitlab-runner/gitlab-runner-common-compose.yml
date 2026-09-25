@@ -3,10 +3,17 @@ services:
   gitlab-runner:
 
     image: "${GITLAB_RUNNER_TAG}"
+    networks:
+      - gitlab_network
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - gitlab_runner_config:/etc/gitlab-runner
       - gitlab_runner_temp:/home/gitlab-runner
+
+networks:
+  gitlab_network:
+    name: "${GITLAB_RUNNER_NETWORK:-gitlab_network}"
+    external: true
 
 volumes:
   gitlab_runner_config:

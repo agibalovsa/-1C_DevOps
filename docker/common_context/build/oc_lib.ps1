@@ -221,6 +221,7 @@ function Get-OC-MSI-RAR
     )
     process
     {
+        $PW7 = $PSVersionTable.PSVersion.Major -eq 7
         $Disk = Get-PSDrive $((Split-Path -Path "${SavePath}" -Qualifier).Substring(0, 1))
         if ( $Disk.Free -lt 3GB )
         {
