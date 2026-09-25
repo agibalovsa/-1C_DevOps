@@ -34,7 +34,7 @@ get_deb_from_url ()
         -d "execution=$execution" \
         -d "_eventId=submit" \
         -d "rememberMe=false" \
-        "https://login.1c.ru/login")
+        "https://login.1c.ru/login") || :
 
     if [[ ! "${authCheck}" =~ "user/profile" ]]; then
         echo "Error: Failed to log in. Check credentials" >&2
@@ -44,8 +44,9 @@ get_deb_from_url ()
 
     echo "2. Searching for a link to version ${Version}..."
 
-    versionsPage=$(curl -sL -b "${cookieFile}" -H "${headers}" "https://releases.1c.ru/project/Platform83?allUpdates=true")
-    versionPath=$(echo "${versionsPage}" | grep -oP "/version_files\?nick=Platform83&ver=${Version}" | head -n 1)
+    majorVersion="$(echo "$Version" | sed -E 's/^([0-9]+)\.([0-9]+).*/\1\2/')"
+    versionsPage=$(curl -sL -b "${cookieFile}" -H "${headers}" "https://releases.1c.ru/project/Platform${majorVersion}?allUpdates=true") || :
+    versionPath=$(echo "${versionsPage}" | grep -oP "/version_files\?nick=Platform${majorVersion}&ver=${Version}" | head -n 1) || :
 
     if [ -z "${versionPath}" ]; then
         echo "Error: Version ${Version} not found" >&2
@@ -59,9 +60,9 @@ get_deb_from_url ()
 
     for fileName in "${files[@]}"; do
 
-        filePageUrl="https://releases.1c.ru/version_file?nick=Platform83&ver=${Version}&path=Platform%5c${Version//./_}%5c${fileName}"
+        filePageUrl="https://releases.1c.ru/version_file?nick=Platform${majorVersion}&ver=${Version}&path=Platform%5c${Version//./_}%5c${fileName}"
         
-        downloadUrl=$(curl -sL -b "${cookieFile}" -H "${headers}" "${filePageUrl}" | grep -oP 'https://dl03.1c.ru/public/file/get/[^"]+')
+        downloadUrl=$(curl -sL -b "${cookieFile}" -H "${headers}" "${filePageUrl}" | grep -oP 'https://dl03.1c.ru/public/file/get/[^"]+') || :
 
         if [ -z "${downloadUrl}" ]; then
             echo "Error: Linux deb 64-bit link not found" >&2

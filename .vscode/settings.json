@@ -94,6 +94,7 @@
         "WEBSERVEREXT",
         "Wsisapi",
         "wsrv",
-        "wwwroot"
+        "wwwroot",
+        "подмодуль"
     ]
 }

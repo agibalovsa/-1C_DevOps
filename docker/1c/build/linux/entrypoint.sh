@@ -60,7 +60,7 @@ setup_ragent_healthcheck()
 {
 
     if [ ! -f "/healthcheck.sh" ]; then
-        echo "gosu usr1cv8 rac cluster list localhost:${RAS_PORT:-1545}" > /healthcheck.sh
+        echo "gosu usr1cv8 rac cluster list localhost:${OC_RAS_PORT:-1545}" > /healthcheck.sh
         chmod 766 /healthcheck.sh
     fi;
 

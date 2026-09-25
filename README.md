@@ -7,6 +7,8 @@
 ## Структура репозитория
 
 - build_deb - каталог, в котором находятся скрипты сборки deb-пакетов.
+- choco - каталог, в котором находятся скрипты сборки choco-пакетов.
+- doc - статьи с примерами использования скриптов репозитория.
 - docker - каталог для работы с docker.
   - applications - каталоги с файлами настроек под конкретное приложении.
     - build - каталог, в котором находятся файлы описания сборки docker-образов
@@ -31,13 +33,15 @@
   - .env
   - .arg
   - users
+- .gitmodules - подключен подмодуль для сборки контейнера aptly
 
 ## Системные настройки для работы репозитория
 
 - Необходимо установить docker <https://docs.docker.com/engine/install/debian/#install-using-the-repository>.
 - Необходимо установить расширенную программу envsubst.
-  > [!WARNING]
-  > Без этой программы будет не совсем корректно работать скрипт init.sh (см. ниже)
+
+> [!WARNING]
+> Без этой программы будет не совсем корректно работать скрипт init.sh (см. ниже)
   
   ```bash
   curl -L https://github.com/a8m/envsubst/releases/download/v1.2.0/envsubst-`uname -s`-`uname -m` -o envsubst
@@ -46,7 +50,44 @@
   envsubst
   ```
 
+- Необходимо установить расширенную программу yq.
+
+> [!WARNING]
+> Без этой программы не будет работать скрипт dialog_lib.sh
+  
+  ```bash
+  curl -L https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -o /usr/local/bin/yq
+  chmod +x /usr/local/bin/yq
+  yq -V
+  ```
+
 - Необходимо проверить, что установлено приложение dialog
+
+- Необходимо настроить локализацию
+
+  ```bash
+  locale-gen ru_RU.UTF-8
+  dpkg-reconfigure locales --frontend=noninteractive
+  update-locale LANG=ru_RU.UTF-8
+  ```
+
+  При необходимости привязать параметры локализации к консоли
+
+  ```bash
+  echo 'export LC_ALL=ru_RU.UTF-8' >> ~/.bashrc
+  ```
+
+- Рекомендуемая версия curl не ниже 7.88.1
+
+  ```bash
+  curl -V
+  ```
+
+- Рекомендуемая версия dialog не ниже 1.3-20201126
+
+  ```bash
+  dialog --version
+  ```
 
 ## Порядок работы с репозиторием
 

@@ -12,14 +12,20 @@ send_deb_to_aptly ()
     fileName=$(basename "${debPath}")
     local uploadDir="upload_pool"
 
-    curl --fail-with-body -w "\n" -X POST \
+    if curl --help all | grep -q "fail-with-body"; then
+        CURL_OPTS="--fail-with-body"
+    else
+        CURL_OPTS="--fail"
+    fi
+
+    curl $CURL_OPTS -w "\n" -X POST \
         -F "file=@${debPath}" \
         "${aptlyApiURL}/api/files/${uploadDir}"
 
-    curl --fail-with-body -w "\n" -X POST \
+    curl $CURL_OPTS -w "\n" -X POST \
         "${aptlyApiURL}/api/repos/${repoName}/file/${uploadDir}/${fileName}?forceReplace=1&move=1"
 
-    curl --fail-with-body -w "\n" -X PUT \
+    curl $CURL_OPTS -w "\n" -X PUT \
         -H "Content-Type: application/json" \
         -d "{
             \"ForceOverwrite\": true,
