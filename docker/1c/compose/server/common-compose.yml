@@ -7,6 +7,8 @@ services:
     command: ${OC_SERVER_COMMAND}
     environment:
       TZ:              ${TZ}
+      MAIN_SERVER:     ${MAIN_SERVER}
+      REQUIREMENT:     ${REQUIREMENT}
       # 1С не любит проброс разноименных портов, используем проброс одноименных портов 
       OC_RAGENT_PORT:  ${OC_RAGENT_PORT:-1540}
       OC_RMNGR_PORT:   ${OC_RMNGR_PORT:-1541}

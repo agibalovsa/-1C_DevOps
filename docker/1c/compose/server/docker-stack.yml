@@ -1,0 +1,8 @@
+services:
+
+  oc-server:
+
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure

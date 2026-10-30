@@ -54,6 +54,127 @@ setup_init()
 
 }
 
+# rac
+
+get_cluster_uid() {
+
+    local targetServer="$1"
+    local clusterUID
+
+    while true; do
+        clusterUID=$(rac cluster list "${targetServer}" 2>/dev/null | awk '/^cluster/ {print $3; exit}')
+        if [ -n "$clusterUID" ]; then
+            echo "Active cluster ${clusterUID} on ${targetServer}" >&2
+            break
+        fi
+
+        echo "Cluster on ${targetServer} not active. Retrying..." >&2
+        sleep 5
+    done
+
+    echo "${clusterUID}"
+
+}
+
+set_main_server()
+{
+
+    if [ -z "$MAIN_SERVER" ]; then
+        return
+    fi
+
+    local clusterUID
+    clusterUID=$(get_cluster_uid "${MAIN_SERVER}")
+
+    if ! rac server list --cluster="${clusterUID}" "${MAIN_SERVER}" | grep -q "name.*: \"${CURRENT_HOSTNAME}\""; then
+        rac server insert \
+            --agent-host="${CURRENT_HOSTNAME}" \
+            --agent-port="${OC_RAGENT_PORT}" \
+            --port-range="${OC_RPHOST_PORT}" \
+            --name="${CURRENT_HOSTNAME}" \
+            --using=normal \
+            --cluster-port="${OC_RMNGR_PORT}" \
+            --cluster="${clusterUID}" \
+            "${MAIN_SERVER}"
+        echo "Registered the current server ${CURRENT_HOSTNAME} in the cluster ${MAIN_SERVER}" >&2
+    else
+        echo "Current server ${CURRENT_HOSTNAME} already registered in the cluster ${MAIN_SERVER}" >&2
+    fi
+
+}
+
+set_requirements()
+{
+
+    if [ -z "$REQUIREMENT" ]; then
+        return
+    fi
+
+    local targetServer="${MAIN_SERVER:-localhost:${OC_RAS_PORT}}"
+    local clusterUID
+    clusterUID=$(get_cluster_uid "${targetServer}")
+
+    local serverUID
+    serverUID=$(rac server list --cluster="$clusterUID" "${targetServer}" | awk -v n="${CURRENT_HOSTNAME}" '
+        /^server/ { id = $3 }
+        $0 ~ "name" && $0 ~ n { print id }
+    ')
+
+    if [ -z "$serverUID" ]; then
+        echo "Error: Failed to find UID for the current server ${CURRENT_HOSTNAME} in the cluster on ${targetServer}" >&2
+        exit 1
+    fi
+
+    if rac rule list --server="${serverUID}" --cluster="${clusterUID}" "${targetServer}" | grep -qE '^rule'; then
+        echo "Server ${CURRENT_HOSTNAME} already has requirement rules. Skipping initialization." >&2
+        return
+    fi
+
+    local ruleIndex=0
+    local stringRequirement="$REQUIREMENT"
+    
+    IFS=',' read -r -a rules <<< "$stringRequirement"
+
+    for rule in "${rules[@]}"; do
+  
+        local rawItem
+        rawItem=$(echo "$rule" | xargs)
+
+        local ruleType="auto"
+        local service=""
+
+        if [[ "$rawItem" == +* ]]; then
+            ruleType="always"
+            service="${rawItem#+}"
+        elif [[ "$rawItem" == -* ]]; then
+            ruleType="never"
+            service="${rawItem#-}"
+        else
+            ruleType="auto"
+            service="$rawItem"
+        fi;
+
+        service=$(echo "$service" | xargs)
+
+        rac rule insert \
+            --server="${serverUID}" \
+            --position="${ruleIndex}" \
+            --object-type="${service}" \
+            --rule-type="${ruleType}" \
+            --cluster="${clusterUID}" \
+            "${targetServer}"
+        
+        echo "Added requirement rule [${ruleType}] for service '${service:-For all}' on server ${CURRENT_HOSTNAME} (Index: ${ruleIndex})" >&2
+
+        ((++ruleIndex))
+
+    done
+
+    rac rule apply --full --cluster="${clusterUID}" "${targetServer}"
+    echo "All functionality requirements have been fully applied on ${targetServer}" >&2
+
+}
+
 # server
 
 setup_ragent_healthcheck()
@@ -68,6 +189,8 @@ setup_ragent_healthcheck()
 
 setup_defaults()
 {
+
+    CURRENT_HOSTNAME=$(hostname)
 
     WWW_PATH=${WWW_PATH:-"/var/www"}
     OC_SRVINFO=${OC_SRVINFO:-"/home/usr1cv8/.1cv8/1C/1cv8"}
@@ -171,6 +294,13 @@ server()
     setup_init
 
     run_ras_exec_background
+
+    (
+        sleep 60
+        set_main_server
+        set_requirements
+    ) &
+
     run_ragent_exec
 
 }

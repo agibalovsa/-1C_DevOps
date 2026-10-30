@@ -95,6 +95,9 @@
         "Wsisapi",
         "wsrv",
         "wwwroot",
-        "подмодуль"
+        "подмодуль",
+        "procname",
+        "webinst",
+        "wsap"
     ]
 }

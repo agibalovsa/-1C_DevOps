@@ -1,14 +1,11 @@
 services:
 
   postgres:
-  
-    networks:
-      - postgres_network
 
-networks:
-  postgres_network:
-    name: "${POSTGRES_NETWORK:-postgres_network}"
-    external: true
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
 
 secrets:
   postgres_password:
