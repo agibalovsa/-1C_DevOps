@@ -3,6 +3,7 @@
 Set-Vars-From-File ".env"
 
 New-Docker-Volume "${MSSQL_DATA_VOL}" "${MSSQL_DATA_MOUNT_PATH}"
+New-Docker-Volume "${MSSQL_LOG_VOL}" "${MSSQL_LOG_MOUNT_PATH}"
 New-Docker-Volume "${MSSQL_TEMP_VOL}" "${MSSQL_TEMP_MOUNT_PATH}"
 New-Docker-Volume "${MSSQL_BACKUP_VOL}" "${MSSQL_BACKUP_MOUNT_PATH}"
 
