@@ -4,7 +4,7 @@ export DH_VERBOSE = 1
 
 SHELL := /bin/bash
 
-archivePath=script_x_linux_${DEB_VERSION}.zip
+archivePath=script_x_linux_${DEB_VERSION}*.zip
 pathPack=debian/1c-element-script
 pathTmp=/tmp/
 pathOpt=/var/opt/script/

@@ -23,8 +23,7 @@ get_deb_from_url ()
 
     # Getting cookies and tokens
 
-    loginPage=$(curl -sL -c "${cookieFile}" -H "${headers}" "https://login.1c.ru/login")
-    execution=$(echo "${loginPage}" | grep -oP 'name="execution" value="\K[^"]+')
+    execution=$(curl -sL -c "${cookieFile}" -H "${headers}" "https://login.1c.ru/login" | grep -oP 'name="execution" value="\K[^"]+')
 
     # Logging on login.1c.ru
 
@@ -34,7 +33,7 @@ get_deb_from_url ()
         -d "execution=$execution" \
         -d "_eventId=submit" \
         -d "rememberMe=false" \
-        "https://login.1c.ru/login") || :
+        "https://login.1c.ru/login" | grep -oP 'user/profile' || true )
 
     if [[ ! "${authCheck}" =~ "user/profile" ]]; then
         echo "Error: Failed to log in. Check credentials" >&2
@@ -45,8 +44,7 @@ get_deb_from_url ()
     echo "2. Searching for a link to version ${Version}..."
 
     majorVersion="$(echo "$Version" | sed -E 's/^([0-9]+)\.([0-9]+).*/\1\2/')"
-    versionsPage=$(curl -sL -b "${cookieFile}" -H "${headers}" "https://releases.1c.ru/project/Platform${majorVersion}?allUpdates=true") || :
-    versionPath=$(echo "${versionsPage}" | grep -oP "/version_files\?nick=Platform${majorVersion}&ver=${Version}" | head -n 1) || :
+    versionPath=$(curl -sL -b "${cookieFile}" -H "${headers}" "https://releases.1c.ru/project/Platform${majorVersion}?allUpdates=true" | grep -oP "/version_files\?nick=Platform${majorVersion}&ver=${Version}" | head -n 1)
 
     if [ -z "${versionPath}" ]; then
         echo "Error: Version ${Version} not found" >&2
@@ -55,14 +53,14 @@ get_deb_from_url ()
 
     files=("deb64_${Version//./_}.zip")
     if [ "${getClient}" = "1" ]; then
-        files+=("client_${Version//./_}.deb64.zip")  
+        files+=("client_${Version//./_}.deb64.zip")
     fi
 
     for fileName in "${files[@]}"; do
 
         filePageUrl="https://releases.1c.ru/version_file?nick=Platform${majorVersion}&ver=${Version}&path=Platform%5c${Version//./_}%5c${fileName}"
         
-        downloadUrl=$(curl -sL -b "${cookieFile}" -H "${headers}" "${filePageUrl}" | grep -oP 'https://dl03.1c.ru/public/file/get/[^"]+') || :
+        downloadUrl=$(curl -sL -b "${cookieFile}" -H "${headers}" "${filePageUrl}" | grep -oP 'https://dl\d+\.1c\.ru/public/file/get/[^"]+' | head -n 1 ) 
 
         if [ -z "${downloadUrl}" ]; then
             echo "Error: Linux deb 64-bit link not found" >&2

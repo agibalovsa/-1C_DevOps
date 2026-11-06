@@ -4,6 +4,9 @@ services:
 
     image: "${SONAR_TAG:-sonarqube:lts-community}"
     hostname: "${SONAR_HOSTNAME:-sonarqube}"
+    logging:
+      options:
+        max-size: "${SONAR_LOG_SIZE:-100M}"
     ulimits:
       nofile: # Maximum number of open files for the sonarqube user
         soft: 131072

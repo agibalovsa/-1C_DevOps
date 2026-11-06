@@ -531,10 +531,11 @@ setup_xvfb_exec()
 
 }
 
-setup_client_exec()
+setup_client_env()
 {
 
-    CLIENT_EXEC="DISPLAY=:99.0 ${1}"
+    echo "Set DISPLAY=:99.0"
+    export DISPLAY=:99.0
 
 }
 
@@ -543,15 +544,6 @@ run_xvfb_exec_background()
 
     echo "Beginning Xvfb in background"
     ${XVFB_EXEC} 2>&1 &
-
-}
-
-run_client_exec()
-{
-
-    echo "Beginning client"
-    echo "${CLIENT_EXEC}"
-    exec ${CLIENT_EXEC} 2>&1
 
 }
 
@@ -566,10 +558,7 @@ client()
     
     run_xvfb_exec_background
 
-    if [ -n "${1}" ]; then
-        setup_client_exec "${1}"
-        run_client_exec
-    fi;
+    setup_client_env
 
 }
 
@@ -583,7 +572,9 @@ elif [ "$1" = "ibsrv" ]; then
 elif [ "$1" = "crserver" ]; then
     crserver
 elif [ "$1" = "client" ]; then
-    client "$2"
+    client
+elif [ "$1" = "load" ]; then
+    return 0
 else
     echo "Wrong parameter: $1" >&2
     exit 1

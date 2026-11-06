@@ -7,12 +7,10 @@ if [ "$1" == "sh" ]; then
 elif [ "$1" == "bash" ] || [ "$1" == "" ]; then
     exec /bin/bash
 elif [[ "$1" == *"="* ]]; then
-    for param in "$@"; do
-        key="${param%%=*}"
-        value="${param#*=}"
-        SH_EXEC=( "entrypoint.d/entrypoint_${key}.sh" "$value" )
-        exec "${SH_EXEC[@]}" 
-    done
+    key="${1%%=*}"
+    value="${1#*=}"
+    SH_EXEC=( "/entrypoint.d/entrypoint_${key}.sh" "$value" )
+    exec "${SH_EXEC[@]}" 
 else
     echo "Wrong parameter: $1" >&2
     exit 1

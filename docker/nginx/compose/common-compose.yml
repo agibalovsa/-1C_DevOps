@@ -8,15 +8,18 @@ services:
       options:
         max-size: "${NGINX_LOG_SIZE:-100M}"
     environment:
-      TZ:                     "${TZ}"
-      NGINX_SERVER_NAME:      "${NGINX_SERVER_NAME}"
-      GITLAB_EXTERNAL_URL:    "${GITLAB_EXTERNAL_URL}"
-      GITLAB_HTTPS_PORT:      "${GITLAB_HTTPS_PORT}"
-      GITLAB_SSH_PORT:        "${GITLAB_SSH_PORT}"
-      SONAR_EXTERNAL_URL:     "${SONAR_EXTERNAL_URL}"
-      SONAR_HTTP_PORT:        "${SONAR_HTTP_PORT}"
-      PORTAINER_EXTERNAL_URL: "${PORTAINER_EXTERNAL_URL}"
-      PORTAINER_HTTPS_PORT:   "${PORTAINER_HTTPS_PORT}"
+      TZ:                        "${TZ}"
+      NGINX_SERVER_NAME:         "${NGINX_SERVER_NAME}"
+      GITLAB_EXTERNAL_URL:       "${GITLAB_EXTERNAL_URL}"
+      GITLAB_HTTPS_PORT:         "${GITLAB_HTTPS_PORT}"
+      GITLAB_SSH_PORT:           "${GITLAB_SSH_PORT}"
+      SONAR_EXTERNAL_URL:        "${SONAR_EXTERNAL_URL}"
+      SONAR_HTTP_PORT:           "${SONAR_HTTP_PORT}"
+      PORTAINER_EXTERNAL_URL:    "${PORTAINER_EXTERNAL_URL}"
+      PORTAINER_HTTPS_PORT:      "${PORTAINER_HTTPS_PORT}"
+      OPENSEARCH_EXTERNAL_URL:   "${OPENSEARCH_EXTERNAL_URL}"
+      OPENSEARCH_API_PORT:       "${OPENSEARCH_API_PORT}"
+      OPENSEARCH_DASHBOARD_PORT: "${OPENSEARCH_DASHBOARD_PORT}"
     networks:
       - nginx_network
     ports:

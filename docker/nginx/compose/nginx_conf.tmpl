@@ -54,7 +54,7 @@ server {
     proxy_ssl_verify off;
     client_max_body_size 10M;
 
-    proxy_pass https://{{ env "OPENSEARCH_EXTERNAL_URL" }}:{{ env "OPENSEARCH_API_PORT" }};
+    proxy_pass https://{{ env "OPENSEARCH_EXTERNAL_URL" }}:{{ env "OPENSEARCH_API_PORT" }}/;
 
   }
 

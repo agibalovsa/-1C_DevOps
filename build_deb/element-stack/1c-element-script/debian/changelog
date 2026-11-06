@@ -1,9 +1,9 @@
-1c-element-script (9.1.1-2) stable; urgency=medium
+1c-element-script-lib (9.1.8-1) stable; urgency=medium
 
   * Новая функциональность
     * Поддержка протокола TCP
 
--- Rarus-Samara <sam-gr@rarus.ru>  Thu, 03 Mar 2026 01:00:00 +0400
+ -- Rarus-Samara <sam-gr@rarus.ru>  Thu, 23 Aug 2026 20:30:00 +0400
 
 1c-element-script-lib (9.0.0-3) stable; urgency=medium
 

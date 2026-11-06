@@ -45,7 +45,7 @@ install_from_repo() {
 install_from_file() {
 
     for installFile in ${INSTALL_FILES}; do
-        dpkg -i "/distr/${installFile}";
+        dpkg -i "context/distr/${installFile}";
     done;
 
 }
