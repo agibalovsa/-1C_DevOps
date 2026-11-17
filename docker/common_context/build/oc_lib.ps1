@@ -221,34 +221,45 @@ function Get-OC-MSI-RAR
     )
     process
     {
+
         $PW7 = $PSVersionTable.PSVersion.Major -eq 7
+
         $Disk = Get-PSDrive $((Split-Path -Path "${SavePath}" -Qualifier).Substring(0, 1))
         if ( $Disk.Free -lt 3GB )
         {
-            Write-Error "Not enough space on the ${Disk} drive"
+            Write-Error "Not enough space on the $($Disk.Name) drive"
             return
         }
         if ( ! ( Test-Path "${SavePath}" ) )
         {
-            New-Item -ItemType Directory -Path "${SavePath}"
+            New-Item -ItemType Directory -Path "${SavePath}" | Out-Null
+        }
+
+        if ( $Version -match '^(\d+)\.(\d+)' )
+        {
+            $MajorVersion = "$($Matches[1])$($Matches[2])"
+        }
+        else
+        {
+            Write-Error "Invalid version format: ${Version}. Expected format like 8.3.27.2424"
+            return
         }
 
         Write-Host "1. Authorization on login.1c.ru..." -ForegroundColor Cyan
 
         # Getting cookies and tokens
-
         $Headers = @{ "User-Agent" = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" }
         $LoginUrl = "https://login.1c.ru/login"
         $LoginPage = Invoke-WebRequest -Uri ${LoginUrl} -SessionVariable "Session1C" -Headers ${Headers} -TimeoutSec 30 -UseBasicParsing
 
         # Logging on login.1c.ru
-        if ( ( ! $PW7 ) -and ($LoginPage.Content -match 'name="execution" value="([^"]+)"') )
+        if ( $LoginPage.Content -match 'name="execution" value="([^"]+)"' )
         {
             $ExecutionId = $Matches[1]
         }
-        elseif ( $PW7 )
+        elseif ( $PW7 -and $LoginPage.InputFields )
         {
-            $ExecutionId = $LoginPage.InputFields[6].value
+            $ExecutionId = ($LoginPage.InputFields | Where-Object { $_.name -eq "execution" }).value
         }
         else
         {
@@ -268,7 +279,8 @@ function Get-OC-MSI-RAR
         }
         $AuthResponse = Invoke-WebRequest -Uri ${LoginUrl} -Method Post -Body ${Body} -WebSession $Session1C -Headers ${Headers} -TimeoutSec 30 -UseBasicParsing -ContentType "application/x-www-form-urlencoded"
 
-        if ( ( ( $PW7 ) -and ( $AuthResponse.BaseResponse.RequestMessage.RequestUri -notmatch "https://login.1c.ru/user/profile" ) ) -or ( ( ! $PW7 ) -and ( $AuthResponse.BaseResponse.ResponseUri -notmatch "https://login.1c.ru/user/profile" ) ) )
+        $ResponseUri = if ($PW7) { $AuthResponse.BaseResponse.RequestMessage.RequestUri } else { $AuthResponse.BaseResponse.ResponseUri }
+        if ( $ResponseUri -notmatch "https://login.1c.ru/user/profile" )
         {
             Write-Error "Failed to log in. Check your username and password"
             return
@@ -277,10 +289,11 @@ function Get-OC-MSI-RAR
         Write-Host "2. Searching for a link to the version ${Version}..." -ForegroundColor Cyan
 
         # Searching links
-
-        $VersionsUrl = "https://releases.1c.ru/project/Platform83?allUpdates=true#updates"
+        $VersionsUrl = "https://releases.1c.ru/project/Platform${MajorVersion}?allUpdates=true#updates"
         $VersionsPage = Invoke-WebRequest -Uri ${VersionsUrl} -WebSession ${Session1C} -Headers ${Headers} -TimeoutSec 30 -UseBasicParsing
-        $VersionUrl = $VersionsPage.Links | Where-Object { $_.href -match "/version_files\?nick=Platform83&ver=${Version}" } | Select-Object -First 1 -ExpandProperty href
+        
+        $VersionEscaped = [regex]::Escape($Version)
+        $VersionUrl = $VersionsPage.Links | Where-Object { $_.href -match "/version_files\?nick=Platform${MajorVersion}&ver=${VersionEscaped}" } | Select-Object -First 1 -ExpandProperty href
 
         if ( $VersionUrl -match '[?&]ver=(?<version>[^&]+)' )
         {
@@ -293,9 +306,11 @@ function Get-OC-MSI-RAR
             return
         }
 
-        $FileName = "windows64full_$($Version.Replace(".","_")).rar"
-        $FileUrl  = "https://releases.1c.ru/version_file?nick=Platform83&ver=${Version}&path=Platform%5c$($Version.Replace(".","_"))%5c${FileName}"
+        $VersionUnderscore = $Version.Replace(".", "_")
+        $FileName = "windows64full_${VersionUnderscore}.rar"
+        $FileUrl  = "https://releases.1c.ru/version_file?nick=Platform${MajorVersion}&ver=${Version}&path=Platform%5c${VersionUnderscore}%5c${FileName}"
         $FilePage = Invoke-WebRequest -Uri ${FileUrl} -WebSession ${Session1C} -Headers ${Headers} -TimeoutSec 30 -UseBasicParsing
+        
         $DownloadUrl = $FilePage.Links | Where-Object { $_.href -match "https://dl0.\.1c\.ru/public/file/get/" } | Select-Object -First 1 -ExpandProperty href
         if ( ! $DownloadUrl )
         {
@@ -306,12 +321,11 @@ function Get-OC-MSI-RAR
         Write-Host "3. Downloading a file ${FileName}..." -ForegroundColor Yellow
 
         # Downloading
-
         try
         {
             Invoke-WebRequest -Uri ${DownloadUrl} -OutFile "${SavePath}\${FileName}" -WebSession ${Session1C} -Headers ${Headers} -UseBasicParsing
             Write-Host "The file ${SavePath}\${FileName} is saved" -ForegroundColor Green
-        } 
+        }
         catch
         {
             Write-Error ("Error when downloading: {0}`nDetails: {1}" -f $_.Exception.Message, $_.Exception.InnerException)

@@ -123,6 +123,14 @@ function Invoke-YamlForm {
                 $optionsArray = [string[]]($f.Options)
                 $radio = [Terminal.Gui.RadioGroup]::new($optionsArray)
                 $radio.X = 4; $radio.Y = $currentY + 1
+                
+                if ($f.Default) {
+                    $selectedIndex = [array]::IndexOf([string[]]@($f.Options), [string]$f.Default)
+                    if ($selectedIndex -ge 0) {
+                        $radio.SelectedItem = $selectedIndex
+                    }
+                }
+                
                 $win.Add($radio)
 
                 $generatedControls[$f.Name] = @{ Control = $radio; Type = "Radio"; Options = $optionsArray }

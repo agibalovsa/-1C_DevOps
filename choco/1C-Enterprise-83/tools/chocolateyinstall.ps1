@@ -14,7 +14,7 @@ $Password = if ($Param['Password']) { $Param['Password'] } else { "" }
 $ReleasesLogin = if ($Param['ReleasesLogin']) { $Param['ReleasesLogin'] } else { "" }
 $ReleasesPassword = if ($Param['ReleasesPassword']) { $Param['ReleasesPassword'] } else { "" }
 
-$DistrFileName = "windows64full_$($Env:chocolateyPackageVersion.Replace('.', '_')).rar"
+$DistrFileName = "windows64full_$($env:chocolateyPackageVersion.Replace('.', '_')).rar"
 $LocalDistrFilePath = (Join-Path "${DistrPath}" "${DistrFileName}")
 
 . (Join-Path "${toolsDir}" "tools.ps1")
@@ -36,9 +36,16 @@ else
     }
     Get-OC-Msi-Rar "${DistrPath}" "${env:chocolateyPackageVersion}" "${ReleasesLogin}" "${ReleasesPassword}"
 }
+
 $InstallDistrPath = ( Join-Path "${toolsDir}" "install")
 $DistrParam = Unpack-OC-Msi-Rar "${LocalDistrFilePath}" "${InstallDistrPath}"
-$DistrMsiPath = ( Join-Path "${InstallDistrPath}" $DistrParam["PackageName"] ) 
+
+if ( "${DistrPath}" -eq "${toolsDir}" )
+{
+    Remove-Item -Path "${LocalDistrFilePath}" -Recurse -Force -ErrorAction SilentlyContinue
+}
+
+$DistrMsiPath = ( Join-Path "${InstallDistrPath}" $DistrParam["PackageName"] )
 Set-Envs
 
 $silentArgs = @(
@@ -57,3 +64,5 @@ $packageArgs = @{
 }
 
 Install-ChocolateyInstallPackage @packageArgs
+
+Remove-Item -Path "${InstallDistrPath}" -Recurse -Force -ErrorAction SilentlyContinue

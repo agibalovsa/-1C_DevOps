@@ -1,8 +1,11 @@
-$Version = Read-Host "Введите версию 1С с сайта https://releases.1c.ru/project/Platform83"
-$Nuspec = (Get-ChildItem *.nuspec).FullName
+Set-Location -Path $PSScriptRoot
 
-[xml]$xml = Get-Content $Nuspec
+$Version = Read-Host "Введите версию платформы 1С с сайта https://releases.1c.ru/project"
+
+$ConfigFile = (Get-ChildItem *.nuspec)
+
+[xml]$xml = Get-Content $ConfigFile.FullName
 $xml.package.metadata.version = $Version
-$xml.Save($Nuspec)
+$xml.Save($ConfigFile.FullName)
 
-choco pack $Nuspec
+choco pack $ConfigFile.FullName

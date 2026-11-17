@@ -18,3 +18,15 @@ Fields:
     Type: "Text"
     Label: "4) Путь установки 1С:"
     Default: "C:\\Program Files\\1cv8"
+
+  - Name: "Push"
+    Type: "Boolean"
+    Label: "5) Отправить пакет в репозиторий"
+
+  - Name: "Repo"
+    Type: "Text"
+    Label: "6) Путь до репозитория"
+
+  - Name: "Api key"
+    Type: "Password"
+    Label: "7) Ключ доступа к репозиторию"
