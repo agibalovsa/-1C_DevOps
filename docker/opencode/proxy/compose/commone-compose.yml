@@ -1,0 +1,17 @@
+services:
+  opencode-proxy:
+    image: "${OPPROXY_TAG:-ghcr.io/jasonxu114514/opencode2api:latest}"
+    hostname: "${OPPROXY_HOSTNAME:-opencode-proxy}"
+    logging:
+      options:
+        max-size: "${OPPROXY_LOG_SIZE:-100M}"
+    ports:
+      - "${OPPROXY_HTTP_PORT:-8081}:8081"
+      - "${OPPROXY_API_PORT:-8080}:8080"
+    volumes:
+      - opencode-proxy-data:/var/lib/opencode2api
+
+volumes:
+  opencode-proxy-data:
+    external: true
+    name: "${OPPROXY_DATA_VOL:-opencode_proxy_data}"

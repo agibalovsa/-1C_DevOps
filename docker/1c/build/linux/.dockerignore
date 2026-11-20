@@ -1,3 +1,5 @@
 .arg.tmpl
+.secret.tmpl
 docker-build.sh
 .arg
+.secret

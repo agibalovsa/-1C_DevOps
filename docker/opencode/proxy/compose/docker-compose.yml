@@ -1,0 +1,7 @@
+services:
+
+  opencode-proxy:
+  
+    container_name: "${OPPROXY_NAME:-opencode-proxy}"
+    restart: always
+

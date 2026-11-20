@@ -43,6 +43,7 @@ init_stack () {
                 "gitlab-ce/compose" "Gitlab" off \
                 "hasp/compose" "Hasp" off \
                 "fluent-bit/compose" "Fluent Bit" off \
+                "opencode/proxy/compose" "Opencode proxy" off \
                 "opensearch/compose" "Open Search" off \
                 "portainer/compose" "Portainer" off \
                 "postgres/compose" "Postgres" off \
@@ -498,7 +499,7 @@ set -Eeo pipefail
 
 paths=( "common_context" )
 make_build_stack "common_context" paths[@]
-make_run_stack "" "common_context" paths[@]
+make_run_stack "" "common_context" paths[@] "1"
 
 declare name_stack
 declare type_stack
