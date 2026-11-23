@@ -27,7 +27,7 @@ RUN --mount=from=context,source=install,target=/install \
     . /install; \
     install_packs
 
-COPY --chmod=766 [ "send_sighup.sh", "/" ]
+COPY --chmod=766 [ "send_signal.sh", "/" ]
 COPY --chmod=766 [ "entrypoint.sh", "/entrypoint.d/entrypoint_step_ca.sh" ]
 COPY --from=entrypoint_context --chmod=766 [ "entrypoint.sh", "/" ]
 

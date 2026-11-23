@@ -17,7 +17,7 @@ services:
       CERT_FORMAT:      "${CERT_FORMAT:-CRT}"
       BACKGROUND:       "${BACKGROUND:-0}"
     ports:
-      - "80:80"
+      - "${STEP_CA_PORT:-80}:80"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /etc/localtime:/etc/localtime
