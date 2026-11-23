@@ -4,6 +4,18 @@ services:
 
     container_name: "${NGINX_NAME:-nginx}"
     restart: always
+    environment:
+      NGINX_SERVER_NAME:         "${NGINX_SERVER_NAME}"
+      GITLAB_URL:                "${GITLAB_URL}"
+      GITLAB_HTTPS_PORT:         "${GITLAB_HTTPS_PORT}"
+      GITLAB_SSH_PORT:           "${GITLAB_SSH_PORT}"
+      SONAR_URL:                 "${SONAR_URL}"
+      SONAR_HTTP_PORT:           "${SONAR_HTTP_PORT}"
+      PORTAINER_URL:             "${PORTAINER_URL}"
+      PORTAINER_HTTPS_PORT:      "${PORTAINER_HTTPS_PORT}"
+      OPENSEARCH_URL:            "${OPENSEARCH_URL}"
+      OPENSEARCH_API_PORT:       "${OPENSEARCH_API_PORT}"
+      OPENSEARCH_DASHBOARD_PORT: "${OPENSEARCH_DASHBOARD_PORT}"
     volumes:
       - nginx_conf:/etc/nginx/conf.d/
       - nginx_stream:/etc/nginx/stream.d/
