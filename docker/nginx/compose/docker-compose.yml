@@ -1,0 +1,17 @@
+services:
+
+  nginx:
+
+    container_name: "${NGINX_NAME:-nginx}"
+    restart: always
+    volumes:
+      - nginx_conf:/etc/nginx/conf.d/
+      - nginx_stream:/etc/nginx/stream.d/
+
+volumes:
+  nginx_conf:
+    external: true
+    name: "${NGINX_CONF_VOL:-nginx_conf}"
+  nginx_stream:
+    external: true
+    name: "${NGINX_STREAM_VOL:-nginx_stream}"

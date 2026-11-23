@@ -2,4 +2,4 @@
 
 set -Eeo pipefail
 
-./entrypoint.sh "step_ca=sighup"
+./entrypoint.sh "step_ca=signal"

@@ -9,9 +9,9 @@ services:
       - "${OPPROXY_HTTP_PORT:-8081}:8081"
       - "${OPPROXY_API_PORT:-8080}:8080"
     volumes:
-      - opencode-proxy-data:/var/lib/opencode2api
+      - opencode_proxy_data:/var/lib/opencode2api
 
 volumes:
-  opencode-proxy-data:
+  opencode_proxy_data:
     external: true
     name: "${OPPROXY_DATA_VOL:-opencode_proxy_data}"

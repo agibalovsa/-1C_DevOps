@@ -25,7 +25,8 @@ services:
     ports:
       - "80:80"
       - "443:443"
-      - "${GITLAB_SSH_PORT:-22}:${GITLAB_SSH_PORT:-22}"
+      - "${SSH_PORT:-22}:${SSH_PORT:-22}"
+      - "${DOCKER_REGISTRY_PORT:-5000}:${DOCKER_REGISTRY_PORT:-5000}"
 
 networks:
   nginx_network:

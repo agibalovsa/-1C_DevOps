@@ -1,4 +1,4 @@
 server {
-  listen {{ env "GITLAB_SSH_PORT" }};
-  proxy_pass {{ env "GITLAB_EXTERNAL_URL" }}:{{ env "GITLAB_SSH_PORT" }};
+  listen {{ or (env "GITLAB_SSH_PORT") "22" }};
+  proxy_pass {{ or (env "GITLAB_URL") "gitlab" }}:{{ or (env "GITLAB_SSH_PORT") "22" }};
 }

@@ -43,6 +43,7 @@ init_stack () {
                 "gitlab-ce/compose" "Gitlab" off \
                 "hasp/compose" "Hasp" off \
                 "fluent-bit/compose" "Fluent Bit" off \
+                "nginx/compose" "Nginx" off \
                 "opencode/proxy/compose" "Opencode proxy" off \
                 "opensearch/compose" "Open Search" off \
                 "portainer/compose" "Portainer" off \
@@ -56,6 +57,7 @@ init_stack () {
             dialog --ascii-lines --no-shadow --no-tags ${ERASE_ON_EXIT} --output-fd 1 --checklist "Please select applications" 0 0 0 \
                 "1c/compose/server" "1C Platform (server)" off \
                 "gitlab-ce/compose" "Gitlab" off \
+                "nginx/compose" "Nginx" off \
                 "opensearch/compose" "Open Search" off \
                 "portainer/compose" "Portainer" off \
                 "postgres/compose" "Postgres" off \
@@ -300,6 +302,9 @@ make_run_stack () {
                     envsubst < "${current_dir}/${rel_path}/.env.tmpl"
                     echo ""
                 } >> "${stack_path}/.env.tmp"
+            elif [[ "${file}" == *".tmpl" ]] || \
+                [[ "${file}" == *".sh" ]]; then
+                cp "${file}" "${stack_path}"
             else
                 filename=$(basename "${file}")
                 [ "${use_env_file_stack}" = "0" ] && (
