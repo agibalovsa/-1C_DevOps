@@ -7,6 +7,7 @@ services:
     volumes:
       - nginx_conf:/etc/nginx/conf.d/
       - nginx_stream:/etc/nginx/stream.d/
+      - nginx_ssl:/etc/nginx/ssl/
 
 volumes:
   nginx_conf:
@@ -15,3 +16,6 @@ volumes:
   nginx_stream:
     external: true
     name: "${NGINX_STREAM_VOL:-nginx_stream}"
+  nginx_ssl:
+    external: true
+    name: "${NGINX_SSL_VOL:-nginx_ssl}"
