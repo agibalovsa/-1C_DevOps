@@ -189,7 +189,7 @@ make_run_stack () {
     [ -f "${stack_path}/${down_script}" ] && rm "${stack_path}/${down_script}"
     [ -n "${logs_script}" ] && [ -f "${stack_path}/${logs_script}" ] && rm "${stack_path}/${logs_script}"
 
-    if [ "${use_env_file_stack}" = "1" ] && [ -d "${stack_path:?}/${stack_name}" ]; then
+    if [ "${use_env_file_stack}" = "1" ] && [ -d "${stack_path:?}/${stack_name}" ] && [[ "${stack_name}" != *"common_context" ]] ; then
         rm -r "${stack_path:?}/${stack_name}"
     fi
 
@@ -211,7 +211,7 @@ make_run_stack () {
             echo "{"
             echo "    echo \"CONTEXT_ENV=\${CONTEXT_ENV}\""
             echo "    echo \"\""
-            echo "    cat \"\${current_dir}/../common_context/.env\""
+            echo "    cat \"\${current_dir}/../../common_context/.env\""
             echo "    echo \"\""
             echo "    cat \"\${current_dir}/.env\""
             echo "} > \"\${CONTEXT_ENV}/.env\""
@@ -294,6 +294,8 @@ make_run_stack () {
             elif [[ "${stack_type}" == "compose" && "${file}" == *"stack.yml" ]]; then
                 continue
             elif [[ "${stack_type}" == "stack" && "${file}" == *"compose.yml" ]]; then
+                continue
+            elif [[ "${file}" == *".arg.tmpl" ]]; then
                 continue
             elif [[ "${file}" == *".env.tmpl" ]]; then
                 [ "${use_env_file_stack}" = "1" ] && {
@@ -429,7 +431,7 @@ make_build_stack () {
             "echo \"CONTEXT_ARG=\${CONTEXT_ARG}\"" \
             "echo \"CONTEXT_SECRET=\${CONTEXT_SECRET}\"" \
             "echo \"\"" \
-            "cat \"\${current_dir}/../common_context/.arg\"" \
+            "cat \"\${current_dir}/../../common_context/.arg\"" \
             "echo \"\"" \
             "cat \"\${current_dir}/.arg\"" \
         "} > \"\${CONTEXT_ARG}/.arg\"" \
@@ -503,8 +505,8 @@ make_build_stack () {
 set -Eeo pipefail
 
 paths=( "common_context" )
-make_build_stack "common_context" paths[@]
-make_run_stack "" "common_context" paths[@] "1"
+make_build_stack "../common_context" paths[@]
+make_run_stack "" "../common_context" paths[@] "1"
 
 declare name_stack
 declare type_stack
