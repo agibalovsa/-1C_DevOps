@@ -17,9 +17,10 @@ services:
       OPENSEARCH_API_PORT:       "${OPENSEARCH_API_PORT}"
       OPENSEARCH_DASHBOARD_PORT: "${OPENSEARCH_DASHBOARD_PORT}"
     volumes:
-      - nginx_conf:/etc/nginx/conf.d/
-      - nginx_stream:/etc/nginx/stream.d/
-      - nginx_ssl:/etc/nginx/ssl/
+      - nginx_conf:/etc/nginx/conf.d:ro
+      - nginx_stream:/etc/nginx/stream.d:ro
+      - nginx_ssl:/etc/nginx/ssl:ro
+      - nginx_auth:/etc/nginx/auth:ro
 
 volumes:
   nginx_conf:
@@ -31,3 +32,6 @@ volumes:
   nginx_ssl:
     external: true
     name: "${NGINX_SSL_VOL:-nginx_ssl}"
+  nginx_auth:
+    external: true
+    name: "${NGINX_AUTH_VOL:-nginx_auth}"

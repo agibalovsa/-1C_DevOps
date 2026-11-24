@@ -328,7 +328,7 @@ make_run_stack () {
             {
                 echo ""
                 echo "cd \"\${CONTEXT_ENV}\""
-                [ "${use_env_file_stack}" = "1" ] && echo "export \$(cat .env | xargs)"
+                [ "${use_env_file_stack}" = "1" ] && echo "set -a; source .env; set +a"
                 echo "docker stack deploy ${compose_files} ${stack_name}"
                 echo "cd .."
             } >> "${stack_path}/${up_script}.tmp"
