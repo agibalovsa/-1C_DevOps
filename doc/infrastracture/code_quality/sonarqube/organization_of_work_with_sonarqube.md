@@ -146,7 +146,7 @@ $> git clone https://github.com/agibalovsa/-1C_DevOps 1c_devops
 - `SONAR_WEB_JAVAOPTS` - веб-сервер выполняется в выделенном процессе Java. Этот параметр используется для настройки параметров **JVM**.
 - `SONAR_CE_JAVAOPTS` - процесс **Compute Engine** отвечает за обработку фоновых задач и выполняется в специальном процессе Java. Этот параметр используется для настройки параметров **JVM**.
 - `SONAR_SEARCH_JAVAOPTS` - **Elasticsearch** используется для обеспечения быстрого и точного поиска информации. Он выполняется в специальном процессе Java. Этот параметр используется для настройки параметров **JVM**.
-- `SONAR_WEB_CONTEXT` - задается, если путь к сервису идет через дополнительные локали, например, нужно задать значение `/sonarqube` если **URL** имеет следующий вид <https://hostname/sonarqube>.
+- `SONAR_WEB_CONTEXT` - задается, если путь к сервису идет через дополнительные локали, например, нужно задать значение `/sonarqube` если **URL** имеет следующий вид <https://hostname:port/sonarqube>.
 
 ### Тома
 
@@ -236,11 +236,11 @@ ulimits:
    $> ./docker-compose-up.sh
    ```
 
-8. После запуска в веб-интерфейсе **Sonarqube** выйдет сообщение об техническом обслуживание. Для его выполнения нужно в браузере указать путь <http://hostname/sonarqube/setup> (путь `/sonarqube` - опционально). После чего откроется страница с предложением обновить базу данных. После подтверждения запустится обновленная версия **Sonarqube**, в веб-интерфейсе возникнут соответствующие сообщения.
+8. После запуска в веб-интерфейсе **Sonarqube** выйдет сообщение об техническом обслуживание. Для его выполнения нужно в браузере указать путь <http://hostname:port/sonarqube/setup> (путь `/sonarqube` - опционально). После чего откроется страница с предложением обновить базу данных. После подтверждения запустится обновленная версия **Sonarqube**, в веб-интерфейсе возникнут соответствующие сообщения.
 
 ## Настройка revers-proxy для Nginx
 
-Для настройки проксирования с внешнего доменного имени, например <http://hostname/sonarqube>, на внутреннее доменное имя, например <http://sonarqube>, необходимо:
+Для настройки проксирования с внешнего доменного имени, например <https://hostname/sonarqube>, на внутреннее доменное имя, например <http://sonarqube:9001>, необходимо:
 
 1. Задать переменную среды `SONAR_WEB_CONTEXT` в файле `.env`
 
@@ -262,7 +262,7 @@ ulimits:
        proxy_set_header X-Forwarded-Protocol $scheme;
        proxy_set_header X-Url-Scheme $scheme;
    
-       proxy_pass http://sonarqube;
+       proxy_pass http://sonarqube:9001;
    
      }
    ```
@@ -495,7 +495,7 @@ PING sonarqube (192.168.0.2) 56(84) bytes of data.
 Параметры переменных
 
 - `SONAR_HOST_URL`
-  - `Value` - Доменное имя сервиса **Sonarqube** - <http://hostname/sonarqube>
+  - `Value` - Доменное имя сервиса **Sonarqube** - <https://hostname/sonarqube>
   - `Protected` - False
   - `Masked` - False
 - `SONAR_TOKEN`
@@ -619,7 +619,7 @@ sonarqube-check:
       - sonar-scanner/
 
   script: 
-    - sonar-scanner -Dsonar.host.url="http://gitlab.raft.ru:9001/sonarqube" -Dsonar.qualitygate.wait=true -Dsonar.qualitygate.timeout=1800
+    - sonar-scanner -Dsonar.host.url="https://hostname/sonarqube" -Dsonar.qualitygate.wait=true -Dsonar.qualitygate.timeout=1800
   allow_failure: true
 
   rules:
@@ -685,7 +685,7 @@ sonarqube-check:
    - Выполняем команду **docker**, после чего запускается скрипт регистрации
 
    ```bash
-    $> docker run --rm -it -v gitlab-runner-config:/etc/gitlab-runner gitlab/gitlab-runner:latest register --url https://hostname/gitlab  --token glrt-t1_uq6DG1oiaxFHsHz6yJc5
+    $> docker run --rm -it -v gitlab-runner-certs:/etc/gitlab-runner/certs -v gitlab-runner-config:/etc/gitlab-runner gitlab/gitlab-runner:latest register --url https://hostname/gitlab  --token glrt-t1_uq6DG1oiaxFHsHz6yJc5
    ```
 
    ```bash
@@ -732,6 +732,45 @@ sonarqube-check:
      - `Executor` - исполнитель, который будет запускать **runner**, в нашем случае - это **docker**-контейнер.
 
      - `Default Docker image` - в случае указания значения **docker**, необходимо указать имя контейнера по-умолчанию, который будет создаваться при выполнении **runner**, если данный контейнер не указали в `.gitlab-ci.yml`.
+
+   После установки будет создан файл */etc/gitlab-runner/config.toml*, проверьте, что в нем заданы настройки
+
+   ```toml
+   concurrent = 1
+   check_interval = 0
+   shutdown_timeout = 0
+
+   [session_server]
+     session_timeout = 1800
+
+   [[runners]]
+     name = "<runner_name>"
+     url = "https://hostname/gitlab"
+     id = 1
+     token = "glrt-t1_uq6DG1oiaxFHsHz6yJc5"
+     token_obtained_at = 0001-01-01T00:00:00Z
+     token_expires_at = 0001-01-01T00:00:00Z
+     tls-ca-file = "/etc/gitlab-runner/certs/gitlab-chain.crt"
+     executor = "docker"
+     [runners.cache]
+       MaxUploadedArchiveSize = 0
+       [runners.cache.s3]
+       [runners.cache.gcs]
+       [runners.cache.azure]
+     [runners.docker]
+       tls_verify = false
+       image = "alpine"
+       allowed_pull_policies = ["always", "if-not-present"]
+       privileged = false
+       disable_entrypoint_overwrite = false
+       oom_kill_disable = false
+       disable_cache = false
+       volumes = ["/cache", "gitlab_runner_certs:/etc/gitlab-runner/certs"]
+       shm_size = 0
+       network_mtu = 0
+    ```
+
+   Строчка `tls-ca-file = "/etc/gitlab-runner/certs/gitlab-chain.crt"` добавляется в том случае, если в исполняемый контейнер необходимо передать сертификаты. Для этого формируется цепочка из корневых и промежуточных сертификатов в формате pem, которая помещается в каталог *certs*.
 
 4. Если runner уже был создан, то его можно привязать к проекту через его настройки
 

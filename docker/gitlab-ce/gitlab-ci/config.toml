@@ -1,4 +1,4 @@
-oncurrent = 1
+concurrent = 1
 check_interval = 0
 shutdown_timeout = 0
 
@@ -6,11 +6,11 @@ shutdown_timeout = 0
   session_timeout = 1800
 
 [[runners]]
-  name = "runner_name"
-  url = "https://dn"
+  name = "<runner_name>"
+  url = "https://<domain_name>"
   id = 1
-  token = "runner_token"
-  token_obtained_at = 2025-04-08T22:05:37Z
+  token = "<runner_token>"
+  token_obtained_at = 0001-01-01T00:00:00Z
   token_expires_at = 0001-01-01T00:00:00Z
   tls-ca-file = "/etc/gitlab-runner/certs/gitlab-chain.crt"
   executor = "docker"
@@ -27,6 +27,6 @@ shutdown_timeout = 0
     disable_entrypoint_overwrite = false
     oom_kill_disable = false
     disable_cache = false
-    volumes = ["/cache", "gitlab_runner_config:/etc/gitlab-runner"]
+    volumes = ["/cache", "gitlab_runner_certs:/etc/gitlab-runner/certs"]
     shm_size = 0
     network_mtu = 0
