@@ -148,8 +148,8 @@ SEND_SIG() {
         setup_p12
     fi;
     setup_cert_access
-    curl --unix-socket "/var/run/docker.sock" -X POST "http://localhost/containers/${DOMAIN_NAME}/${SIGNAL}"
-    echo "Send signal \"${SIGNAL}\" ${DOMAIN_NAME}"
+    curl --unix-socket "/var/run/docker.sock" -X POST "http://localhost/containers/${DOMAIN_NAME//./-}/${SIGNAL}"
+    echo "Send signal \"${SIGNAL}\" ${DOMAIN_NAME//./-}"
 
 }
 

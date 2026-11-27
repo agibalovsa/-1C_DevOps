@@ -599,16 +599,16 @@ stages:
   - sonarqube-check
 
 sonarqube-check:
+  stage: sonarqube-check
   tags:
      - sonar
-  stage: sonarqube-check
   image: 
     name: sonarsource/sonar-scanner-cli:latest
     entrypoint: [""]
 
   variables:
     SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
-    SONAR_SCANNER_OPTS: "-Xmx16g"
+    SONAR_SCANNER_OPTS: "-Xmx16g -Djavax.net.ssl.trustStore=/tmp/cacerts -Djavax.net.ssl.trustStorePassword=changeit"
     GIT_DEPTH: "0"  # Tells git to fetch all the branches of the project, required by the analysis task
 
   cache:
@@ -618,14 +618,33 @@ sonarqube-check:
       - "${SONAR_USER_HOME}/cache"
       - sonar-scanner/
 
-  script: 
+  before_script:
+    - |
+      JAVA_BIN=$(dirname $(readlink -f $(command -v java)))
+      KEYTOOL="${JAVA_BIN}/keytool"
+      cp "${JAVA_BIN}/../lib/security/cacerts" /tmp/cacerts
+      chmod 644 /tmp/cacerts
+      for certFile in /etc/gitlab-runner/certs/*.crt /etc/gitlab-runner/certs/*.pem; do
+        [ -e "${certFile}" ] || continue
+        echo "${certFile}"
+        "$KEYTOOL" -importcert -trustcacerts -noprompt \
+          -keystore /tmp/cacerts \
+          -storepass changeit \
+          -alias "$(basename "${certFile}")" \
+          -file "${certFile}"
+      done
+  script:
     - sonar-scanner -Dsonar.host.url="https://hostname/sonarqube" -Dsonar.qualitygate.wait=true -Dsonar.qualitygate.timeout=1800
   allow_failure: true
-
   rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: never
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-    - if: $CI_COMMIT_BRANCH == 'master'
-    - if: $CI_COMMIT_BRANCH =~ '/^codereview.*$/'
+      changes:
+        - "src/**/*"
+    - if: $CI_COMMIT_BRANCH == 'master' || $CI_COMMIT_BRANCH =~ /^codereview/
+      changes:
+        - "src/**/*"
 ```
 
 ### Настройка Gitlab-runner для запуска Sonarqube
@@ -761,6 +780,7 @@ sonarqube-check:
        tls_verify = false
        image = "alpine"
        allowed_pull_policies = ["always", "if-not-present"]
+       pull_policy = ["always", "if-not-present"]
        privileged = false
        disable_entrypoint_overwrite = false
        oom_kill_disable = false
@@ -770,7 +790,14 @@ sonarqube-check:
        network_mtu = 0
     ```
 
-   Строчка `tls-ca-file = "/etc/gitlab-runner/certs/gitlab-chain.crt"` добавляется в том случае, если в исполняемый контейнер необходимо передать сертификаты. Для этого формируется цепочка из корневых и промежуточных сертификатов в формате pem, которая помещается в каталог *certs*.
+   Строчка `tls-ca-file = "/etc/gitlab-runner/certs/gitlab-chain.crt"` добавляется в том случае, если в исполняемый контейнер необходимо передать сертификаты. Для этого формируется цепочка из корневых и промежуточных сертификатов в формате pem, которая помещается в каталог *certs*. Также сюда можно поместить отдельные сертификаты, также в формате pem.
+
+   Для каталога certs и для сертификатов внутри каталога необходимо задать права доступа. Для этого необходимо зайти внутрь запущенного контейнера gitlab-runner и выполнить внутри следующие команды:
+
+   ```bash
+   chmod 755 /etc/gitlab-runner/certs
+   chmod 644 /etc/gitlab-runner/certs/*
+   ```
 
 4. Если runner уже был создан, то его можно привязать к проекту через его настройки
 
